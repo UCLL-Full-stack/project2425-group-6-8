@@ -1,18 +1,18 @@
 import { ConsumableType } from './consumableTypeEnum';
 
 export class Item {
-    private itemid: number;
+    private Id?: number | undefined;
     private description: string;
     private name: string;
     private consumableType: ConsumableType;
     private price: number;
 
-    constructor(itemid: number, description: string, name: string, consumableType: ConsumableType, price: number) {
-        this.itemid = itemid;
-        this.description = description;
-        this.name = name;
-        this.consumableType = consumableType;
-        this.price = price;
+       constructor(item: { Id?: number; description: string; name: string; consumableType: ConsumableType; price: number }) {
+        this.Id = item.Id;
+        this.description = item.description;
+        this.name = item.name;
+        this.consumableType = item.consumableType;
+        this.price = item.price;
     }
 
     getDescription(): string {
@@ -48,6 +48,6 @@ export class Item {
     }
 
     getId(): number | undefined {
-        return this.itemid;
+        return this.Id;
     }
 }

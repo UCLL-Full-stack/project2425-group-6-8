@@ -1,18 +1,20 @@
 export class Schedule {
-    private scheduleid: number;
+    private id?: number | undefined;
     private name: string;
     private startDate: Date;
     private endDate: Date;
 
-    constructor(scheduleid: number,name: string, startDate: Date, endDate: Date) {
-        this.scheduleid = scheduleid;
-        this.name = name;
-        this.startDate = startDate;
-        this.endDate = endDate;
+    constructor(schedule: { id?: number; name: string; startDate: Date; endDate: Date }) {
+    this.id = schedule.id;
+    this.name = schedule.name;
+    this.startDate = schedule.startDate;
+    this.endDate = schedule.endDate;
     }
 
+
+
     getId(): number | undefined {
-        return this.scheduleid;
+        return this.id;
     }
 
     getName(): string {

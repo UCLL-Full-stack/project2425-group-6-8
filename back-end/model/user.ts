@@ -1,18 +1,18 @@
 export class User {
-    private userid: number;
+    private id?: number | undefined;
     private name: string;
     private email: string;
     private nickname: string;
 
-    constructor(userid: number, name: string, email: string, nickname: string) {
-        this.userid = userid;
-        this.name = name;
-        this.email = email;
-        this.nickname = nickname;
+    constructor(user: { id?: number; name: string; email: string; nickname: string }) {
+        this.id = user.id;
+        this.name = user.name;
+        this.email = user.email;
+        this.nickname = user.nickname;
     }
 
     getId(): number | undefined {
-        return this.userid;
+        return this.id;
     }
 
     getName(): string {

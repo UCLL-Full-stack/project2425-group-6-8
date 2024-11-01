@@ -1,25 +1,23 @@
+import { Item } from "./item";
+
 export class GroceryList {
-    private grocerylistid: number;
-    private itemid: number; 
+    private id?: number | undefined;
+    private item: Item; // Changed from itemId to Item instance
     private weight?: number | null;
     private quantity?: number | null;
 
-    constructor(grocerylistid: number, itemid: number, weight?: number | null, quantity?: number | null) {
-        this.grocerylistid = grocerylistid;
-        this.itemid = itemid;
-        this.weight = weight || null;
-        this.quantity = quantity || null;
-    }
-
-    getGrocerylistId(): number {
-        return this.grocerylistid;
-    }
-
-    setGrocerylistId(grocerylistid: number): void {
-        this.grocerylistid = grocerylistid;
+    constructor(grocerylist: { id?: number; item: Item; weight?: number | null; quantity?: number | null }) {
+        this.id = grocerylist.id;
+        this.item = grocerylist.item;
+        this.weight = grocerylist.weight || null;
+        this.quantity = grocerylist.quantity || null;
     }
 
     getId(): number | undefined {
-        return this.grocerylistid;
+        return this.id;
+    }
+
+    getItem(): Item {
+        return this.item;
     }
 }

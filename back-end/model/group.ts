@@ -1,29 +1,43 @@
+import { User, GroceryList, Schedule, Message } from "./index";
+
 export class Group {
     private name: string;
-    private groupid: number;
-    private userid: number; 
-    private grocerylistid: number; 
-    private scheduleid: number; 
-    private messageid: number;
+    private id?: number | undefined;
+    private user: User; 
+    private groceryList?: GroceryList; 
+    private schedule?: Schedule; 
+    private message?: Message; 
 
-    constructor(name: string, groupid: number, userid: number, grocerylistid: number, scheduleid: number, messageid: number) {
-        this.name = name;
-        this.groupid = groupid;
-        this.userid = userid;
-        this.grocerylistid = grocerylistid;
-        this.scheduleid = scheduleid;
-        this.messageid = messageid;
+    constructor(group: { name: string; id?: number; user: User; groceryList?: GroceryList; schedule?: Schedule; message?: Message }) {
+        this.name = group.name;
+        this.id = group.id;
+        this.user = group.user;
+        this.groceryList = group.groceryList;
+        this.schedule = group.schedule;
+        this.message = group.message;
     }
 
     getName(): string {
         return this.name;
     }
 
-    setName(name: string): void {
-        this.name = name;
+    getId(): number | undefined {
+        return this.id;
     }
 
-    getId(): number | undefined {
-        return this.groupid;
+    getUser(): User {
+        return this.user;
+    }
+
+    getGroceryList(): GroceryList | undefined {
+        return this.groceryList;
+    }
+
+    getSchedule(): Schedule | undefined {
+        return this.schedule;
+    }
+
+    getMessage(): Message | undefined {
+        return this.message;
     }
 }
