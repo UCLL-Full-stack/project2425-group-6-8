@@ -3,15 +3,15 @@ import { User, GroceryList, Schedule, Message } from "./index";
 export class Group {
     private name: string;
     private id?: number | undefined;
-    private user: User; 
+    private users?: User[]; 
     private groceryList?: GroceryList; 
     private schedule?: Schedule; 
     private message?: Message; 
 
-    constructor(group: { name: string; id?: number; user: User; groceryList?: GroceryList; schedule?: Schedule; message?: Message }) {
+    constructor(group: { name: string; id?: number; users?: User[]; groceryList?: GroceryList; schedule?: Schedule; message?: Message }) {
         this.name = group.name;
         this.id = group.id;
-        this.user = group.user;
+        this.users = group.users;
         this.groceryList = group.groceryList;
         this.schedule = group.schedule;
         this.message = group.message;
@@ -25,8 +25,8 @@ export class Group {
         return this.id;
     }
 
-    getUser(): User {
-        return this.user;
+    getUsers(): User[] | undefined {
+        return this.users;
     }
 
     getGroceryList(): GroceryList | undefined {
