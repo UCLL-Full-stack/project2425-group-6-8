@@ -33,8 +33,8 @@
  */
 
 import express, { NextFunction, Request, Response } from 'express';
-import userService from '../service/user.service'; // Adjust the import based on your file structure
-import { UserInput } from '../types'; // Adjust the import based on your file structure
+import userService from '../service/user.service'; 
+import { UserInput } from '../types'; 
 
 const userRouter = express.Router();
 

@@ -45,8 +45,8 @@
 
 
 import express, { NextFunction, Request, Response } from 'express';
-import scheduleService from '../service/schedule.service'; // Adjust the import based on your file structure
-import { ScheduleInput } from '../types'; // Adjust the import based on your file structure
+import scheduleService from '../service/schedule.service';
+import { ScheduleInput } from '../types';
 
 const scheduleRouter = express.Router();
 
