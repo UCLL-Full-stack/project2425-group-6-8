@@ -1,3 +1,37 @@
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: The unique identifier for the user.
+ *         name:
+ *           type: string
+ *           description: The name of the user.
+ *         email:
+ *           type: string
+ *           description: The email address of the user.
+ *         nickname:
+ *           type: string
+ *           description: The nickname of the user.
+ *     
+ *     UserInput:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: The name of the user.
+ *         email:
+ *           type: string
+ *           description: The email address of the user.
+ *         nickname:
+ *           type: string
+ *           description: The nickname of the user.
+ */
+
 import express, { NextFunction, Request, Response } from 'express';
 import userService from '../service/user.service'; // Adjust the import based on your file structure
 import { UserInput } from '../types'; // Adjust the import based on your file structure
@@ -11,7 +45,7 @@ const userRouter = express.Router();
  *      summary: Create a new user.
  *      requestBody:
  *        required: true
- *        content:
+ *        content:                     
  *          application/json:
  *            schema:
  *              $ref: '#/components/schemas/UserInput'

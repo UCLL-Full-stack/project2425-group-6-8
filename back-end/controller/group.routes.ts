@@ -1,3 +1,69 @@
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ *   schemas:
+ *     Group:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: number
+ *           format: int64
+ *         name:
+ *           type: string
+ *           description: The name of the group.
+ *         users:
+ *           type: array
+ *           items:
+ *             type: integer
+ *             description: User IDs that are part of the group.
+ *         groceryList:
+ *           type: array
+ *           items:
+ *             type: integer
+ *             description: IDs of grocery lists associated with the group.
+ *         schedule:
+ *           type: array
+ *           items:
+ *             type: integer
+ *             description: IDs of schedules associated with the group.
+ *         message:
+ *           type: array
+ *           items:
+ *             type: integer
+ *             description: IDs of messages associated with the group.
+ *     GroupInput:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: The name of the group.
+ *         users:
+ *           type: array
+ *           items:
+ *             type: integer
+ *             description: User IDs that are to be added to the group.
+ *         groceryList:
+ *           type: array
+ *           items:
+ *             type: integer
+ *             description: IDs of grocery lists to be associated with the group.
+ *         schedule:
+ *           type: array
+ *           items:
+ *             type: integer
+ *             description: IDs of schedules to be associated with the group.
+ *         message:
+ *           type: array
+ *           items:
+ *             type: integer
+ *             description: IDs of messages to be associated with the group.
+ */
+
 import express, { NextFunction, Request, Response } from 'express';
 import groupService from '../service/group.service';
 import { GroupInput } from '../types';
@@ -27,13 +93,13 @@ groupRouter.post('/', async (req: Request, res: Response, next: NextFunction) =>
     try {
         const groupData: GroupInput = {
             name: req.body.name,
-            user: req.body.user, // Make sure the user is being sent in the request body
+            users: req.body.users, 
             groceryList: req.body.groceryList,
             schedule: req.body.schedule,
             message: req.body.message,
         };
 
-        const result = await groupService.createGroup(groupData,);
+        const result = await groupService.createGroup(groupData);
         res.status(200).json(result);
     } catch (error) {
         next(error);

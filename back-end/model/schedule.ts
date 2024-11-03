@@ -5,13 +5,13 @@ export class Schedule {
     private endDate: Date;
 
     constructor(schedule: { id?: number; name: string; startDate: Date; endDate: Date }) {
-    this.id = schedule.id;
-    this.name = schedule.name;
-    this.startDate = schedule.startDate;
-    this.endDate = schedule.endDate;
+        this.validate(schedule); // Call validate method to check input
+
+        this.id = schedule.id;
+        this.name = schedule.name;
+        this.startDate = schedule.startDate;
+        this.endDate = schedule.endDate;
     }
-
-
 
     getId(): number | undefined {
         return this.id;
@@ -39,5 +39,20 @@ export class Schedule {
 
     setEndDate(endDate: Date): void {
         this.endDate = endDate;
+    }
+
+    validate(schedule: { name: string; startDate: Date; endDate: Date }): void {
+        if (!schedule.name?.trim()) {
+            throw new Error('Name is required');
+        }
+        if (!(schedule.startDate instanceof Date) || isNaN(schedule.startDate.getTime())) {
+            throw new Error('Start date is required and must be a valid date');
+        }
+        if (!(schedule.endDate instanceof Date) || isNaN(schedule.endDate.getTime())) {
+            throw new Error('End date is required and must be a valid date');
+        }
+        if (schedule.endDate <= schedule.startDate) {
+            throw new Error('End date must be after start date');
+        }
     }
 }

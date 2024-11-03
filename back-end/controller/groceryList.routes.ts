@@ -1,51 +1,52 @@
 /**
  * @swagger
- *   components:
- *     schemas:
- *       GroceryList:
- *         type: object
- *         properties:
- *           id:
- *             type: number
- *             format: int64
- *           name:
- *             type: string
+ * components:
+ *   schemas:
+ *     GroceryList:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: number
+ *           format: int64
+ *         name:
+ *           type: string
+ *         items:
+ *           type: array
  *           items:
- *             type: array
- *             items:
- *               $ref: '#/components/schemas/Item'
- *           weight:
- *             type: number
- *             format: float
- *           quantity:
- *             type: number
- *             format: float
- *       GroceryListInput:
- *         type: object
- *         properties:
- *           name:
- *             type: string
+ *             $ref: '#/components/schemas/Item'
+ *         weight:
+ *           type: number
+ *           format: float
+ *         quantity:
+ *           type: number
+ *           format: float
+ *     GroceryListInput:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *         items:
+ *           type: array
  *           items:
- *             type: array
- *             items:
- *               type: object
- *               properties:
- *                 description:
- *                   type: string
- *                 name:
- *                   type: string
- *                 consumableType:
- *                   type: string
- *                 price:
- *                   type: number
- *                   format: float
- *           weight:
- *             type: number
- *             format: float
- *           quantity:
- *             type: number
- *             format: float
+ *             type: object
+ *             properties:
+ *               description:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               consumableType:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *                 format: float
+ *         weight:
+ *           type: number
+ *           format: float
+ *         quantity:
+ *           type: number
+ *           format: float
  */
+
 
 import express, { NextFunction, Request, Response } from 'express';
 import groceryListService from '../service/groceryList.service';

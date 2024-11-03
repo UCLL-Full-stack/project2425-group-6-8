@@ -5,6 +5,7 @@ export class User {
     private nickname: string;
 
     constructor(user: { id?: number; name: string; email: string; nickname: string }) {
+        this.validate(user); 
         this.id = user.id;
         this.name = user.name;
         this.email = user.email;
@@ -37,5 +38,25 @@ export class User {
 
     setNickname(nickname: string): void {
         this.nickname = nickname;
+    }
+
+    validate(user: { name: string; email: string; nickname: string }): void {
+        if (!user.name?.trim()) {
+            throw new Error('Name is required');
+        }
+        if (!user.email?.trim()) {
+            throw new Error('Email is required');
+        }
+        if (!this.isValidEmail(user.email)) {
+            throw new Error('Email is not valid');
+        }
+        if (!user.nickname?.trim()) {
+            throw new Error('Nickname is required');
+        }
+    }
+
+     isValidEmail(email: string): boolean {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+        return emailRegex.test(email);
     }
 }

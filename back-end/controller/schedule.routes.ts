@@ -1,3 +1,49 @@
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ *   schemas:
+ *     Schedule:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: number
+ *           format: int64
+ *           description: The unique identifier for the schedule.
+ *         groupId:
+ *           type: number
+ *           format: int64
+ *           description: The ID of the group associated with the schedule.
+ *         date:
+ *           type: string
+ *           format: date-time
+ *           description: The date and time of the scheduled event.
+ *         description:
+ *           type: string
+ *           description: A brief description of the schedule.
+ *     ScheduleInput:
+ *       type: object
+ *       properties:
+ *         groupId:
+ *           type: number
+ *           format: int64
+ *           description: The ID of the group associated with the schedule.
+ *         date:
+ *           type: string
+ *           format: date-time
+ *           description: The date and time of the scheduled event.
+ *         description:
+ *           type: string
+ *           description: A brief description of the schedule.
+ */
+
+
+
+
 import express, { NextFunction, Request, Response } from 'express';
 import scheduleService from '../service/schedule.service'; // Adjust the import based on your file structure
 import { ScheduleInput } from '../types'; // Adjust the import based on your file structure

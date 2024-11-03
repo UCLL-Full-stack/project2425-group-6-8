@@ -1,6 +1,52 @@
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ *   schemas:
+ *     Message:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: number
+ *           format: int64
+ *           description: The unique identifier for the message.
+ *         content:
+ *           type: string
+ *           description: The content of the message.
+ *         senderId:
+ *           type: number
+ *           format: int64
+ *           description: The ID of the user who sent the message.
+ *         groupId:
+ *           type: number
+ *           format: int64
+ *           description: The ID of the group to which the message belongs.
+ *     MessageInput:
+ *       type: object
+ *       properties:
+ *         content:
+ *           type: string
+ *           description: The content of the message.
+ *         senderId:
+ *           type: number
+ *           format: int64
+ *           description: The ID of the user who is sending the message.
+ *         groupId:
+ *           type: number
+ *           format: int64
+ *           description: The ID of the group to which the message will be sent.
+ */
+
+
+
 import express, { NextFunction, Request, Response } from 'express';
 import messageService from '../service/message.service';
 import { MessageInput } from '../types';
+import { User } from '../model';
 
 const messageRouter = express.Router();
 
