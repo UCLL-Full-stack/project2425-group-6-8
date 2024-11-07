@@ -12,6 +12,11 @@ const Header: React.FC = () => {
           Home
         </Link>
       </nav>
+      <nav className="nav justify-content-center">
+        <Link href="/group" className="nav-link px-4 fs-5 text-white">
+          Group
+        </Link>
+      </nav>
     </header>
   );
 };
