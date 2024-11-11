@@ -1,86 +1,78 @@
-/**
- * @swagger
- * components:
- *   schemas:
- *     GroceryList:
- *       type: object
- *       properties:
- *         id:
- *           type: number
- *           format: int64
- *         name:
- *           type: string
- *         items:
- *           type: array
- *           items:
- *             $ref: '#/components/schemas/Item'
- *         weight:
- *           type: number
- *           format: float
- *         quantity:
- *           type: number
- *           format: float
- *     GroceryListInput:
- *       type: object
- *       properties:
- *         name:
- *           type: string
- *         items:
- *           type: array
- *           items:
- *             type: object
- *             properties:
- *               description:
- *                 type: string
- *               name:
- *                 type: string
- *               consumableType:
- *                 type: string
- *               price:
- *                 type: number
- *                 format: float
- *         weight:
- *           type: number
- *           format: float
- *         quantity:
- *           type: number
- *           format: float
- */
-
-
 import express, { NextFunction, Request, Response } from 'express';
 import groceryListService from '../service/groceryList.service';
-import { GroceryListInput } from '../types';
+import { ItemInput } from '../types';
+
 
 const groceryListRouter = express.Router();
 
 /**
  * @swagger
  * /grocerylists:
- *   post:
- *     summary: Create a new grocery list.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/GroceryListInput'
+ *   get:
+ *     summary: Get all grocery lists.
  *     responses:
  *       200:
- *         description: The created grocery list.
+ *         description: List of all grocery lists.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/GroceryList'
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/GroceryList'
  */
-groceryListRouter.post('/', async (req: Request, res: Response, next: NextFunction) => {
+groceryListRouter.get('/', (req: Request, res: Response) => {
+    const groceryLists = groceryListService.getAllGroceryLists();
+    res.status(200).json(groceryLists);
+});
+
+
+/**
+ * @swagger
+ * /grocerylists/{id}/items:
+ *   post:
+ *     summary: Add items to an existing grocery list.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the grocery list to add items to.
+ *         schema:
+ *           type: integer
+ *       - in: body
+ *         name: items
+ *         description: List of items to add to the grocery list.
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             items:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/ItemInput'
+ *     responses:
+ *       200:
+ *         description: Updated grocery list with new items.
+ *       400:
+ *         description: Error adding items.
+ */
+
+groceryListRouter.post('/:id/items', (req: Request, res: Response, next: NextFunction) => {
+    const groceryListId = parseInt(req.params.id, 10);
+    const items: ItemInput[] = req.body.items;
+
+    console.log('Grocery List ID:', groceryListId);
+    console.log('Items:', items);
+
     try {
-        const groceryListData = <GroceryListInput>req.body;
-        const result = await groceryListService.addGroceryList(groceryListData);
-        res.status(200).json(result);
+        const updatedGroceryList = groceryListService.addItemsToGroceryList(groceryListId, items);
+        res.status(200).json(updatedGroceryList);
     } catch (error) {
+        console.error('Error:', error); 
         next(error);
     }
 });
+
+
+
 
 export { groceryListRouter };

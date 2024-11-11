@@ -1,9 +1,10 @@
 import { ItemInput } from '../types';
 import { Item } from '../model/item';
-import { ConsumableType } from '../model/consumableTypeEnum';
 
-const items: Item[] = [];
-let itemIdCounter = 1;
+import itemDb from '../repository/item.db'; 
+
+const items: Item[] = itemDb.getAllItems(); 
+let itemIdCounter = items.length + 1; 
 
 const createItem = (itemData: ItemInput): Item => {
     if (!itemData.name?.trim()) {
@@ -16,11 +17,11 @@ const createItem = (itemData: ItemInput): Item => {
         throw new Error('Consumable type is required');
     }
     if (itemData.price == null || itemData.price < 0) {
-        throw new Error('Item price must be postive lil bro');
+        throw new Error('Item price must be positive');
     }
 
     const newItem = new Item({
-        Id: itemIdCounter++,
+        id: itemIdCounter++,
         description: itemData.description,
         name: itemData.name,
         consumableType: itemData.consumableType,
@@ -30,7 +31,6 @@ const createItem = (itemData: ItemInput): Item => {
     items.push(newItem);
     return newItem;
 };
-
 
 const getItemById = (id: number): Item | undefined => {
     return items.find(item => item.getId() === id);

@@ -1,22 +1,23 @@
+import { ItemInput } from '../types';
 import { ConsumableType } from './consumableTypeEnum';
 
 export class Item {
-    private Id?: number | undefined;
+    private id?: number;
     private name: string;
-    private description: string;
+    private description?: string | undefined;
     private consumableType: ConsumableType;
     private price: number;
 
-       constructor(item: { Id?: number; name: string; description: string; consumableType: ConsumableType; price: number }) {
+       constructor(item: { id?: number; name: string; description?: string; consumableType: ConsumableType; price: number }) {
         this.validate(item);
-        this.Id = item.Id;
+        this.id = item.id;
         this.description = item.description;
         this.name = item.name;
         this.consumableType = item.consumableType;
         this.price = item.price;
     }
 
-    getDescription(): string {
+    getDescription(): string | undefined {
         return this.description;
     }
 
@@ -49,21 +50,19 @@ export class Item {
     }
 
     getId(): number | undefined {
-        return this.Id;
+        return this.id;
     }
-    
-    validate(item: { name: string; description: string; consumableType: ConsumableType; price: number }): void {
+
+    validate(item: { name: string; description?: string; consumableType: ConsumableType; price: number }): void {
         if (!item.name?.trim()) {
             throw new Error('Item name is required');
         }
-        if (!item.description?.trim()) {
-            throw new Error('Item description is required');
-        }
-        if (!item.consumableType) {
+        if (item.consumableType === undefined) {
             throw new Error('Consumable type is required');
         }
         if (item.price < 0) {
             throw new Error('Item must be higher than 0 mate, what do you think this is');
         }
     }
+    
 }

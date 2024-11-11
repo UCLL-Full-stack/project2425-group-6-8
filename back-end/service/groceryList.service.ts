@@ -1,32 +1,9 @@
-import { User } from '../model';
+import { Item } from '../model';
 import { GroceryList } from '../model/groceryList';
-import { GroceryListInput } from '../types'; 
-import { Item } from '../model/item'; 
+import groceryListDb from '../repository/groceryList.db';
+import { ItemInput } from '../types';
 
-let groceryLists: GroceryList[] = []; 
-let idCounter = 1; 
-
-const addGroceryList = (groceryListData: GroceryListInput): GroceryList => {
-    if (!groceryListData.name?.trim()) {
-        throw new Error('Grocery list name is required');
-    }
-    if (!groceryListData.items || groceryListData.items.length === 0) {
-        throw new Error('At least one item is required in the grocery list');
-    }
-
-    const items: Item[] = groceryListData.items.map(itemInput => {
-        return new Item(itemInput); 
-    });
-
-    const groceryList = new GroceryList({ 
-        id: idCounter++,
-        name: groceryListData.name,
-        items: items, 
-    });
-
-    groceryLists.push(groceryList);
-    return groceryList;
-};
+let groceryLists: GroceryList[] = groceryListDb.getAllGroceryLists(); 
 
 
 const getGroceryListById = (id: number): GroceryList | undefined => {
@@ -37,8 +14,31 @@ const getAllGroceryLists = (): GroceryList[] => {
     return groceryLists;
 };
 
+const addItemsToGroceryList = (groceryListId: number, items: ItemInput[]): GroceryList => {
+    if (!groceryListId)
+         throw new Error('Grocery list ID is required');
+
+    const groceryList = groceryListDb.getGroceryListById(groceryListId);
+    if (!groceryList)
+         throw new Error('Grocery list not found');
+
+    items.forEach(itemInput => {
+        const item = new Item({
+            id: itemInput.id,
+            name: itemInput.name,
+            description: itemInput.description,
+            consumableType: itemInput.consumableType,
+            price: itemInput.price,
+        });
+
+        groceryList.addItem(item);
+    });
+
+    return groceryList;
+};
+
 export default {
-    addGroceryList,
     getGroceryListById,
     getAllGroceryLists,
+    addItemsToGroceryList
 };

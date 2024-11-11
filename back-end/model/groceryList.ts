@@ -29,6 +29,10 @@ export class GroceryList {
         return this.items;
     }
 
+     addItem(item: Item): void {
+        this.items.push(item);
+    }
+
     validate(grocerylist: { name: string; items: Item[] }) {
         if (!grocerylist.name?.trim()) {
             throw new Error('Name is required');

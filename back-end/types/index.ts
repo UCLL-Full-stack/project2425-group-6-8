@@ -9,7 +9,7 @@ type ScheduleInput = {
 
 
 type ItemInput = {
-    Id?: number;
+    id?: number;
     description: string;
     name: string;
     consumableType: ConsumableType;
