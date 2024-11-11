@@ -14,35 +14,32 @@
  *           type: number
  *           format: int64
  *           description: The unique identifier for the schedule.
- *         groupId:
- *           type: number
- *           format: int64
- *           description: The ID of the group associated with the schedule.
- *         date:
+ *         name:
+ *           type: string
+ *           description: The name of the scheduled event.
+ *         startDate:
  *           type: string
  *           format: date-time
- *           description: The date and time of the scheduled event.
- *         description:
+ *           description: The start date and time of the scheduled event.
+ *         endDate:
  *           type: string
- *           description: A brief description of the schedule.
+ *           format: date-time
+ *           description: The end date and time of the scheduled event.
  *     ScheduleInput:
  *       type: object
  *       properties:
- *         groupId:
- *           type: number
- *           format: int64
- *           description: The ID of the group associated with the schedule.
- *         date:
+ *         name:
+ *           type: string
+ *           description: The name of the scheduled event.
+ *         startDate:
  *           type: string
  *           format: date-time
- *           description: The date and time of the scheduled event.
- *         description:
+ *           description: The start date and time of the scheduled event.
+ *         endDate:
  *           type: string
- *           description: A brief description of the schedule.
+ *           format: date-time
+ *           description: The end date and time of the scheduled event.
  */
-
-
-
 
 import express, { NextFunction, Request, Response } from 'express';
 import scheduleService from '../service/schedule.service';
@@ -71,13 +68,21 @@ const scheduleRouter = express.Router();
  */
 scheduleRouter.post('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const scheduleData: ScheduleInput = req.body;
+        const { name, startDate, endDate } = req.body;
+
+        const scheduleData: ScheduleInput = {
+            name,
+            startDate: new Date(startDate),
+            endDate: new Date(endDate)
+        };
+
         const result = await scheduleService.createSchedule(scheduleData);
         res.status(200).json(result);
     } catch (error) {
         next(error);
     }
 });
+
 
 /**
  * @swagger

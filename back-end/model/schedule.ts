@@ -5,7 +5,7 @@ export class Schedule {
     private endDate: Date;
 
     constructor(schedule: { id?: number; name: string; startDate: Date; endDate: Date }) {
-        this.validate(schedule); // Call validate method to check input
+        this.validate(schedule); 
 
         this.id = schedule.id;
         this.name = schedule.name;

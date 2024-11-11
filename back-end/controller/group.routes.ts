@@ -88,6 +88,15 @@ const groupRouter = express.Router();
  *              application/json:
  *                schema:
  *                  $ref: '#/components/schemas/Group'
+ *         400:
+ *            description: Bad request due to missing or invalid group data.
+ *            content:
+ *              application/json:
+ *                schema:
+ *                  type: object
+ *                  properties:
+ *                    message:
+ *                      type: string
  */
 groupRouter.post('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -101,9 +110,10 @@ groupRouter.post('/', async (req: Request, res: Response, next: NextFunction) =>
 
         const result = await groupService.createGroup(groupData);
         res.status(200).json(result);
-    } catch (error) {
-        next(error);
-    }
+    } catch (error)
+     {
+        next(error)
+     }
 });
 
 /**
@@ -149,6 +159,15 @@ groupRouter.get('/', async (req: Request, res: Response, next: NextFunction) => 
  *              application/json:
  *                schema:
  *                  $ref: '#/components/schemas/Group'
+ *         404:
+ *            description: Group not found.
+ *            content:
+ *              application/json:
+ *                schema:
+ *                  type: object
+ *                  properties:
+ *                    message:
+ *                      type: string
  */
 groupRouter.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
     try {

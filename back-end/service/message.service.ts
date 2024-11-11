@@ -1,43 +1,29 @@
 import { MessageInput } from '../types';
 import { Message } from '../model/message';
-import { User } from '../model/user';
-
-const messages: Message[] = [];
-let messageIdCounter = 1;
+import messageDb from '../repository/message.db';
+import UserService from '../service/user.service';
 
 const createMessage = (messageData: MessageInput): Message => {
-    const name = "Dagobert";
-        const email = "dagobertduck@gmail.com";
-        const nickname = "Dago";
-
-        const user = new User({
-            name,
-            email,
-            nickname
-        });
-
-    if (!messageData.message) throw new Error('Message content is required');
-    if (!user) throw new Error('A valid user is required to send a message');
-
-    const timestamp = messageData.timestamp || new Date().toISOString(); //mensen gaan deze zelf ni invullen
+    if (!messageData.user?.id) throw new Error('User ID is required');
+    const user = UserService.getUserById(messageData.user.id);
+    if (!user) throw new Error('A valid user is required');
 
     const newMessage = new Message({
-        id: messageIdCounter++,
-        user,  
-        timestamp,
+        user,
+        timestamp: messageData.timestamp || new Date().toISOString(),
         message: messageData.message,
     });
 
-    messages.push(newMessage);
+    messageDb.createMessage(newMessage);
     return newMessage;
 };
 
 const getMessageById = (id: number): Message | undefined => {
-    return messages.find(message => message.getId() === id);
+    return messageDb.getMessageById(id);
 };
 
 const getAllMessages = (): Message[] => {
-    return messages;
+    return messageDb.getAllMessages();
 };
 
 export default { createMessage, getMessageById, getAllMessages };

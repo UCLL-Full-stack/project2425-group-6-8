@@ -1,7 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
 import groceryListService from '../service/groceryList.service';
-import { ItemInput } from '../types';
-
 
 const groceryListRouter = express.Router();
 
@@ -25,12 +23,11 @@ groceryListRouter.get('/', (req: Request, res: Response) => {
     res.status(200).json(groceryLists);
 });
 
-
 /**
  * @swagger
  * /grocerylists/{id}/items:
  *   post:
- *     summary: Add items to an existing grocery list.
+ *     summary: Add existing items to an existing grocery list by their IDs.
  *     parameters:
  *       - in: path
  *         name: id
@@ -38,41 +35,38 @@ groceryListRouter.get('/', (req: Request, res: Response) => {
  *         description: ID of the grocery list to add items to.
  *         schema:
  *           type: integer
- *       - in: body
- *         name: items
- *         description: List of items to add to the grocery list.
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             items:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/ItemInput'
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               itemIds:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *                 description: Array of item IDs to add to the grocery list.
  *     responses:
  *       200:
- *         description: Updated grocery list with new items.
+ *         description: Updated grocery list with added items.
  *       400:
  *         description: Error adding items.
  */
-
 groceryListRouter.post('/:id/items', (req: Request, res: Response, next: NextFunction) => {
     const groceryListId = parseInt(req.params.id, 10);
-    const items: ItemInput[] = req.body.items;
+    const { itemIds } = req.body;
 
     console.log('Grocery List ID:', groceryListId);
-    console.log('Items:', items);
+    console.log('Item IDs:', itemIds);
 
     try {
-        const updatedGroceryList = groceryListService.addItemsToGroceryList(groceryListId, items);
+        const updatedGroceryList = groceryListService.addItemsToGroceryList(groceryListId, itemIds);
         res.status(200).json(updatedGroceryList);
     } catch (error) {
         console.error('Error:', error); 
         next(error);
     }
 });
-
-
-
 
 export { groceryListRouter };

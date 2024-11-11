@@ -1,7 +1,7 @@
 import { Item } from '../model/item';
 import { ConsumableType } from '../model/consumableTypeEnum';
 
-const items = [
+const items: Item[] = [
     new Item({
         id: 1,
         name: 'Peanut Butter',
@@ -32,15 +32,15 @@ const items = [
     }),
 ];
 
+const createItem = (item: Item): Item => {
+    items.push(item);
+    return item;
+};
+
+const getAllItems = (): Item[] => items;
+
 const getItemById = (id: number): Item | null => {
     return items.find(item => item.getId() === id) || null;
 };
 
-const getAllItems = (): Item[] => {
-    return items;
-};
-
-export default {
-    getItemById,
-    getAllItems,
-};
+export default { createItem, getAllItems, getItemById };

@@ -42,7 +42,7 @@ type MessageInput = {
 type GroupInput = {
     name: string;
     id?: number;
-    users: UserInput[];
+    users: number[];
     groceryList?: GroceryListInput;
     schedule?: ScheduleInput;
     message?: MessageInput;

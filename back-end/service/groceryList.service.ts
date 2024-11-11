@@ -1,41 +1,29 @@
-import { Item } from '../model';
 import { GroceryList } from '../model/groceryList';
 import groceryListDb from '../repository/groceryList.db';
-import { ItemInput } from '../types';
-
-let groceryLists: GroceryList[] = groceryListDb.getAllGroceryLists(); 
-
+import itemDb from '../repository/item.db';
 
 const getGroceryListById = (id: number): GroceryList | undefined => {
-    return groceryLists.find(groceryList => groceryList.getId() === id); 
+    return groceryListDb.getGroceryListById(id); 
 };
 
 const getAllGroceryLists = (): GroceryList[] => {
-    return groceryLists;
+    return groceryListDb.getAllGroceryLists();
 };
 
-const addItemsToGroceryList = (groceryListId: number, items: ItemInput[]): GroceryList => {
-    if (!groceryListId)
-         throw new Error('Grocery list ID is required');
-
+const addItemsToGroceryList = (groceryListId: number, itemIds: number[]): GroceryList => {
     const groceryList = groceryListDb.getGroceryListById(groceryListId);
-    if (!groceryList)
-         throw new Error('Grocery list not found');
+    if (!groceryList) throw new Error('Grocery list not found');
 
-    items.forEach(itemInput => {
-        const item = new Item({
-            id: itemInput.id,
-            name: itemInput.name,
-            description: itemInput.description,
-            consumableType: itemInput.consumableType,
-            price: itemInput.price,
-        });
-
-        groceryList.addItem(item);
+    itemIds.forEach(itemId => {
+        const item = itemDb.getItemById(itemId);
+        console.log("ITEMS ARE: ", item )
+        if (!item) throw new Error(`Item with ID ${itemId} not found`);
+        groceryList.addItem(item); 
     });
 
     return groceryList;
 };
+
 
 export default {
     getGroceryListById,

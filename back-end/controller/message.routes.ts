@@ -17,7 +17,7 @@
  *         content:
  *           type: string
  *           description: The content of the message.
- *         senderId:
+ *         userId:
  *           type: number
  *           format: int64
  *           description: The ID of the user who sent the message.
@@ -31,7 +31,7 @@
  *         content:
  *           type: string
  *           description: The content of the message.
- *         senderId:
+ *         userId:
  *           type: number
  *           format: int64
  *           description: The ID of the user who is sending the message.
