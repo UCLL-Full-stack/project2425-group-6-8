@@ -7,7 +7,7 @@ export class Message {
     private message: string;
 
     constructor(message: { id?: number; user: User; timestamp: string; message: string }) {
-        this.validate(message); // Call validate method to check input
+        this.validate(message);
 
         this.id = message.id;
         this.user = message.user;

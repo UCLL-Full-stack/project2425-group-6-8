@@ -13,7 +13,7 @@ export class User {
     }
 
     getId(): number | undefined {
-        return this.id;
+        return this.id
     }
 
     getName(): string {
