@@ -1,4 +1,15 @@
 import { Group, User } from '../model';
+import database from './database';
+
+import {
+    Schedule as SchedulePrisma,
+    User as UserPrisma,
+    Message as MessagePrisma,
+    GroceryList as GroceryListPrisma,
+    Group as GroupPrisma,
+    Item as ItemPrisma
+
+} from '@prisma/client';
 
 const groups: Group[] = [];
 

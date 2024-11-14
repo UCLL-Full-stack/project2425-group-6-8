@@ -1,26 +1,31 @@
-import { Schedule } from '../model';
+import { Schedule } from '../model/schedule';
+import database from './database';
+import { Schedule as SchedulePrisma } from '@prisma/client';
 
-const schedules: Schedule[] = [];
-
-const dummySchedule = new Schedule({
-    name: 'Weekly Groceries',
-    id: 1,
-    startDate: new Date('2024-12-01T10:00:00'),
-    endDate: new Date('2024-12-01T12:00:00'),
-});
-
-schedules.push(dummySchedule);
-
-const createSchedule = (schedule: Schedule): Schedule => {
-    schedules.push(schedule);
-    console.log('Schedule created:', schedule.getName());
-    return schedule;
+Schedule.from = function ({
+    id,
+    name,
+    startDate,
+    endDate
+}: SchedulePrisma): Schedule {
+    return new Schedule({
+        id,
+        name,
+        startDate,
+        endDate
+    });
 };
 
-const getAllSchedules = (): Schedule[] => schedules;
-
-const getScheduleById = (id: number): Schedule | undefined => {
-    return schedules.find(schedule => schedule.getId() === id);
+const getAllSchedules = async (): Promise<Schedule[]> => {
+    try {
+        const schedulesPrisma = await database.schedule.findMany();
+        return schedulesPrisma.map((schedulePrisma) => Schedule.from(schedulePrisma));
+    } catch (error) {
+        console.error(error);
+        throw new Error('Database error. See server log for details');
+    }
 };
 
-export default { createSchedule, getAllSchedules, getScheduleById };
+export default {
+    getAllSchedules,
+};

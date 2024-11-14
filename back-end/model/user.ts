@@ -1,19 +1,34 @@
+import {
+    User as UserPrisma
+} from '@prisma/client';
+
 export class User {
     private id?: number | undefined;
     private name: string;
     private email: string;
     private nickname: string;
+    private createdAt?: Date;  
+    private updatedAt?: Date;  
 
-    constructor(user: { id?: number; name: string; email: string; nickname: string }) {
-        this.validate(user); 
+    constructor(user: {
+        id?: number;
+        name: string;
+        email: string;
+        nickname: string;
+        createdAt?: Date;  
+        updatedAt?: Date;  
+    }) {
+        this.validate(user);
         this.id = user.id;
         this.name = user.name;
         this.email = user.email;
         this.nickname = user.nickname;
+        this.createdAt = user.createdAt;
+        this.updatedAt = user.updatedAt;
     }
 
     getId(): number | undefined {
-        return this.id
+        return this.id;
     }
 
     getName(): string {
@@ -40,6 +55,14 @@ export class User {
         this.nickname = nickname;
     }
 
+    getCreatedAt(): Date | undefined {
+        return this.createdAt;
+    }
+
+    getUpdatedAt(): Date | undefined {
+        return this.updatedAt;
+    }
+
     validate(user: { name: string; email: string; nickname: string }): void {
         if (!user.name?.trim()) {
             throw new Error('Name is required');
@@ -55,8 +78,26 @@ export class User {
         }
     }
 
-     isValidEmail(email: string): boolean {
+    isValidEmail(email: string): boolean {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
         return emailRegex.test(email);
+    }
+
+    static from({
+        id,
+        name,
+        email,
+        nickname,
+        createdAt,
+        updatedAt
+    }: UserPrisma): User {
+        return new User({
+            id,
+            name,
+            email,
+            nickname,
+            createdAt,
+            updatedAt
+        });
     }
 }

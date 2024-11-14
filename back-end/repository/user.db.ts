@@ -1,41 +1,49 @@
 import { User } from '../model/user';
+import database from './database';
+import { User as UserPrisma } from '@prisma/client';
 
-const users: User[] = [
-    new User({
-        id: 1,
-        name: 'Alice Johnson',
-        email: 'alice.johnson@example.com',
-        nickname: 'alice',
-    }),
-    new User({
-        id: 2,
-        name: 'Bob Smith',
-        email: 'bob.smith@example.com',
-        nickname: 'bobby',
-    }),
-    new User({
-        id: 3,
-        name: 'Charlie Brown',
-        email: 'charlie.brown@example.com',
-        nickname: 'charlie',
-    }),
-    new User({
-        id: 4,
-        name: 'Diana Prince',
-        email: 'diana.prince@example.com',
-        nickname: 'diana',
-    }),
-];
-
-const createUser = (user: User): User => {
-    users.push(user);
-    return user;
+User.from = function ({
+    id,
+    name,
+    email,
+    nickname,
+    createdAt,
+    updatedAt,
+}: UserPrisma): User {
+    return new User({
+        id,
+        name,
+        email,
+        nickname,
+        createdAt,
+        updatedAt,
+    });
 };
 
-const getAllUsers = (): User[] => users;
-
-const getUserById = (id: number): User | null => {
-    return users.find(user => user.getId() === id) || null;
+const getAllUsers = async (): Promise<User[]> => {
+    try {
+        const usersPrisma = await database.user.findMany();
+        return usersPrisma.map((userPrisma) => User.from(userPrisma));
+    } catch (error) {
+        console.error(error);
+        throw new Error('Database error. See server log for details');
+    }
 };
 
-export default { createUser, getAllUsers, getUserById };
+const getUserById = async (id: number): Promise<User | null> => {
+    try {
+        const userPrisma = await database.user.findUnique({
+            where: { id }
+        });
+        if (!userPrisma) return null;
+        return User.from(userPrisma);
+    } catch (error) {
+        console.error(error);
+        throw new Error('Database error. See server log for details');
+    }
+};
+
+export default {
+    getAllUsers,
+    getUserById
+};

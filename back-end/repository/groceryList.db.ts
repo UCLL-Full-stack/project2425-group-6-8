@@ -1,6 +1,18 @@
 import { GroceryList } from '../model/groceryList';
 import { Item } from '../model/item';
 import { ConsumableType } from '../model/consumableTypeEnum';
+import database from './database';
+
+
+import {
+    Schedule as SchedulePrisma,
+    User as UserPrisma,
+    Message as MessagePrisma,
+    GroceryList as GroceryListPrisma,
+    Group as GroupPrisma,
+    Item as ItemPrisma
+
+} from '@prisma/client';
 
 const groceryLists: GroceryList[] = [
     new GroceryList({

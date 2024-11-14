@@ -1,3 +1,7 @@
+import {
+    Schedule as SchedulePrisma
+} from '@prisma/client';
+
 export class Schedule {
     private id?: number | undefined;
     private name: string;
@@ -5,7 +9,7 @@ export class Schedule {
     private endDate: Date;
 
     constructor(schedule: { id?: number; name: string; startDate: Date; endDate: Date }) {
-        this.validate(schedule); 
+        this.validate(schedule);
 
         this.id = schedule.id;
         this.name = schedule.name;
@@ -54,5 +58,19 @@ export class Schedule {
         if (schedule.endDate <= schedule.startDate) {
             throw new Error('End date must be after start date');
         }
+    }
+
+    static from({
+        id,
+        name,
+        startDate,
+        endDate
+    }: SchedulePrisma): Schedule {
+        return new Schedule({
+            id,
+            name,
+            startDate,
+            endDate
+        });
     }
 }
