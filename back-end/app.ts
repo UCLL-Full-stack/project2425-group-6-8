@@ -22,7 +22,7 @@ app.get('/status', (req, res) => {
     res.json({ message: 'Back-end is running...' });
 });
 
-app.use('/grocerylists', groceryListRouter);
+app.use('/groceryLists', groceryListRouter);
 app.use('/groups', groupRouter);
 app.use('/items', itemRouter);
 app.use('/messages', messageRouter);

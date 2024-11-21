@@ -1,20 +1,30 @@
-import { Item } from "./item";
+import { Item } from './item';
+import {
+    GroceryList as GroceryListPrisma,
+    Item as ItemPrisma,
+} from '@prisma/client';
 
 export class GroceryList {
     private id?: number | undefined;
     private name: string;
     private items: Item[];
-    private weight?: number | null;
-    private quantity?: number | null;
+    private createdAt?: Date;
+    private updatedAt?: Date;
 
-    constructor(grocerylist: { id?: number; name: string; items: Item[]; weight?: number | null; quantity?: number | null }) {
+    constructor(grocerylist: {
+        id?: number;
+        name: string;
+        items: Item[];
+        createdAt?: Date;
+        updatedAt?: Date;
+    }) {
         this.validate(grocerylist);
 
         this.id = grocerylist.id;
         this.name = grocerylist.name;
         this.items = grocerylist.items;
-        this.weight = grocerylist.weight || null;
-        this.quantity = grocerylist.quantity || null;
+        this.createdAt = grocerylist.createdAt;
+        this.updatedAt = grocerylist.updatedAt;
     }
 
     getId(): number | undefined {
@@ -29,11 +39,19 @@ export class GroceryList {
         return this.items;
     }
 
-     addItem(item: Item): void {
+    getCreatedAt(): Date | undefined {
+        return this.createdAt;
+    }
+
+    getUpdatedAt(): Date | undefined {
+        return this.updatedAt;
+    }
+
+    addItem(item: Item): void {
         this.items.push(item);
     }
 
-    validate(grocerylist: { name: string; items: Item[] }) {
+    validate(grocerylist: { name: string; items: Item[] }): void {
         if (!grocerylist.name?.trim()) {
             throw new Error('Name is required');
         }
@@ -42,13 +60,19 @@ export class GroceryList {
         }
     }
 
-    equals(groceryList: GroceryList): boolean {
-        return (
-            this.name === groceryList.getName() &&
-            this.items.length === groceryList.getItems().length &&
-            this.items.every((item, index) => item === groceryList.getItems()[index]) &&
-            this.weight === groceryList.weight &&
-            this.quantity === groceryList.quantity
-        );
+    static from({
+        id,
+        name,
+        items = [],
+        createdAt,
+        updatedAt,
+    }: GroceryListPrisma & { items?: ItemPrisma[] }): GroceryList {
+        return new GroceryList({
+            id,
+            name,
+            items: items.map((item) => Item.from(item)),
+            createdAt,
+            updatedAt,
+        });
     }
 }

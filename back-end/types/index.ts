@@ -14,6 +14,8 @@ type ItemInput = {
     name: string;
     consumableType: ConsumableType;
     price: number;
+    weight?: number;
+    quantity?: number;
 };
 
 type UserInput = {
@@ -28,14 +30,13 @@ type GroceryListInput = {
     name: string;
     id?: number;
     items: ItemInput[];
-    weight?: number | null;
-    quantity?: number | null;
+
 };
 
 type MessageInput = {
     id?: number;
     user: UserInput;
-    timestamp: string;
+    timestamp: Date;
     message: string;
 };
 
@@ -43,9 +44,9 @@ type GroupInput = {
     name: string;
     id?: number;
     users: number[];
-    groceryList?: GroceryListInput;
-    schedule?: ScheduleInput;
-    message?: MessageInput;
+    groceryList?: GroceryListInput[];
+    schedule?: ScheduleInput[];
+    message?: MessageInput[];
 };
 
 export {

@@ -1,5 +1,5 @@
 export enum ConsumableType {
-    Food,
-    Drink,
-    Other
+    Food = "Food",
+    Drink = "Drink",
+    Other = "Other"
 }

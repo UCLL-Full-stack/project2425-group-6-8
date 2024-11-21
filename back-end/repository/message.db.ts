@@ -1,10 +1,7 @@
-import { Message, User } from '../model';
+import { Message as MessagePrisma, User as UserPrisma } from '@prisma/client';
+import { Message } from '../model';
+import { User } from '../model/user';
 import database from './database';
-import {
-    Message as MessagePrisma,
-    User as UserPrisma,
-} from '@prisma/client';
-
 
 Message.from = function ({
     id,
@@ -16,7 +13,7 @@ Message.from = function ({
 }: MessagePrisma & { user: UserPrisma }): Message {
     return new Message({
         id,
-        user: User.from(user),  
+        user: User.from(user),
         timestamp,
         message,
         createdAt,
@@ -24,31 +21,37 @@ Message.from = function ({
     });
 };
 
-
 const createMessage = async (message: Message): Promise<Message> => {
     try {
+        const userId = message.getUser().getId();
+        if (!userId) {
+            throw new Error('User ID is required to create a message');
+        }
+
         const messagePrisma = await database.message.create({
             data: {
-                userId: message.getUser().getId(), 
+                userId: userId,
                 timestamp: message.getTimestamp(),
                 message: message.getMessage(),
                 createdAt: message.getCreatedAt(),
                 updatedAt: message.getUpdatedAt(),
+            },
+            include: {
+                user: true,
             },
         });
 
         return Message.from(messagePrisma);
     } catch (error) {
         console.error(error);
-        throw new Error('Database error. See server log for details');
+        throw new Error('Database error. See server log for details.');
     }
 };
-
 
 const getAllMessages = async (): Promise<Message[]> => {
     try {
         const messagesPrisma = await database.message.findMany({
-            include: { user: true },  
+            include: { user: true },
         });
 
         return messagesPrisma.map((messagePrisma) => Message.from(messagePrisma));
@@ -58,14 +61,12 @@ const getAllMessages = async (): Promise<Message[]> => {
     }
 };
 
-
 const getMessageById = async (id: number): Promise<Message | null> => {
     try {
         const messagePrisma = await database.message.findUnique({
             where: { id },
-            include: { user: true }, 
+            include: { user: true },
         });
-
         if (!messagePrisma) return null;
         return Message.from(messagePrisma);
     } catch (error) {

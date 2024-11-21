@@ -1,22 +1,43 @@
-import { User, GroceryList, Schedule, Message } from "./index";
+import { User, GroceryList, Schedule, Message } from './index';
+import {
+    Group as GroupPrisma,
+    User as UserPrisma,
+    GroceryList as GroceryListPrisma,
+    Schedule as SchedulePrisma,
+    Message as MessagePrisma,
+    Item as ItemPrisma,
+} from '@prisma/client';
 
 export class Group {
     private name: string;
     private id?: number | undefined;
-    private users?: User[];
-    private groceryList?: GroceryList;
-    private schedule?: Schedule;
-    private message?: Message;
+    private users: User[];
+    private groceryLists?: GroceryList[];
+    private schedules?: Schedule[];
+    private messages?: Message[];
+    private createdAt?: Date;
+    private updatedAt?: Date;
 
-    constructor(group: { name: string; id?: number; users?: User[]; groceryList?: GroceryList; schedule?: Schedule; message?: Message }) {
+    constructor(group: { 
+        name: string; 
+        id?: number; 
+        users: User[]; 
+        groceryLists?: GroceryList[];
+        schedules?: Schedule[]; 
+        messages?: Message[]; 
+        createdAt?: Date; 
+        updatedAt?: Date; 
+    }) {
         this.validate(group);
 
         this.name = group.name;
         this.id = group.id;
         this.users = group.users;
-        this.groceryList = group.groceryList;
-        this.schedule = group.schedule;
-        this.message = group.message;
+        this.groceryLists = group.groceryLists; 
+        this.schedules = group.schedules;
+        this.messages = group.messages;
+        this.createdAt = group.createdAt;
+        this.updatedAt = group.updatedAt;
     }
 
     getName(): string {
@@ -27,20 +48,28 @@ export class Group {
         return this.id;
     }
 
-    getUsers(): User[] | undefined {
+    getUsers(): User[] {
         return this.users;
     }
 
-    getGroceryList(): GroceryList | undefined {
-        return this.groceryList;
+    getGroceryList(): GroceryList[] | undefined {
+        return this.groceryLists;
     }
 
-    getSchedule(): Schedule | undefined {
-        return this.schedule;
+    getSchedule(): Schedule[] | undefined {
+        return this.schedules;
     }
 
-    getMessage(): Message | undefined {
-        return this.message;
+    getMessage(): Message[] | undefined {
+        return this.messages;
+    }
+
+    getCreatedAt(): Date | undefined {
+        return this.createdAt;
+    }
+
+    getUpdatedAt(): Date | undefined {
+        return this.updatedAt;
     }
 
     validate(group: { name: string; users?: User[] }) {
@@ -52,4 +81,30 @@ export class Group {
         }
     }
 
+       static from({
+        id,
+        name,
+        users,
+        groceryLists, 
+        schedules,
+        messages,
+        createdAt,
+        updatedAt,
+    }: GroupPrisma & { 
+        users: UserPrisma[]; 
+        groceryLists: GroceryListPrisma[]; 
+        schedules: SchedulePrisma[]; 
+        messages?: MessagePrisma[]; 
+    }): Group {
+        return new Group({
+            id,
+            name,
+            users: users?.map(User.from),
+            groceryLists: groceryLists?.map(GroceryList.from), 
+            schedules: schedules?.map(Schedule.from),
+            messages: messages?.map(Message.from),
+            createdAt,
+            updatedAt,
+        });  
+    }
 }

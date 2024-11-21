@@ -3,27 +3,27 @@ import { Message } from '../model/message';
 import messageDb from '../repository/message.db';
 import UserService from '../service/user.service';
 
-const createMessage = (messageData: MessageInput): Message => {
+const createMessage = async (messageData: MessageInput): Promise<Message> => {
     if (!messageData.user?.id) throw new Error('User ID is required');
-    const user = UserService.getUserById(messageData.user.id);
+    
+    const user = await UserService.getUserById(messageData.user.id);
     if (!user) throw new Error('A valid user is required');
 
     const newMessage = new Message({
         user,
-        timestamp: messageData.timestamp || new Date().toISOString(),
+        timestamp: messageData.timestamp,
         message: messageData.message,
     });
 
-    messageDb.createMessage(newMessage);
-    return newMessage;
+    return await messageDb.createMessage(newMessage);
 };
 
-const getMessageById = (id: number): Message | undefined => {
-    return messageDb.getMessageById(id);
+const getMessageById = async (id: number): Promise<Message | null> => {
+    return await messageDb.getMessageById(id);  
 };
 
-const getAllMessages = (): Message[] => {
-    return messageDb.getAllMessages();
+const getAllMessages = async (): Promise<Message[]> => {
+    return await messageDb.getAllMessages(); 
 };
 
 export default { createMessage, getMessageById, getAllMessages };

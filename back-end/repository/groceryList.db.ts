@@ -1,75 +1,71 @@
+import { GroceryList as GroceryListPrisma, Item as ItemPrisma } from '@prisma/client';
 import { GroceryList } from '../model/groceryList';
 import { Item } from '../model/item';
-import { ConsumableType } from '../model/consumableTypeEnum';
 import database from './database';
 
-
-import {
-    Schedule as SchedulePrisma,
-    User as UserPrisma,
-    Message as MessagePrisma,
-    GroceryList as GroceryListPrisma,
-    Group as GroupPrisma,
-    Item as ItemPrisma
-
-} from '@prisma/client';
-
-const groceryLists: GroceryList[] = [
-    new GroceryList({
-        id: 1,
-        name: 'Weekly Grocery List',
-        items: [
-            new Item({
-                id: 1,
-                name: 'Peanut Butter',
-                description: 'Smooth peanut butter for sandwiches',
-                consumableType: ConsumableType.Food,
-                price: 4.99,
-            }),
-            new Item({
-                id: 2,
-                name: 'Bread',
-                description: 'Whole grain bread',
-                consumableType: ConsumableType.Food,
-                price: 2.49,
-            }),
-        ],
-        weight: 3,
-        quantity: 2,
-    }),
-    new GroceryList({
-        id: 2,
-        name: 'Vegetable Grocery List',
-        items: [
-            new Item({
-                id: 3,
-                name: 'Tomatoes',
-                description: 'Fresh organic tomatoes',
-                consumableType: ConsumableType.Food,
-                price: 1.99,
-            }),
-            new Item({
-                id: 4,
-                name: 'Cucumber',
-                description: 'Crisp cucumbers for salads',
-                consumableType: ConsumableType.Food,
-                price: 0.99,
-            }),
-        ],
-        weight: 2,
-        quantity: 2,
-    }),
-];
-
-const createGroceryList = (groceryList: GroceryList): GroceryList => {
-    groceryLists.push(groceryList);
-    return groceryList;
+GroceryList.from = function ({
+    id,
+    name,
+    items = [],
+    createdAt,
+    updatedAt,
+}: GroceryListPrisma & { items?: ItemPrisma[] }): GroceryList {
+    return new GroceryList({
+        id,
+        name,
+        items: items.map((item) => Item.from(item)),
+        createdAt,
+        updatedAt,
+    });
 };
 
-const getAllGroceryLists = (): GroceryList[] => groceryLists;
-
-const getGroceryListById = (id: number): GroceryList | undefined => {
-    return groceryLists.find(groceryList => groceryList.getId() === id);
+const getGroceryListById = async (id: number): Promise<GroceryList | null> => {
+    try {
+        const groceryListPrisma = await database.groceryList.findUnique({
+            where: { id },
+            include: { items: true },
+        });
+        if (!groceryListPrisma) return null;
+        return GroceryList.from(groceryListPrisma);
+    } catch (error) {
+        console.error(error);
+        throw new Error('Database error. See server log for details');
+    }
 };
 
-export default { createGroceryList, getAllGroceryLists, getGroceryListById };
+const getAllGroceryLists = async (): Promise<GroceryList[]> => {
+    try {
+        const groceryListsPrisma = await database.groceryList.findMany({
+            include: { items: true },
+        });
+        return groceryListsPrisma.map((groceryList) => GroceryList.from(groceryList));
+    } catch (error) {
+        console.error(error);
+        throw new Error('Database error. See server log for details');
+    }
+};
+
+const addItemsToGroceryList = async (groceryListId: number, itemIds: number[]): Promise<GroceryList> => {
+    try {
+        const updatedGroceryListPrisma = await database.groceryList.update({
+            where: { id: groceryListId },
+            data: {
+                items: {
+                    connect: itemIds.map((itemId) => ({ id: itemId })),
+                },
+            },
+            include: { items: true },
+        });
+
+        return GroceryList.from(updatedGroceryListPrisma);
+    } catch (error) {
+        console.error(error);
+        throw new Error('Database error. See server log for details');
+    }
+};
+
+export default {
+    getGroceryListById,
+    getAllGroceryLists,
+    addItemsToGroceryList,
+};

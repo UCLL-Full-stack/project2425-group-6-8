@@ -1,7 +1,10 @@
 import { PrismaClient } from '@prisma/client';
+import { ScheduleInput } from '../types'; // Assuming ScheduleInput type exists
+
 const prisma = new PrismaClient();
 
 const main = async () => {
+  // Creating Users
   const user1 = await prisma.user.create({
     data: {
       name: 'Dagobert Duck',
@@ -23,6 +26,8 @@ const main = async () => {
       name: 'Peanut Butter',
       description: 'Crunchy peanut butter',
       consumableType: 'FOOD',
+      price: 2.99, 
+      weight: 200
     },
   });
 
@@ -31,6 +36,8 @@ const main = async () => {
       name: 'Bread',
       description: 'Whole grain bread',
       consumableType: 'FOOD',
+      price: 1.99,
+      quantity: 16
     },
   });
 
@@ -39,6 +46,7 @@ const main = async () => {
       name: 'Tomatoes',
       description: 'Fresh tomatoes',
       consumableType: 'FOOD',
+      price: 3.49,
     },
   });
 

@@ -1,50 +1,117 @@
-import { Group, User } from '../model';
-import database from './database';
-
+import { Group } from '../model/group';
+import { User } from '../model/user';
+import { GroceryList } from '../model/groceryList';
+import { Schedule } from '../model/schedule';
+import { Message } from '../model/message';
+import database from './database'; 
 import {
-    Schedule as SchedulePrisma,
-    User as UserPrisma,
-    Message as MessagePrisma,
-    GroceryList as GroceryListPrisma,
     Group as GroupPrisma,
-    Item as ItemPrisma
-
+    User as UserPrisma,
+    GroceryList as GroceryListPrisma,
+    Schedule as SchedulePrisma,
+    Message as MessagePrisma,
+    Item as ItemPrisma,
 } from '@prisma/client';
 
-const groups: Group[] = [];
-
-const dummyUser1 = new User({
-    id: 1,
-    name: 'Alice Johnson',
-    email: 'alice.johnson@example.com',
-    nickname: 'alice',
-});
-
-const dummyUser2 = new User({
-    id: 2,
-    name: 'Bob Smith',
-    email: 'bob.smith@example.com',
-    nickname: 'bob',
-});
-
-const dummyGroup = new Group({
-    name: 'Friends Group',
-    id: 1,
-    users: [dummyUser1, dummyUser2],
-});
-
-groups.push(dummyGroup);
-
-const createGroup = (group: Group): Group => {
-    groups.push(group);
-    console.log('Group created:', group.getName());
-    return group;
+Group.from = function ({
+    id,
+    name,
+    users,
+    groceryLists,
+    schedules,
+    messages,
+    createdAt,
+    updatedAt,
+}: GroupPrisma & {
+    users: UserPrisma[];
+    groceryLists?: GroceryListPrisma[];  
+    schedules?: SchedulePrisma[];
+    messages?: MessagePrisma[];
+}): Group {
+    return new Group({
+        id,
+        name,
+        users: users.map(User.from),
+        groceryLists: groceryLists ? groceryLists.map(GroceryList.from) : [], 
+        schedules: schedules ? schedules.map(Schedule.from) : [],
+        messages: messages ? messages.map(Message.from) : [],
+        createdAt,
+        updatedAt,
+    });
 };
 
-const getAllGroups = (): Group[] => groups;
+const createGroup = async (group: Group): Promise<Group> => {
+    try {
+        const groupPrisma = await database.group.create({
+            data: {
+                name: group.getName(),
+                users: {
+                    connect: group.getUsers().map((user) => ({ id: user.getId() })),
+                },
+            },
+            include: {
+                users: true,
+                groceryLists: {
+                    include: {
+                        items: true,
+                    },
+                },
+                schedules: true,
+                messages: true,
+            },
+        });
 
-const getGroupById = (id: number): Group | undefined => {
-    return groups.find(group => group.getId() === id);
+        return Group.from(groupPrisma);
+    } catch (error) {
+        console.error('Database error:', error);
+        throw new Error('Failed to create group. See server logs for details.');
+    }
 };
 
-export default { createGroup, getAllGroups, getGroupById };
+const getGroupById = async (id: number): Promise<Group | undefined> => {
+    try {
+        const groupPrisma = await database.group.findUnique({
+            where: { id },
+            include: {
+                users: true,
+                groceryLists: {
+                    include: {
+                        items: true,
+                    },
+                },
+                schedules: true,
+                messages: true,
+            },
+        });
+
+        return groupPrisma ? Group.from(groupPrisma) : undefined;
+    } catch (error) {
+        console.error('Database error:', error);
+        throw new Error('Failed to fetch group by ID. See server logs for details.');
+    }
+};
+
+const getAllGroups = async (): Promise<Group[]> => {
+    try {
+        const groupsPrisma = await database.group.findMany({
+            include: {
+                users: true,
+                groceryLists: {
+                    include: {
+                        items: true,
+                    },
+                },
+                schedules: true,
+                messages: true,
+            },
+        });
+
+        return groupsPrisma.map(Group.from);
+    } catch (error) {
+        console.error('Database error:', error);
+        throw new Error('Failed to fetch all groups. See server logs for details.');
+    }
+};
+
+export default { createGroup, getGroupById, getAllGroups };
+

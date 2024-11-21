@@ -33,7 +33,7 @@ const getAllUsers = async (): Promise<User[]> => {
 const getUserById = async (id: number): Promise<User | null> => {
     try {
         const userPrisma = await database.user.findUnique({
-            where: { id }
+            where: { id },
         });
         if (!userPrisma) return null;
         return User.from(userPrisma);
@@ -43,7 +43,24 @@ const getUserById = async (id: number): Promise<User | null> => {
     }
 };
 
+const createUser = async (user: User): Promise<User> => {
+    try {
+        const userPrisma = await database.user.create({
+            data: {
+                name: user.getName(),
+                email: user.getEmail(),
+                nickname: user.getNickname(),
+            },
+        });
+        return User.from(userPrisma);
+    } catch (error) {
+        console.error(error);
+        throw new Error('Database error. See server log for details');
+    }
+};
+
 export default {
     getAllUsers,
-    getUserById
+    getUserById,
+    createUser,
 };

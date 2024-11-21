@@ -1,33 +1,35 @@
-import { GroupInput } from '../types';
-import { Group } from '../model/group';
 import groupDb from '../repository/group.db';
-import UserService from '../service/user.service';
+import { Group } from '../model/group';
+import UserService from './user.service';
 
-const createGroup = (groupData: GroupInput): Group => {
-    if (!groupData.name?.trim()) throw new Error('Group name is required');
-    if (!groupData.users || groupData.users.length === 0) throw new Error('At least one user is required');
+const createGroup = async (groupInput: { name: string; userIds: number[] }): Promise<Group> => {
+    if (!groupInput.name?.trim()) throw new Error('Group name is required');
+    if (!groupInput.userIds || groupInput.userIds.length === 0) throw new Error('At least one user is required');
 
-    const existingUsers = groupData.users.map(userId => {
-        const user = UserService.getUserById(userId);
-        if (!user) throw new Error(`User with ID ${userId} not found`);
-        return user;
-    });
+    const existingUsers = await Promise.all(
+        groupInput.userIds.map(async (userId) => {
+            const user = await UserService.getUserById(userId);
+            if (!user) throw new Error(`User with ID ${userId} not found`);
+            return user;
+        })
+    );
 
     const newGroup = new Group({
-        name: groupData.name,
+        name: groupInput.name,
         users: existingUsers,
     });
 
-    groupDb.createGroup(newGroup);
-    return newGroup;
+    return await groupDb.createGroup(newGroup);
 };
 
-const getGroupById = (id: number): Group | undefined => {
-    return groupDb.getGroupById(id);
+const getGroupById = async (id: number): Promise<Group | undefined> => {
+    const group = await groupDb.getGroupById(id);
+    if (!group) throw new Error(`Group with ID ${id} does not exist`);
+    return group;
 };
 
-const getAllGroups = (): Group[] => {
-    return groupDb.getAllGroups();
+const getAllGroups = async (): Promise<Group[]> => {
+    return await groupDb.getAllGroups();
 };
 
 export default { createGroup, getGroupById, getAllGroups };

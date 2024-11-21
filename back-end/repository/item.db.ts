@@ -1,57 +1,58 @@
 import { Item } from '../model/item';
 import { ConsumableType } from '../model/consumableTypeEnum';
 import database from './database';
+import { Item as ItemPrisma } from '@prisma/client';
 
-import {
-    Schedule as SchedulePrisma,
-    User as UserPrisma,
-    Message as MessagePrisma,
-    GroceryList as GroceryListPrisma,
-    Group as GroupPrisma,
-    Item as ItemPrisma
-
-} from '@prisma/client';
-
-const items: Item[] = [
-    new Item({
-        id: 1,
-        name: 'Peanut Butter',
-        description: 'Smooth peanut butter for sandwiches',
-        consumableType: ConsumableType.Food,
-        price: 4.99,
-    }),
-    new Item({
-        id: 2,
-        name: 'Bread',
-        description: 'Whole grain bread',
-        consumableType: ConsumableType.Food,
-        price: 2.49,
-    }),
-    new Item({
-        id: 3,
-        name: 'Tomatoes',
-        description: 'Fresh organic tomatoes',
-        consumableType: ConsumableType.Food,
-        price: 1.99,
-    }),
-    new Item({
-        id: 4,
-        name: 'Cucumber',
-        description: 'Crisp cucumbers for salads',
-        consumableType: ConsumableType.Food,
-        price: 0.99,
-    }),
-];
-
-const createItem = (item: Item): Item => {
-    items.push(item);
-    return item;
+Item.from = function ({
+    id,
+    name,
+    description,
+    consumableType,
+    price
+}: ItemPrisma): Item {
+    const consumableTypeEnum = consumableType as ConsumableType;
+    return new Item({
+        id,
+        name,
+        description,
+        consumableType: consumableTypeEnum,  
+        price
+    });
 };
 
-const getAllItems = (): Item[] => items;
+const createItem = async (item: Item): Promise<Item> => {
+    const itemPrisma = await database.item.create({
+        data: {
+            name: item.getName(),
+            description: item.getDescription(),
+            consumableType: item.getConsumableType(),
+            price: item.getPrice(),
+        },
+    });
+    return Item.from(itemPrisma);
+};
 
-const getItemById = (id: number): Item | null => {
-    return items.find(item => item.getId() === id) || null;
+const getAllItems = async (): Promise<Item[]> => {
+    try {
+        const itemsPrisma = await database.item.findMany();
+        return itemsPrisma.map((itemPrisma) => Item.from(itemPrisma));
+    } catch (error) {
+        console.error(error);
+        throw new Error('Database error. See server log for details');
+    }
+};
+
+const getItemById = async (id: number): Promise<Item | null> => {
+    try {
+        const itemPrisma = await database.item.findUnique({
+            where: { id },
+        });
+        if (!itemPrisma) return null;
+        return Item.from(itemPrisma);
+    } catch (error) {
+        console.error(error);
+        throw new Error('Database error. See server log for details');
+    }
 };
 
 export default { createItem, getAllItems, getItemById };

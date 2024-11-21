@@ -1,21 +1,23 @@
 import { User } from './user';
-import { Message as MessagePrisma } from '@prisma/client';
-
+import {
+    Message as MessagePrisma,
+    User as UserPrisma,
+} from '@prisma/client';
 export class Message {
     private id?: number | undefined;
-    private user: User; 
-    private timestamp: Date;  
+    private user: User;
+    private timestamp: Date;
     private message: string;
-    private createdAt?: Date; 
-    private updatedAt?: Date; 
+    private createdAt?: Date;
+    private updatedAt?: Date;
 
-    constructor(message: { 
-        id?: number; 
-        user: User; 
-        timestamp: Date;  
-        message: string; 
-        createdAt?: Date;  
-        updatedAt?: Date; 
+    constructor(message: {
+        id?: number;
+        user: User;
+        timestamp: Date;
+        message: string;
+        createdAt?: Date;
+        updatedAt?: Date;
     }) {
         this.validate(message);
 
@@ -27,6 +29,7 @@ export class Message {
         this.updatedAt = message.updatedAt;
     }
 
+    
     getId(): number | undefined {
         return this.id;
     }
@@ -58,27 +61,28 @@ export class Message {
         if (!message.timestamp) {
             throw new Error('Timestamp is required');
         }
-
         if (!message.message?.trim()) {
             throw new Error('Message content is required');
         }
     }
-    
-    static from({
-        id,
-        user,
-        timestamp,
-        message,
-        createdAt,
-        updatedAt,
-    }: MessagePrisma): Message {
-        return new Message({
-            id,
-            user: User.from(user),
-            timestamp: new Date(timestamp), 
-            message,
-            createdAt,
-            updatedAt
-        });
+
+  static from(message: MessagePrisma & { user?: UserPrisma | null } | undefined): Message {
+    if (!message) {
+        throw new Error('Invalid message data'); 
     }
+
+    if (!message.user) {
+        throw new Error('Message must include a valid user relation');
+    }
+
+    return new Message({
+        id: message.id,
+        user: User.from(message.user),
+        timestamp: message.timestamp,
+        message: message.message,
+        createdAt: message.createdAt,
+        updatedAt: message.updatedAt,
+    });
+}
+
 }

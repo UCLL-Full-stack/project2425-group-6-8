@@ -2,7 +2,7 @@ import { ScheduleInput } from '../types';
 import { Schedule } from '../model/schedule';
 import scheduleDb from '../repository/schedule.db';
 
-const createSchedule = (scheduleData: ScheduleInput): Schedule => {
+const createSchedule = async (scheduleData: ScheduleInput): Promise<Schedule> => {
     if (!scheduleData.name) throw new Error('Schedule name is required');
     if (!scheduleData.startDate || !scheduleData.endDate) throw new Error('Start and end dates are required');
     if (scheduleData.startDate >= scheduleData.endDate) throw new Error('Start date must be earlier than end date');
@@ -13,16 +13,15 @@ const createSchedule = (scheduleData: ScheduleInput): Schedule => {
         endDate: scheduleData.endDate,
     });
 
-    scheduleDb.createSchedule(newSchedule);
-    return newSchedule;
+    return await scheduleDb.createSchedule(newSchedule);
 };
 
-const getScheduleById = (id: number): Schedule | undefined => {
-    return scheduleDb.getScheduleById(id);
+const getScheduleById = async (id: number): Promise<Schedule | null> => {
+    return await scheduleDb.getScheduleById(id);
 };
 
-const getAllSchedules = (): Schedule[] => {
-    return scheduleDb.getAllSchedules();
+const getAllSchedules = async (): Promise<Schedule[]> => {
+    return await scheduleDb.getAllSchedules();
 };
 
 export default { createSchedule, getScheduleById, getAllSchedules };

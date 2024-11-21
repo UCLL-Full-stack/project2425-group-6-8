@@ -1,42 +1,30 @@
+import itemDb from '../repository/item.db';
 import { ItemInput } from '../types';
 import { Item } from '../model/item';
-import itemDb from '../repository/item.db'; 
 
-const items: Item[] = itemDb.getAllItems(); 
-let itemIdCounter = items.length + 1; 
+const createItem = async (itemInput: ItemInput): Promise<Item> => {
+    const { name, description, consumableType, price, weight, quantity } = itemInput;
 
-const createItem = (itemData: ItemInput): Item => {
-    if (!itemData.name?.trim()) {
-        throw new Error('Item name is required');
-    }
-    if (!itemData.description?.trim()) {
-        throw new Error('Item description is required');
-    }
-    if (!itemData.consumableType) {
-        throw new Error('Consumable type is required');
-    }
-    if (itemData.price == null || itemData.price < 0) {
-        throw new Error('Item price must be positive');
-    }
+    if (!name?.trim()) throw new Error('Item name is required.');
+    if (!description?.trim()) throw new Error('Item description is required.');
+    if (!consumableType) throw new Error('Consumable type is required.');
+    if (price === undefined || price < 0) throw new Error('Item price must be positive.');
 
-    const newItem = new Item({
-        id: itemIdCounter++,
-        description: itemData.description,
-        name: itemData.name,
-        consumableType: itemData.consumableType,
-        price: itemData.price,
-    });
-
-    items.push(newItem);
-    return newItem;
+    const item = new Item({ name, description, consumableType, price, weight, quantity });
+    return await itemDb.createItem(item);
 };
 
-const getItemById = (id: number): Item | undefined => {
-    return items.find(item => item.getId() === id);
+const getAllItems = async (): Promise<Item[]> => {
+    return await itemDb.getAllItems();
 };
 
-const getAllItems = (): Item[] => {
-    return items;
+const getItemById = async (id: number): Promise<Item | null> => {
+    if (!id || id <= 0) throw new Error('Invalid ID.');
+    return await itemDb.getItemById(id);
 };
 
-export default { createItem, getItemById, getAllItems };
+export default {
+    createItem,
+    getAllItems,
+    getItemById,
+};
