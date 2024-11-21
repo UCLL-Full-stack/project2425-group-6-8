@@ -62,6 +62,97 @@
  *           items:
  *             type: integer
  *             description: IDs of messages to be associated with the group.
+ *     ItemInput:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: The unique ID of the item.
+ *         name:
+ *           type: string
+ *           description: The name of the item.
+ *         description:
+ *           type: string
+ *           description: A description of the item.
+ *         consumableType:
+ *           type: string
+ *           enum:
+ *             - FOOD
+ *             - NON_FOOD
+ *           description: The type of consumable (e.g., FOOD, NON_FOOD).
+ *         price:
+ *           type: number
+ *           format: float
+ *           description: The price of the item.
+ *         weight:
+ *           type: number
+ *           format: float
+ *           description: The weight of the item (optional).
+ *         quantity:
+ *           type: number
+ *           format: integer
+ *           description: The quantity of the item (optional).
+ *     GroceryListInput:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: The unique ID of the grocery list.
+ *         name:
+ *           type: string
+ *           description: The name of the grocery list.
+ *         items:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/ItemInput'
+ *           description: A list of items in the grocery list.
+ *     ScheduleInput:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: The unique ID of the schedule.
+ *         name:
+ *           type: string
+ *           description: The name of the schedule.
+ *         startDate:
+ *           type: string
+ *           format: date-time
+ *           description: The start date of the schedule.
+ *         endDate:
+ *           type: string
+ *           format: date-time
+ *           description: The end date of the schedule.
+ *     MessageInput:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: The unique ID of the message.
+ *         user:
+ *           $ref: '#/components/schemas/UserInput'
+ *         timestamp:
+ *           type: string
+ *           format: date-time
+ *           description: The timestamp when the message was sent.
+ *         message:
+ *           type: string
+ *           description: The content of the message.
+ *     UserInput:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: The unique ID of the user.
+ *         name:
+ *           type: string
+ *           description: The name of the user.
+ *         email:
+ *           type: string
+ *           description: The email of the user.
+ *         nickname:
+ *           type: string
+ *           description: The nickname of the user.
  */
 
 import express, { NextFunction, Request, Response } from 'express';
@@ -100,9 +191,9 @@ const groupRouter = express.Router();
  */
 groupRouter.post('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const groupData: GroupInput = {
+        const groupData = {
             name: req.body.name,
-            users: req.body.users, 
+            userIds: req.body.users.map((user: { id: number }) => user.id), 
             groceryList: req.body.groceryList,
             schedule: req.body.schedule,
             message: req.body.message,
@@ -110,11 +201,11 @@ groupRouter.post('/', async (req: Request, res: Response, next: NextFunction) =>
 
         const result = await groupService.createGroup(groupData);
         res.status(200).json(result);
-    } catch (error)
-     {
-        next(error)
-     }
+    } catch (error) {
+        next(error);
+    }
 });
+
 
 /**
  * @swagger

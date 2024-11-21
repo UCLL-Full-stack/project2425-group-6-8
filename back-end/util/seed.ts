@@ -1,10 +1,8 @@
 import { PrismaClient } from '@prisma/client';
-import { ScheduleInput } from '../types'; // Assuming ScheduleInput type exists
 
 const prisma = new PrismaClient();
 
 const main = async () => {
-  // Creating Users
   const user1 = await prisma.user.create({
     data: {
       name: 'Dagobert Duck',
@@ -12,6 +10,7 @@ const main = async () => {
       nickname: 'Wise Old Geezer',
     },
   });
+  console.log('Created user1:', user1.id); 
 
   const user2 = await prisma.user.create({
     data: {
@@ -20,6 +19,7 @@ const main = async () => {
       nickname: 'SuperDonald',
     },
   });
+  console.log('Created user2:', user2.id); 
 
   const item1 = await prisma.item.create({
     data: {
@@ -27,9 +27,10 @@ const main = async () => {
       description: 'Crunchy peanut butter',
       consumableType: 'FOOD',
       price: 2.99, 
-      weight: 200
+      weight: 200,
     },
   });
+  console.log('Created item1:', item1.id); 
 
   const item2 = await prisma.item.create({
     data: {
@@ -37,9 +38,10 @@ const main = async () => {
       description: 'Whole grain bread',
       consumableType: 'FOOD',
       price: 1.99,
-      quantity: 16
+      quantity: 16,
     },
   });
+  console.log('Created item2:', item2.id); 
 
   const item3 = await prisma.item.create({
     data: {
@@ -49,6 +51,7 @@ const main = async () => {
       price: 3.49,
     },
   });
+  console.log('Created item3:', item3.id); 
 
   const groceryList1 = await prisma.groceryList.create({
     data: {
@@ -58,6 +61,7 @@ const main = async () => {
       },
     },
   });
+  console.log('Created groceryList1:', groceryList1.id);
 
   const group1 = await prisma.group.create({
     data: {
@@ -70,6 +74,7 @@ const main = async () => {
       },
     },
   });
+  console.log('Created group1:', group1.id); 
 
   const message1 = await prisma.message.create({
     data: {
@@ -79,6 +84,7 @@ const main = async () => {
       group: { connect: { id: group1.id } },
     },
   });
+  console.log('Created message1:', message1.id); 
 
   const message2 = await prisma.message.create({
     data: {
@@ -88,6 +94,7 @@ const main = async () => {
       group: { connect: { id: group1.id } },
     },
   });
+  console.log('Created message2:', message2.id); 
 
   const schedule1 = await prisma.schedule.create({
     data: {
@@ -97,6 +104,7 @@ const main = async () => {
       group: { connect: { id: group1.id } },
     },
   });
+  console.log('Created schedule1:', schedule1.id); 
 
   console.log('Database has been seeded with sample data!');
 };
@@ -106,7 +114,7 @@ const main = async () => {
     await main();
     await prisma.$disconnect();
   } catch (error) {
-    console.error(error);
+    console.error('Error during seeding:', error); 
     await prisma.$disconnect();
     process.exit(1);
   }

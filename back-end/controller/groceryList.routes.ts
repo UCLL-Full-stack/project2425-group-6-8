@@ -11,7 +11,7 @@ const groceryListRouter = express.Router();
  *     responses:
  *       200:
  *         description: List of all grocery lists.
- *         content:
+ *         content:1    
  *           application/json:
  *             schema:
  *               type: array

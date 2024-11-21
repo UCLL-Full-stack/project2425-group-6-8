@@ -27,6 +27,14 @@
  *           type: number
  *           format: float
  *           description: The price of the item.
+ *         weight:
+ *           type: number
+ *           format: float
+ *           description: The weight of the item in grams.
+ *         quantity:
+ *           type: number
+ *           format: int32
+ *           description: The quantity of the item.
  *     ItemInput:
  *       type: object
  *       properties:
@@ -43,7 +51,16 @@
  *           type: number
  *           format: float
  *           description: The price of the item.
+ *         weight:
+ *           type: number
+ *           format: float
+ *           description: The weight of the item in grams.
+ *         quantity:
+ *           type: number
+ *           format: int32
+ *           description: The quantity of the item.
  */
+
 
 import express, { NextFunction, Request, Response } from 'express';
 import itemService from '../service/item.service';
