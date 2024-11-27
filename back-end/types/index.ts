@@ -20,9 +20,10 @@ type ItemInput = {
 
 type UserInput = {
     id?: number;
-    name: string;
-    email: string;
+    name?: string;
+    email?: string;
     nickname: string;
+    password: string;
 };
 
 

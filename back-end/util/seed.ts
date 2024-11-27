@@ -8,6 +8,7 @@ const main = async () => {
       name: 'Dagobert Duck',
       email: 'dagoduck@duckberg.com',
       nickname: 'Wise Old Geezer',
+      password: 'PassWordOfDagobert123'
     },
   });
   console.log('Created user1:', user1.id); 
@@ -17,6 +18,7 @@ const main = async () => {
       name: 'Donald Duck',
       email: 'donald@gmail.com',
       nickname: 'SuperDonald',
+      password: 'PassWordOfDonald123'
     },
   });
   console.log('Created user2:', user2.id); 

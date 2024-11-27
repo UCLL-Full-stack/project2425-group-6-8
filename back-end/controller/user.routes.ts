@@ -125,4 +125,66 @@ userRouter.get('/:id', async (req: Request, res: Response, next: NextFunction) =
     }
 });
 
+
+/**
+ * @swagger
+ * /users/register:
+ *   post:
+ *     summary: Register a new user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               nickname:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *             required:
+ *               - name
+ *               - email
+ *               - nickname
+ *               - password
+ *     responses:
+ *       201:
+ *         description: User successfully registered.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Invalid input or user already exists.
+ */
+
+
+userRouter.post(
+    '/register',
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {   
+            // Parse the input
+            const userInput: UserInput = req.body;
+
+            // Call the service to create a new user
+            const newUser = await userService.createUser(userInput);
+
+            // Respond with the newly created user (excluding the password)
+            res.status(201).json({
+                id: newUser.getId(),
+                name: newUser.getName(),
+                nickname: newUser.getNickname(),
+                email: newUser.getEmail(),
+                password: newUser.getPassword()
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+);
+
 export { userRouter };
