@@ -84,7 +84,7 @@
                 throw new Error('Nickname is required');
             }
             if (!user.password?.trim()) {
-                throw new Error('Password is required');
+                throw new Error('Password  is required');
             }
         }
 
