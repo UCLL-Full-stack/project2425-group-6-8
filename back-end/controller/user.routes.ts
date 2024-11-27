@@ -187,4 +187,56 @@ userRouter.post(
     }
 );
 
+/**
+ * @swagger
+ * /users/login:
+ *   post:
+ *     summary: Login with a registered user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nickname:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *             required:
+ *               - nickname
+ *               - password
+ *     responses:
+ *       200:
+ *         description: Successful login
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthenticationResponse'
+ *       400:
+ *         description: Invalid username or password
+ *       500:
+ *         description: Server error
+ */
+userRouter.post(
+    '/login',
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { nickname, password } = req.body as UserInput;
+
+            if (!nickname || !password) {
+                return res.status(400).json({ message: 'Username and password are required.' });
+            }
+
+            // Call the authenticate method from the service layer
+            const authResponse = await userService.authenticate({ nickname, password });
+
+            // Send the response to the client
+            res.status(200).json(authResponse);
+        } catch (error) {
+            next(error);
+        }
+    }
+);
+
 export { userRouter };

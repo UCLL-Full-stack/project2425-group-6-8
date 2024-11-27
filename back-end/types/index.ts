@@ -50,6 +50,12 @@ type GroupInput = {
     message?: MessageInput[];
 };
 
+type AuthenticationResponse = {
+    token: string;
+    nickname: string;
+    fullname: string;
+};
+
 export {
     ScheduleInput,
     ItemInput,
@@ -57,4 +63,5 @@ export {
     GroceryListInput,
     MessageInput,
     GroupInput,
+    AuthenticationResponse
 };

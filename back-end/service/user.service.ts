@@ -2,6 +2,8 @@ import { UserInput } from '../types';
 import { User } from '../model/user';
 import userDB from '../repository/user.db';
 import bcrypt from 'bcrypt';
+import { generateJWTtoken } from '../util/jwt';
+import { AuthenticationResponse } from '../types/index';
 
 const SALT_ROUNDS = 10;
 
@@ -49,9 +51,40 @@ const getUserById = async (id: number): Promise<User | null> => {
     return user;
 };
 
+/**
+ * Authenticates a user by username and password.
+ * @param username - The username of the user.
+ * @param password - The entered password.
+ * @returns An AuthenticationResponse containing username, token, and fullname.
+ */
+const authenticate = async (userInput: UserInput): Promise<AuthenticationResponse> => {
+    const { nickname, password } = userInput;
+    
+    const user = await userDB.getUserByNickName({ nickname });
+    if (!user) {
+        throw new Error('User does not exist');
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.getPassword());
+    if (!isPasswordValid) {
+        throw new Error('Invalid password');
+    }
+
+    // Generate JWT token with role
+    const token = generateJWTtoken(nickname);
+
+    return {
+        nickname,
+        token,
+        fullname: `${user.getName()}`,
+    };
+};
+
 export default {
     createUser,
     getUserById,
     getAllUsers,
-    getUserByNickName
+    getUserByNickName,
+    authenticate,
+    generateJWTtoken,
 };
