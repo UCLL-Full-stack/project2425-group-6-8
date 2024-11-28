@@ -14,7 +14,7 @@
  *           type: number
  *           format: int64
  *           description: The unique identifier for the message.
- *         content:
+ *         message:
  *           type: string
  *           description: The content of the message.
  *         userId:
@@ -28,9 +28,6 @@
  *     MessageInput:
  *       type: object
  *       properties:
- *         content:
- *           type: string
- *           description: The content of the message.
  *         userId:
  *           type: number
  *           format: int64

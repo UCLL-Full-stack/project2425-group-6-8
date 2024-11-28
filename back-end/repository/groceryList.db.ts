@@ -19,6 +19,25 @@ GroceryList.from = function ({
     });
 };
 
+const createGroceryList = async (name: string, itemIds: number[]): Promise<GroceryList> => {
+    try {
+        const groceryListPrisma = await database.groceryList.create({
+            data: {
+                name,
+                items: {
+                    connect: itemIds.map((itemId) => ({ id: itemId })),
+                },
+            },
+            include: { items: true },
+        });
+
+        return GroceryList.from(groceryListPrisma);
+    } catch (error) {
+        console.error(error);
+        throw new Error('Database error. See server log for details');
+    }
+};
+
 const getGroceryListById = async (id: number): Promise<GroceryList | null> => {
     try {
         const groceryListPrisma = await database.groceryList.findUnique({
@@ -65,6 +84,7 @@ const addItemsToGroceryList = async (groceryListId: number, itemIds: number[]): 
 };
 
 export default {
+    createGroceryList,
     getGroceryListById,
     getAllGroceryLists,
     addItemsToGroceryList,

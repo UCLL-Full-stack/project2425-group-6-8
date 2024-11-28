@@ -1,32 +1,27 @@
 /**
  * @swagger
  * components:
- *   securitySchemes:
- *     bearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
  *   schemas:
  *     Schedule:
  *       type: object
- *       properties:
- *         id:
- *           type: number
- *           format: int64
- *           description: The unique identifier for the schedule.
+ *       properties:    
  *         name:
  *           type: string
  *           description: The name of the scheduled event.
  *         startDate:
  *           type: string
  *           format: date-time
- *           description: The start date and time of the scheduled event.
+ *           description: The start date and time of the scheduled event (ISO 8601 format).
  *         endDate:
  *           type: string
  *           format: date-time
- *           description: The end date and time of the scheduled event.
+ *           description: The end date and time of the scheduled event (ISO 8601 format).
  *     ScheduleInput:
  *       type: object
+ *       required:
+ *         - name
+ *         - startDate
+ *         - endDate
  *       properties:
  *         name:
  *           type: string
@@ -34,12 +29,13 @@
  *         startDate:
  *           type: string
  *           format: date-time
- *           description: The start date and time of the scheduled event.
+ *           description: The start date and time of the scheduled event (ISO 8601 format).
  *         endDate:
  *           type: string
  *           format: date-time
- *           description: The end date and time of the scheduled event.
+ *           description: The end date and time of the scheduled event (ISO 8601 format).
  */
+
 
 import express, { NextFunction, Request, Response } from 'express';
 import scheduleService from '../service/schedule.service';
@@ -66,6 +62,7 @@ const scheduleRouter = express.Router();
  *                schema:
  *                  $ref: '#/components/schemas/Schedule'
  */
+
 scheduleRouter.post('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { name, startDate, endDate } = req.body;
