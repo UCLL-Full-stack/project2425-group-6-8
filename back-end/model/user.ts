@@ -4,17 +4,19 @@
 
     export class User {
         private id?: number | undefined;
-        private name: string;
-        private email: string;
+        private name?: string;
+        private email?: string;
         private nickname: string;
+        private password: string;
         private createdAt?: Date;  
         private updatedAt?: Date;  
 
         constructor(user: {
             id?: number;
-            name: string;
-            email: string;
+            name?: string;
+            email?: string;
             nickname: string;
+            password: string;
             createdAt?: Date;  
             updatedAt?: Date;  
         }) {
@@ -23,6 +25,7 @@
             this.name = user.name;
             this.email = user.email;
             this.nickname = user.nickname;
+            this.password = user.password;
             this.createdAt = user.createdAt;
             this.updatedAt = user.updatedAt;
         }
@@ -31,7 +34,7 @@
             return this.id;
         }
 
-        getName(): string {
+        getName(): string | undefined {
             return this.name;
         }
 
@@ -39,7 +42,7 @@
             this.name = name;
         }
 
-        getEmail(): string {
+        getEmail(): string | undefined {
             return this.email;
         }
 
@@ -63,7 +66,11 @@
             return this.updatedAt;
         }
 
-        validate(user: { name: string; email: string; nickname: string }): void {
+        getPassword(): string {
+            return this.password;
+        }
+
+        validate(user: { name?: string; email?: string; nickname: string, password: string }): void {
             if (!user.name?.trim()) {
                 throw new Error('Name is required');
             }
@@ -75,6 +82,9 @@
             }
             if (!user.nickname?.trim()) {
                 throw new Error('Nickname is required');
+            }
+            if (!user.password?.trim()) {
+                throw new Error('Password  is required');
             }
         }
 
@@ -88,6 +98,7 @@
             name,
             email,
             nickname,
+            password,
             createdAt,
             updatedAt
         }: UserPrisma): User {
@@ -96,6 +107,7 @@
                 name,
                 email,
                 nickname,
+                password,
                 createdAt,
                 updatedAt
             });

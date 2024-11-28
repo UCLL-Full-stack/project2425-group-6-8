@@ -20,9 +20,10 @@ type ItemInput = {
 
 type UserInput = {
     id?: number;
-    name: string;
-    email: string;
+    name?: string;
+    email?: string;
     nickname: string;
+    password: string;
 };
 
 
@@ -49,6 +50,12 @@ type GroupInput = {
     message?: MessageInput[];
 };
 
+type AuthenticationResponse = {
+    token: string;
+    nickname: string;
+    fullname: string;
+};
+
 export {
     ScheduleInput,
     ItemInput,
@@ -56,4 +63,5 @@ export {
     GroceryListInput,
     MessageInput,
     GroupInput,
+    AuthenticationResponse
 };

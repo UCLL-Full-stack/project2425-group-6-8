@@ -46,7 +46,7 @@ const GroupPage = () => {
             <link rel="icon" href="/favicon.ico" />
             </Head>
             <Header />
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "50vh" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "70vh" }}>
                 {!showCreateGroupForm ? (
                 <div style={{ textAlign: "center" }}>
                     <button

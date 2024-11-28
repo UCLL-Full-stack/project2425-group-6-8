@@ -125,4 +125,118 @@ userRouter.get('/:id', async (req: Request, res: Response, next: NextFunction) =
     }
 });
 
+
+/**
+ * @swagger
+ * /users/register:
+ *   post:
+ *     summary: Register a new user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               nickname:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *             required:
+ *               - name
+ *               - email
+ *               - nickname
+ *               - password
+ *     responses:
+ *       201:
+ *         description: User successfully registered.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Invalid input or user already exists.
+ */
+
+
+userRouter.post(
+    '/register',
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {   
+            // Parse the input
+            const userInput: UserInput = req.body;
+
+            // Call the service to create a new user
+            const newUser = await userService.createUser(userInput);
+
+            // Respond with the newly created user (excluding the password)
+            res.status(201).json({
+                id: newUser.getId(),
+                name: newUser.getName(),
+                nickname: newUser.getNickname(),
+                email: newUser.getEmail(),
+                password: newUser.getPassword()
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+);
+
+/**
+ * @swagger
+ * /users/login:
+ *   post:
+ *     summary: Login with a registered user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nickname:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *             required:
+ *               - nickname
+ *               - password
+ *     responses:
+ *       200:
+ *         description: Successful login
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthenticationResponse'
+ *       400:
+ *         description: Invalid username or password
+ *       500:
+ *         description: Server error
+ */
+userRouter.post(
+    '/login',
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { nickname, password } = req.body as UserInput;
+
+            if (!nickname || !password) {
+                return res.status(400).json({ message: 'Username and password are required.' });
+            }
+
+            // Call the authenticate method from the service layer
+            const authResponse = await userService.authenticate({ nickname, password });
+
+            // Send the response to the client
+            res.status(200).json(authResponse);
+        } catch (error) {
+            next(error);
+        }
+    }
+);
+
 export { userRouter };
