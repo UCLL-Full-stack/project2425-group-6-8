@@ -1,9 +1,10 @@
-import { UserInput } from '../types';
+import { UserInput, Role } from '../types';
 import { User } from '../model/user';
 import userDB from '../repository/user.db';
 import bcrypt from 'bcrypt';
-import { generateJWTtoken } from '../util/jwt';
+import { generateJwtToken } from '../util/jwt';
 import { AuthenticationResponse } from '../types/index';
+import { UnauthorizedError } from 'express-jwt';
 
 const SALT_ROUNDS = 10;
 
@@ -22,6 +23,7 @@ const createUser = async (userInput: {
     nickname: string;
     email?: string;
     password: string;
+    role?: Role;
 }): Promise<User> => {
     const { name, nickname, email, password } = userInput;
 
@@ -40,6 +42,7 @@ const createUser = async (userInput: {
         nickname,
         email,
         password: hashedPassword,
+        role: 'user',
     });
 
     return newUser;
@@ -53,30 +56,23 @@ const getUserById = async (id: number): Promise<User | null> => {
 
 /**
  * Authenticates a user by username and password.
- * @param username - The username of the user.
+ * @param nickname - The username of the user.
  * @param password - The entered password.
  * @returns An AuthenticationResponse containing username, token, and fullname.
  */
-const authenticate = async (userInput: UserInput): Promise<AuthenticationResponse> => {
-    const { nickname, password } = userInput;
-    
-    const user = await userDB.getUserByNickName({ nickname });
-    if (!user) {
-        throw new Error('User does not exist');
+const authenticate = async ({ nickname, password }: UserInput): Promise<AuthenticationResponse> => {
+    const user = await getUserByNickName({ nickname });
+
+    const isValidPassword = await bcrypt.compare(password, user.getPassword());
+
+    if (!isValidPassword) {
+        throw new Error('Incorrect password.');
     }
-
-    const isPasswordValid = await bcrypt.compare(password, user.getPassword());
-    if (!isPasswordValid) {
-        throw new Error('Invalid password');
-    }
-
-    // Generate JWT token with role
-    const token = generateJWTtoken(nickname);
-
     return {
-        nickname,
-        token,
-        fullname: `${user.getName()}`,
+        token: generateJwtToken({ nickname, role: user.getRole() }),
+        nickname: nickname,
+        name: `${user.getName()}`,
+        role: user.getRole(),
     };
 };
 
@@ -86,5 +82,5 @@ export default {
     getAllUsers,
     getUserByNickName,
     authenticate,
-    generateJWTtoken,
+    generateJwtToken,
 };

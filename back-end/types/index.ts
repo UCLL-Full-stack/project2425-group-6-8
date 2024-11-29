@@ -1,5 +1,7 @@
 import { ConsumableType } from '../model/consumableTypeEnum';
 
+type Role = 'ApplicationAdmin' | 'user' | 'GroupAdmin';
+
 type ScheduleInput = {
     id?: number;
     name: string;
@@ -24,6 +26,7 @@ type UserInput = {
     email?: string;
     nickname: string;
     password: string;
+    role?: Role;
 };
 
 
@@ -53,7 +56,8 @@ type GroupInput = {
 type AuthenticationResponse = {
     token: string;
     nickname: string;
-    fullname: string;
+    name: string;
+    role: string;
 };
 
 export {
@@ -64,4 +68,5 @@ export {
     MessageInput,
     GroupInput,
     AuthenticationResponse,
+    Role
 };

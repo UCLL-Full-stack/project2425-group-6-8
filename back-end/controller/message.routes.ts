@@ -51,6 +51,8 @@ const messageRouter = express.Router();
  * @swagger
  * /messages:
  *   post:
+ *      security:
+ *        - bearerAuth: []
  *      summary: Create a new message.
  *      requestBody:
  *        required: true
@@ -80,8 +82,10 @@ messageRouter.post('/', async (req: Request, res: Response, next: NextFunction) 
  * @swagger
  * /messages:
  *   get:
- *      summary: Retrieve all messages.
- *      responses:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Retrieve all messages.
+ *     responses:
  *         200:
  *            description: A list of messages.
  *            content:
@@ -104,15 +108,17 @@ messageRouter.get('/', async (req: Request, res: Response, next: NextFunction) =
  * @swagger
  * /messages/{id}:
  *   get:
- *      summary: Retrieve a message by ID.
- *      parameters:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Retrieve a message by ID.
+ *     parameters:
  *        - in: path
  *          name: id
  *          required: true
  *          description: ID of the message to retrieve
  *          schema:
  *            type: integer
- *      responses:
+ *     responses:
  *         200:
  *            description: The requested message.
  *            content:

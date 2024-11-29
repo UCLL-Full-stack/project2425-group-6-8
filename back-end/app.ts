@@ -11,17 +11,34 @@ import { itemRouter }  from './controller/item.routes';
 import { messageRouter }  from './controller/message.routes';
 import { scheduleRouter }  from './controller/schedule.routes';
 import { userRouter }  from './controller/user.routes';
+import helmet from 'helmet';
+
+const app = express();
+app.use(helmet());
+
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            // Allow connections to own server and the external API
+            connectSrc: ["'self'", 'https://api.ucll.be'],
+        },
+    })
+);
 
 dotenv.config();
-const app = express();
 const port = process.env.APP_PORT || 3000;
 
-app.use(cors());
+app.use(cors({ origin: 'http://localhost:8080' }));
 app.use(bodyParser.json());
 
-app.get('/status', (req, res) => {
-    res.json({ message: 'Back-end is running...' });
-});
+app.use(
+    expressjwt({
+        secret: process.env.JWT_SECRET || 'default_secret',
+        algorithms: ['HS256'],
+    }).unless({
+        path: ['/api-docs', /^\/api-docs\/.*/, '/users/login', '/users/register', '/status'],
+    })
+);
 
 app.use('/groceryLists', groceryListRouter);
 app.use('/groups', groupRouter);
@@ -30,9 +47,8 @@ app.use('/messages', messageRouter);
 app.use('/schedules', scheduleRouter);
 app.use('/users', userRouter);
 
-
-app.listen(port, () => {
-    console.log(`Back-end is running on port ${port}.`);
+app.get('/status', (req, res) => {
+    res.json({ message: 'Back-end is running...' });
 });
 
 const swaggerOpts = {
@@ -45,15 +61,8 @@ const swaggerOpts = {
     },
     apis: ['./controller/*.routes.ts'],
 };
-
-app.use(
-    expressjwt({
-        secret: process.env.JWT_SECRET || 'default_secret',
-        algorithms: ['HS256'],
-    }).unless({
-        path: ['/api-docs', /^\/api-docs\/.*/, '/users/login', '/users/signup', '/status'],
-    })
-);
+const swaggerSpec = swaggerJSDoc(swaggerOpts);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     if (err.name === 'UnauthorizedError') {
@@ -65,5 +74,6 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     }
 });
 
-const swaggerSpec = swaggerJSDoc(swaggerOpts);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.listen(port || 3000, () => {
+    console.log(`Back-end is running on port ${port}.`);
+});

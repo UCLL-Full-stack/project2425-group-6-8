@@ -1,6 +1,7 @@
 import { User } from '../model/user';
 import database from './database';
 import { User as UserPrisma } from '@prisma/client';
+import { Role } from '../types';
 
 const getAllUsers = async (): Promise<User[]> => {
     try {
@@ -43,15 +44,17 @@ const createUser = async ({
     nickname,
     email,
     password,
+    role
 }: {
     name?: string;
     nickname: string;
     email?: string;
     password: string;
+    role?: Role
 }): Promise<User> => {
     try {
         const userPrisma = await database.user.create({
-            data: { name, nickname, email, password },
+            data: { name, nickname, email, password,role },
         });
 
         return User.from(userPrisma);

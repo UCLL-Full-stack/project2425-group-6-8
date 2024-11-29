@@ -1,6 +1,8 @@
     import {
         User as UserPrisma
     } from '@prisma/client';
+    import { Role } from '../types';
+import { ro } from 'date-fns/locale';
 
     export class User {
         private id?: number | undefined;
@@ -9,7 +11,8 @@
         private nickname: string;
         private password: string;
         private createdAt?: Date;  
-        private updatedAt?: Date;  
+        private updatedAt?: Date;
+        private role: Role;  
 
         constructor(user: {
             id?: number;
@@ -18,7 +21,8 @@
             nickname: string;
             password: string;
             createdAt?: Date;  
-            updatedAt?: Date;  
+            updatedAt?: Date;
+            role: Role;  
         }) {
             this.validate(user);
             this.id = user.id;
@@ -28,6 +32,7 @@
             this.password = user.password;
             this.createdAt = user.createdAt;
             this.updatedAt = user.updatedAt;
+            this.role = user.role;
         }
 
         getId(): number | undefined {
@@ -70,7 +75,15 @@
             return this.password;
         }
 
-        validate(user: { name?: string; email?: string; nickname: string, password: string }): void {
+        getRole(): Role {
+            return this.role;
+        }
+
+        setRole(role: Role): void {
+            this.role = role;
+        }
+
+        validate(user: { name?: string; email?: string; nickname: string, password: string, role: Role; }): void {
             if (!user.name?.trim()) {
                 throw new Error('Name is required');
             }
@@ -86,6 +99,19 @@
             if (!user.password?.trim()) {
                 throw new Error('Password  is required');
             }
+            if (!user.role) {
+                throw new Error('Role is required');
+            }
+        }
+
+        equals(user: User): boolean {
+            return (
+                this.name === user.getName() &&
+                this.nickname === user.getNickname() &&
+                this.email === user.getEmail() &&
+                this.password === user.getPassword() &&
+                this.role === user.getRole()
+            );
         }
 
         isValidEmail(email: string): boolean {
@@ -100,7 +126,8 @@
             nickname,
             password,
             createdAt,
-            updatedAt
+            updatedAt,
+            role
         }: UserPrisma): User {
             return new User({
                 id,
@@ -109,7 +136,8 @@
                 nickname,
                 password,
                 createdAt,
-                updatedAt
+                updatedAt,
+                role: role as Role,
             });
         }
     }

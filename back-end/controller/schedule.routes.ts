@@ -47,6 +47,8 @@ const scheduleRouter = express.Router();
  * @swagger
  * /schedules:
  *   post:
+ *      security:
+ *        - bearerAuth: []
  *      summary: Create a new schedule.
  *      requestBody:
  *        required: true
@@ -85,8 +87,10 @@ scheduleRouter.post('/', async (req: Request, res: Response, next: NextFunction)
  * @swagger
  * /schedules:
  *   get:
- *      summary: Retrieve all schedules.
- *      responses:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Retrieve all schedules.
+ *     responses:
  *         200:
  *            description: A list of schedules.
  *            content:
@@ -109,15 +113,17 @@ scheduleRouter.get('/', async (req: Request, res: Response, next: NextFunction) 
  * @swagger
  * /schedules/{id}:
  *   get:
- *      summary: Retrieve a schedule by ID.
- *      parameters:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Retrieve a schedule by ID.
+ *     parameters:
  *        - in: path
  *          name: id
  *          required: true
  *          description: ID of the schedule to retrieve
  *          schema:
  *            type: integer
- *      responses:
+ *     responses:
  *         200:
  *            description: The requested schedule.
  *            content:

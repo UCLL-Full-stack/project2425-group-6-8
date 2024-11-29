@@ -162,6 +162,8 @@ const groupRouter = express.Router();
  * @swagger
  * /groups:
  *   post:
+ *      security:
+ *        - bearerAuth: []
  *      summary: Create a new group.
  *      requestBody:
  *        required: true
@@ -208,8 +210,10 @@ groupRouter.post('/', async (req: Request, res: Response, next: NextFunction) =>
  * @swagger
  * /groups:
  *   get:
- *      summary: Retrieve all groups.
- *      responses:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Retrieve all groups.
+ *     responses:
  *         200:
  *            description: A list of groups.
  *            content:
@@ -232,15 +236,17 @@ groupRouter.get('/', async (req: Request, res: Response, next: NextFunction) => 
  * @swagger
  * /groups/{id}:
  *   get:
- *      summary: Retrieve a group by ID.
- *      parameters:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Retrieve a group by ID.
+ *     parameters:
  *        - in: path
  *          name: id
  *          required: true
  *          description: ID of the group to retrieve
  *          schema:
  *            type: integer
- *      responses:
+ *     responses:
  *         200:
  *            description: The requested group.
  *            content:

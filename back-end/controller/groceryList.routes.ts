@@ -52,6 +52,8 @@ const groceryListRouter = express.Router();
  * @swagger
  * /grocerylists:
  *   get:
+ *     security:
+ *       - bearerAuth: []
  *     summary: Get all grocery lists
  *     responses:
  *       200:
@@ -77,6 +79,8 @@ groceryListRouter.get('/', async (req: Request, res: Response) => {
  * @swagger
  * /grocerylists/{id}:
  *   get:
+ *     security:
+ *       - bearerAuth: []
  *     summary: Get a grocery list by ID
  *     parameters:
  *       - in: path
@@ -113,6 +117,8 @@ groceryListRouter.get('/:id', async (req: Request, res: Response) => {
  * @swagger
  * /grocerylists:
  *   post:
+ *     security:
+ *        - bearerAuth: []
  *     summary: Create a new grocery list
  *     requestBody:
  *       required: true

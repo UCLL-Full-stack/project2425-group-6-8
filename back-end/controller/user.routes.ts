@@ -49,6 +49,8 @@
  *            email:
  *              type: string
  *              description: E-mail.
+ *            role:
+ *               $ref: '#/components/schemas/Role'
  *      UserInput:
  *          type: object
  *          properties:
@@ -64,42 +66,16 @@
  *            email:
  *              type: string
  *              description: E-mail.
+ *      Role:
+ *          type: string
+ *          enum: [student, lecturer, admin, guest]
  */
 
 import express, { NextFunction, Request, Response } from 'express';
 import userService from '../service/user.service'; 
-import { UserInput } from '../types'; 
+import { UserInput} from '../types'; 
 
 const userRouter = express.Router();
-
-/**
- * @swagger
- * /users:
- *   post:
- *      summary: Create a new user.
- *      requestBody:
- *        required: true
- *        content:                     
- *          application/json:
- *            schema:
- *              $ref: '#/components/schemas/UserInput'
- *      responses:
- *         200:
- *            description: The created user.
- *            content:
- *              application/json:
- *                schema:
- *                  $ref: '#/components/schemas/User'
- */
-userRouter.post('/', async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const userData: UserInput = req.body;
-        const result = await userService.createUser(userData);
-        res.status(200).json(result);
-    } catch (error) {
-        next(error);
-    }
-});
 
 /**
  * @swagger
@@ -120,10 +96,8 @@ userRouter.post('/', async (req: Request, res: Response, next: NextFunction) => 
  */
 userRouter.get('/', async (req: Request , res: Response, next: NextFunction) => {
     try {
-        const request = req as Request & { auth: { nickname: string; password: string; } };
-        const { nickname, password } = request.auth;
-        const result = await userService.getAllUsers();
-        res.status(200).json(result);
+        const users = await userService.getAllUsers();
+        res.status(200).json(users);
     } catch (error) {
         next(error);
     }
@@ -133,15 +107,17 @@ userRouter.get('/', async (req: Request , res: Response, next: NextFunction) => 
  * @swagger
  * /users/{id}:
  *   get:
- *      summary: Retrieve a user by ID.
- *      parameters:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Retrieve a user by ID.
+ *     parameters:
  *        - in: path
  *          name: id
  *          required: true
  *          description: ID of the user to retrieve
  *          schema:
  *            type: integer
- *      responses:
+ *     responses:
  *         200:
  *            description: The requested user.
  *            content:
@@ -197,7 +173,7 @@ userRouter.post('/register', async (req: Request, res: Response, next: NextFunct
  * @swagger
  * /users/login:
  *   post:
- *      summary: Login using username/password. Returns an object with JWT token and user name when succesful.
+ *      summary: Login using nickname/password. Returns an object with JWT token and user name when succesful.
  *      requestBody:
  *        required: true
  *        content:

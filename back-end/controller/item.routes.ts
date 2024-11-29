@@ -72,6 +72,8 @@ const itemRouter = express.Router();
  * @swagger
  * /items:
  *   post:
+ *     security:
+ *        - bearerAuth: []
  *     summary: Create a new item.
  *     requestBody:
  *       required: true
@@ -101,6 +103,8 @@ itemRouter.post('/', async (req: Request, res: Response, next: NextFunction) => 
  * @swagger
  * /items:
  *   get:
+ *     security:
+ *       - bearerAuth: []
  *     summary: Retrieve all items.
  *     responses:
  *       200:
@@ -125,6 +129,8 @@ itemRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
  * @swagger
  * /items/{id}:
  *   get:
+ *     security:
+ *       - bearerAuth: []
  *     summary: Retrieve an item by ID.
  *     parameters:
  *       - in: path
