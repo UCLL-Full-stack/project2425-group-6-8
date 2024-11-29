@@ -63,5 +63,5 @@ export {
     GroceryListInput,
     MessageInput,
     GroupInput,
-    AuthenticationResponse
+    AuthenticationResponse,
 };

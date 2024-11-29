@@ -1,35 +1,69 @@
 /**
  * @swagger
- * components:
- *   schemas:
- *     User:
- *       type: object
- *       properties:
- *         id:
- *           type: integer
- *           description: The unique identifier for the user.
- *         name:
- *           type: string
- *           description: The name of the user.
- *         email:
- *           type: string
- *           description: The email address of the user.
- *         nickname:
- *           type: string
- *           description: The nickname of the user.
- *     
- *     UserInput:
- *       type: object
- *       properties:
- *         name:
- *           type: string
- *           description: The name of the user.
- *         email:
- *           type: string
- *           description: The email address of the user.
- *         nickname:
- *           type: string
- *           description: The nickname of the user.
+ *   components:
+ *    securitySchemes:
+ *     bearerAuth:
+ *      type: http
+ *      scheme: bearer
+ *      bearerFormat: JWT
+ *    schemas:
+ *      AuthenticationResponse:
+ *          type: object
+ *          properties:
+ *            message:
+ *              type: string
+ *              description: Authentication response.
+ *            token:
+ *              type: string
+ *              description: JWT access token.
+ *            nickname:
+ *              type: string
+ *              description: User name.
+ *            name:
+ *             type: string
+ *             description: Full name.
+ *      AuthenticationRequest:
+ *          type: object
+ *          properties:
+ *            nickname:
+ *              type: string
+ *              description: User name.
+ *            password:
+ *              type: string
+ *              description: User password.
+ *      User:
+ *          type: object
+ *          properties:
+ *            id:
+ *              type: number
+ *              format: int64
+ *            name:
+ *              type: string
+ *              description: User name.
+ *            password:
+ *              type: string
+ *              description: User password.
+ *            nickname:
+ *              type: string
+ *              description: Nickname of the user.
+ *            email:
+ *              type: string
+ *              description: E-mail.
+ *      UserInput:
+ *          type: object
+ *          properties:
+ *            name:
+ *              type: string
+ *              description: User name.
+ *            password:
+ *              type: string
+ *              description: User password.
+ *            nickname:
+ *              type: string
+ *              description: Nickname of the user.
+ *            email:
+ *              type: string
+ *              description: E-mail.
  */
 
 import express, { NextFunction, Request, Response } from 'express';
@@ -71,19 +105,23 @@ userRouter.post('/', async (req: Request, res: Response, next: NextFunction) => 
  * @swagger
  * /users:
  *   get:
- *      summary: Retrieve all users.
- *      responses:
- *         200:
- *            description: A list of users.
- *            content:
- *              application/json:
- *                schema:
- *                  type: array
- *                  items:
- *                    $ref: '#/components/schemas/User'
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Get a list of all users
+ *     responses:
+ *       200:
+ *         description: A list of users.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                  $ref: '#/components/schemas/User'
  */
-userRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
+userRouter.get('/', async (req: Request , res: Response, next: NextFunction) => {
     try {
+        const request = req as Request & { auth: { nickname: string; password: string; } };
+        const { nickname, password } = request.auth;
         const result = await userService.getAllUsers();
         res.status(200).json(result);
     } catch (error) {
@@ -130,93 +168,49 @@ userRouter.get('/:id', async (req: Request, res: Response, next: NextFunction) =
  * @swagger
  * /users/register:
  *   post:
- *     summary: Register a new user
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               email:
- *                 type: string
- *               nickname:
- *                 type: string
- *               password:
- *                 type: string
- *             required:
- *               - name
- *               - email
- *               - nickname
- *               - password
- *     responses:
- *       201:
- *         description: User successfully registered.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
- *       400:
- *         description: Invalid input or user already exists.
+ *      summary: Create a user
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/UserInput'
+ *      responses:
+ *         200:
+ *            description: The created user object
+ *            content:
+ *              application/json:
+ *                schema:
+ *                  $ref: '#/components/schemas/User'
  */
-
-
-userRouter.post(
-    '/register',
-    async (req: Request, res: Response, next: NextFunction) => {
-        try {   
-            // Parse the input
-            const userInput: UserInput = req.body;
-
-            // Call the service to create a new user
-            const newUser = await userService.createUser(userInput);
-
-            // Respond with the newly created user (excluding the password)
-            res.status(201).json({
-                id: newUser.getId(),
-                name: newUser.getName(),
-                nickname: newUser.getNickname(),
-                email: newUser.getEmail(),
-                password: newUser.getPassword()
-            });
-        } catch (error) {
-            next(error);
-        }
+userRouter.post('/register', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const userInput = <UserInput>req.body;
+        const user = await userService.createUser(userInput);
+        res.status(200).json(user);
+    } catch (error) {
+        next(error);
     }
-);
+});
 
 /**
  * @swagger
  * /users/login:
  *   post:
- *     summary: Login with a registered user
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               nickname:
- *                 type: string
- *               password:
- *                 type: string
- *             required:
- *               - nickname
- *               - password
- *     responses:
- *       200:
- *         description: Successful login
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/AuthenticationResponse'
- *       400:
- *         description: Invalid username or password
- *       500:
- *         description: Server error
+ *      summary: Login using username/password. Returns an object with JWT token and user name when succesful.
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/AuthenticationRequest'
+ *      responses:
+ *         200:
+ *            description: The created user object
+ *            content:
+ *              application/json:
+ *                schema:
+ *                  $ref: '#/components/schemas/AuthenticationResponse'
  */
 userRouter.post(
     '/login',

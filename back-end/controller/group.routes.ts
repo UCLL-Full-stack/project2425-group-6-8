@@ -141,9 +141,6 @@
  *     UserInput:
  *       type: object
  *       properties:
- *         id:
- *           type: integer
- *           description: The unique ID of the user.
  *         name:
  *           type: string
  *           description: The name of the user.
