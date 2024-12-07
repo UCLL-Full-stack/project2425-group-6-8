@@ -1,9 +1,14 @@
 import { ConsumableType } from '../../back-end/model/consumableTypeEnum';
 
+type Role = 'ApplicationAdmin' | 'user' | 'GroupAdmin';
+
 export type User = {
+    id?: number;
     name?: string;
     email?: string;
-    nickname?: string;
+    nickname: string;
+    password: string;
+    role?: Role;
 };
 
 export type Item = {
@@ -26,5 +31,10 @@ export type Group = {
     name?: string;
     users?: User[];
     groceryList?: GroceryList;
+};
+
+export type StatusMessage = {
+    message: string;
+    type: "error" | "success";
 };
   

@@ -1,0 +1,26 @@
+{
+    "app": {
+    "title": "Shared Grocery List App"
+  },
+    "general.error": "An error has occurred. Please try again later.",
+    "login": {
+        "title": "Login",
+        "button": "Login",
+        "success": "Login succesful. Redirecting to homepage...",
+        "validate": {
+        "nickname": "Nickname is required",
+        "password": "Password is required"
+        },
+    "label": { "username": "Nickname:", "password": "Password:" }   
+    },
+    "header": {
+        "welcome": "Welcome",
+        "nav": {
+            "home": "Home",
+            "group": "Group",
+            "login": "Login",
+            "logout": "Logout"
+        }
+    }
+}
+   

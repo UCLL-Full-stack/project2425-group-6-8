@@ -1,0 +1,25 @@
+{
+    "app.title": "Aplicación de lista de compras compartida",
+    "general.error": "Se ha producido un error. Vuelva a intentarlo más tarde.",
+    "login": {
+        "title": "Inicio de sesión",
+        "button": "Conéctese",
+        "success": "Inicio de sesión exitoso. Redirigiendo a la página de inicio...",
+        "validate": {
+        "nickname": "Apodo obligatorio",
+        "password": "Se requiere contraseña"
+    },
+    "label": { "username": "Apodo:", "password": "Contraseña:" }
+    },
+
+    "header": {
+        "welcome": "Bienvenido",
+        "nav": {
+            "home": "Inicio",
+            "group": "Grupo",
+            "login": "Conéctese",
+            "logout": "Cerrar sesión"
+            }
+    }
+}
+    

@@ -1,22 +1,59 @@
 import Link from 'next/link';
+import { useEffect, useState } from "react";
+import Language from "./language/Language";
+import { useTranslation } from "next-i18next";
 
 const Header: React.FC = () => {
+  const [loggedInUser, setLoggedInUser] = useState<String>(null);
+  const { t } = useTranslation("common");
+
+  useEffect(() => {
+    setLoggedInUser(localStorage.getItem("loggedInUser"));
+  }, []);
+
+  const handleClick = () => {
+    localStorage.removeItem("loggedInUser");
+    setLoggedInUser(null);
+  };
+
   return (
-    <header style={{ backgroundColor: '#95D3AC' }}>
-      <a className="fs-2 d-flex justify-content-center mb-2 mb-lg-0 text-white text-decoration-none">
-        {' '}
-        Shared Gorcery List App
+    <header className="p-3 mb-3 border-bottom bg-gradient-to-br from-gray-900 to-gray-600 flex flex-col items-center">
+      <a className="flex mb-2 md:mb-5 text-white-50 text-3xl text-gray-300">
+        {t('app.title')}
       </a>
-      <nav className="nav justify-content-center">
-        <Link href="/" className="nav-link px-4 fs-5 text-white">
-          Home
+      <nav className="items-center flex md:flex-row flex-col">
+        <Link href="/" className="px-4 text-xl text-white hover:bg-gray-600 rounded-lg">
+        {t('header.nav.home')}
         </Link>
-      </nav>
-      <nav className="nav justify-content-center">
-        <Link href="/group" className="nav-link px-4 fs-5 text-white">
-          Group
+
+        <Link href="/group" className="px-4 text-white text-xl hover:bg-gray-600 rounded-lg">
+        {t('header.nav.group')}
         </Link>
+
+        {!loggedInUser && (
+          <Link
+            href="/login"
+            className="px-4 text-white text-xl hover:bg-gray-600 rounded-lg"
+          >
+          {t('header.nav.login')}
+          </Link>
+        )}
+        {loggedInUser && (
+          <a
+            href="/login"
+            onClick={handleClick}
+            className="px-4 text-white text-xl hover:bg-gray-600 rounded-lg"
+          >
+            {t('header.nav.logout')}
+          </a>
+        )}
+        {loggedInUser && (
+          <div className="text-white ms-5 mt-2 md:mt-0 pt-1 md:pt-0 grow">
+            {t('header.welcome')}, {loggedInUser}!
+          </div>
+        )}
       </nav>
+      <Language />
     </header>
   );
 };

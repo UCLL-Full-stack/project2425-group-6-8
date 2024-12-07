@@ -2,12 +2,21 @@ import Head from 'next/head';
 import Image from 'next/image';
 import Header from '@components/header';
 import styles from '@styles/home.module.css';
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+
+export const getStaticProps = async ({ locale }) => ({
+    props: {
+      ...(await serverSideTranslations(locale, ["common"])),
+    },
+});
 
 const Home: React.FC = () => {
+  const { t } = useTranslation("common");
   return (
     <>
       <Head>
-        <title>Shared Grocery List</title>
+        <title>{t('app.title')}</title>
         <meta name="description" content="Courses app" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
