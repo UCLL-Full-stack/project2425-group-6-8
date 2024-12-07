@@ -31,13 +31,11 @@ const Home: React.FC = () => {
             width={50}
             height={50}
           />
-          <h1>Welcome!</h1>
+          <h1>{t('header.welcome')}</h1>
         </span>
 
         <div className={styles.description}>
-          <p>
-            This is a shared Grocery list you can use with your family or friends.
-          </p>
+          <p>{t('header.description')}</p>
         </div>
       </main>
     </>

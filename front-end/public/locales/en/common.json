@@ -20,7 +20,8 @@
             "group": "Group",
             "login": "Login",
             "logout": "Logout"
-        }
+        },
+        "description": "This is a shared Grocery List App you can use with your family or friends."
     }
 }
    

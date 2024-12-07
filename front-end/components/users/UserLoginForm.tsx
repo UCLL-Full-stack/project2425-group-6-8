@@ -44,14 +44,19 @@ const UserLoginForm: React.FC = () => {
 
     try {
       const response = await UserService.loginUser({ nickname, password });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
 
       if (response.status === 200) {
-        const { token, fullname, username, role } = data;
+        const { name, role } = data;
 
         localStorage.setItem(
           "loggedInUser",
-          JSON.stringify({ token, fullname, username, role })
+          JSON.stringify({ name, role })
         );
 
         setStatusMessages([
@@ -61,7 +66,7 @@ const UserLoginForm: React.FC = () => {
         setTimeout(() => router.push("/"), 2000);
       }
     } catch (error) {
-      setStatusMessages([{ message: t("general.success"), type: "error" }]);
+      setStatusMessages([{ message: t("general.error"), type: "error" }]);
     }
   };
 

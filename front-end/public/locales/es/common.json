@@ -19,7 +19,8 @@
             "group": "Grupo",
             "login": "Conéctese",
             "logout": "Cerrar sesión"
-            }
+        },
+        "description": "Esta es una aplicación de lista de compras compartida que puedes usar con tu familia o amigos."
     }
 }
     
