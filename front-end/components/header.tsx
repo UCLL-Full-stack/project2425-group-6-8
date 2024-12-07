@@ -8,7 +8,9 @@ const Header: React.FC = () => {
   const { t } = useTranslation("common");
 
   useEffect(() => {
-    setLoggedInUser(localStorage.getItem("loggedInUser"));
+    const loggedInUserData = JSON.parse(localStorage.getItem("loggedInUser"));
+    const userDataToShow = loggedInUserData ? { name: loggedInUserData.name, role: loggedInUserData.role } : null;
+    setLoggedInUser(userDataToShow?.name);
   }, []);
 
   const handleClick = () => {
