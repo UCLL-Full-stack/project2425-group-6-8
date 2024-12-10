@@ -40,6 +40,16 @@ const Header: React.FC = () => {
           {t('header.nav.login')}
           </Link>
         )}
+
+        {!loggedInUser && (
+          <Link
+            href="/register"
+            className="px-4 text-white text-xl hover:bg-gray-600 rounded-lg"
+          >
+          {t('header.nav.register')}
+          </Link>
+        )}
+
         {loggedInUser && (
           <a
             href="/login"
