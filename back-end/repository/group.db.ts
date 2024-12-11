@@ -42,11 +42,19 @@ Group.from = function ({
 
 const createGroup = async (group: Group): Promise<Group> => {
     try {
+        const usersWithValidIds = group.getUsers().map((user) => {
+            const userId = user.getId();
+            if (!userId) {
+                throw new Error(`User ID is missing for user: ${JSON.stringify(user)}`);
+            }
+            return { id: userId };
+        });
+
         const groupPrisma = await database.group.create({
             data: {
                 name: group.getName(),
                 users: {
-                    connect: group.getUsers().map((user) => ({ id: user.getId() })),
+                    connect: usersWithValidIds,
                 },
             },
             include: {
@@ -67,6 +75,7 @@ const createGroup = async (group: Group): Promise<Group> => {
         throw new Error('Failed to create group. See server logs for details.');
     }
 };
+
 
 const getGroupById = async (id: number): Promise<Group | undefined> => {
     try {

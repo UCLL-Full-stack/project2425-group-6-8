@@ -14,16 +14,21 @@ const getAllUsers = async (): Promise<User[]> => {
 
 const getUserById = async (id: number): Promise<User | null> => {
     try {
+        if (!id) {
+            throw new Error('User ID is required and must be a valid number');
+        }
+
         const userPrisma = await database.user.findUnique({
             where: { id },
         });
-        if (!userPrisma) return null;
-        return User.from(userPrisma);
+
+        return userPrisma ? User.from(userPrisma) : null;
     } catch (error) {
         console.error(error);
         throw new Error('Database error. See server log for details');
     }
 };
+
 
 const getUserByNickName = async ({ nickname }: { nickname: string }): Promise<User | null> => {
     try {

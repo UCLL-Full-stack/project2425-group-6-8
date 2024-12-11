@@ -192,7 +192,7 @@ groupRouter.post('/', async (req: Request, res: Response, next: NextFunction) =>
     try {
         const groupData = {
             name: req.body.name,
-            userIds: req.body.users.map((user: { id: number }) => user.id), 
+            userIds: req.body.users, 
             groceryList: req.body.groceryList,
             schedule: req.body.schedule,
             message: req.body.message,
@@ -201,9 +201,11 @@ groupRouter.post('/', async (req: Request, res: Response, next: NextFunction) =>
         const result = await groupService.createGroup(groupData);
         res.status(200).json(result);
     } catch (error) {
+        console.error('Error in group creation:', error);
         next(error);
     }
 });
+
 
 
 /**
