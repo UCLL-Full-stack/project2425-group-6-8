@@ -33,11 +33,11 @@ const GroupPage: React.FC<{ groups: Group[] }> = ({ groups }) => {
       <Header />
       <main>
         <section className="p-6 min-h-screen flex flex-col items-center">
-          <h1 className="text-2xl font-bold mb-4">{t("group.overviewTitle")}</h1>
+          <h1 className="text-2xl font-bold mb-4">{t("group.title")}</h1>
           {groups.length > 0 ? (
             <GroupList groups={groups} />
           ) : (
-            <p className="text-gray-500">{t("group.noGroups")}</p>
+            <p className="text-gray-500">{t("group.validate.noGroups")}</p>
           )}
         </section>
       </main>
