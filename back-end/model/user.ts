@@ -118,7 +118,6 @@ import { ro } from 'date-fns/locale';
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
             return emailRegex.test(email);
         }
-
         static from({
             id,
             name,

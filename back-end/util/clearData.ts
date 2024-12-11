@@ -6,8 +6,7 @@ async function clearData() {
     try {
         await prisma.message.deleteMany({});
         await prisma.groceryList.deleteMany({});
-        await prisma.schedule.deleteMany({});
-        
+        await prisma.schedule.deleteMany({})
         await prisma.user.deleteMany({});
         await prisma.group.deleteMany({});
         await prisma.item.deleteMany({});

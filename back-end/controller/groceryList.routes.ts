@@ -157,4 +157,55 @@ groceryListRouter.post('/', async (req: Request, res: Response) => {
     }
 });
 
+
+
+/**
+ * @swagger
+ * /grocerylists/{id}/items:
+ *   post:
+ *     security:
+ *       - bearerAuth: []  # Add this security definition
+ *     summary: Add existing items to an existing grocery list by their IDs.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the grocery list to add items to.
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               itemIds:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *                 description: Array of item IDs to add to the grocery list.
+ *     responses:
+ *       200:
+ *         description: Updated grocery list with added items.
+ *       400:
+ *         description: Error adding items.
+ */
+groceryListRouter.post('/:id/items', (req: Request, res: Response, next: NextFunction) => {
+    const groceryListId = parseInt(req.params.id, 10);
+    const { itemIds } = req.body;
+
+    console.log('Grocery List ID:', groceryListId);
+    console.log('Item IDs:', itemIds);
+
+    try {
+        const updatedGroceryList = groceryListService.addItemsToGroceryList(groceryListId, itemIds);
+        res.status(200).json(updatedGroceryList);
+    } catch (error) {
+        console.error('Error:', error); 
+        next(error);
+    }
+});
+
+
 export { groceryListRouter };

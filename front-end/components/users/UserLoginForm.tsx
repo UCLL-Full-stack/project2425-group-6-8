@@ -36,7 +36,7 @@ const UserLoginForm: React.FC = () => {
     return result;
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: { preventDefault: () => void; }) => {
     event.preventDefault();
     clearErrors();
 

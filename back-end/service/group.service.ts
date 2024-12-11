@@ -32,4 +32,17 @@ const getAllGroups = async (): Promise<Group[]> => {
     return await groupDb.getAllGroups();
 };
 
-export default { createGroup, getGroupById, getAllGroups };
+const addUserToGroup = async (groupId: number, userId: number): Promise<Group> => {
+    if (!groupId || groupId <= 0) throw new Error('Invalid group ID');
+    if (!userId || userId <= 0) throw new Error('Invalid user ID');
+
+    const group = await groupDb.getGroupById(groupId);
+    if (!group) throw new Error(`Group with ID ${groupId} does not exist`);
+
+    const user = await UserService.getUserById(userId);
+    if (!user) throw new Error(`User with ID ${userId} does not exist`);
+
+    return await groupDb.addUserToGroup(groupId, userId);
+};
+
+export default { createGroup, getGroupById, getAllGroups, addUserToGroup };

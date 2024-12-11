@@ -113,5 +113,32 @@ const getAllGroups = async (): Promise<Group[]> => {
     }
 };
 
-export default { createGroup, getGroupById, getAllGroups };
+const addUserToGroup = async (groupId: number, userId: number): Promise<Group> => {
+    try {
+        const updatedGroup = await database.group.update({
+            where: { id: groupId },
+            data: {
+                users: {
+                    connect: { id: userId },
+                },
+            },
+            include: {
+                users: true,
+                groceryLists: {
+                    include: {
+                        items: true,
+                    },
+                },
+                schedules: true,
+                messages: true,
+            },
+        });
 
+        return Group.from(updatedGroup);
+    } catch (error) {
+        console.error('Database error:', error);
+        throw new Error('Failed to add user to group. See server logs for details.');
+    }
+};
+
+export default { createGroup, getGroupById, getAllGroups, addUserToGroup };

@@ -63,6 +63,7 @@ const createUser = async ({
     }
 };
 
+
 export default {
     getAllUsers,
     getUserById,
