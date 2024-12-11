@@ -6,19 +6,37 @@
         "button": "Conéctese",
         "success": "Inicio de sesión exitoso. Redirigiendo a la página de inicio...",
         "validate": {
-        "nickname": "Apodo obligatorio",
-        "password": "Se requiere contraseña"
+            "nickname": "Apodo obligatorio",
+            "password": "Se requiere contraseña"
+        }
     },
-    "label": { "username": "Apodo:", "password": "Contraseña:" }
+    "register": {
+        "title": "Registro",
+        "button": "Registro",
+        "success": "Registro exitoso. Iniciar sesión y luego redirigir a la página de inicio...",
+        "validate": {
+            "name": "El nombre es obligatorio",
+            "email": "Se requiere correo electrónico",
+            "emailInvalid": "El correo electrónico no es válido",
+            "nickname": "Apodo obligatorio",
+            "password": "Se requiere contraseña"
+        },
+        "password":{
+            "minLength": "La longitud de la contraseña debe ser de al menos 6 caracteres",
+            "uppercase": "Utilice al menos 1 letra mayúscula",
+            "number": "Utilice al menos 1 número",
+            "specialChar": "Utilice al menos 1 carácter especial"
+        }
     },
-
+    "label": { "nickname": "Apodo:", "password": "Contraseña:", "name": "Nombre:", "email": "Correo electrónico:" },
     "header": {
         "welcome": "Bienvenido",
         "nav": {
             "home": "Inicio",
             "group": "Grupo",
             "login": "Conéctese",
-            "logout": "Cerrar sesión"
+            "logout": "Cerrar sesión",
+            "register": "Registro"
         },
         "description": "Esta es una aplicación de lista de compras compartida que puedes usar con tu familia o amigos."
     }

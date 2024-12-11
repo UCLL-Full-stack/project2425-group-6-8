@@ -1,25 +1,44 @@
 {
     "app": {
     "title": "Shared Grocery List App"
-  },
+    },
     "general.error": "An error has occurred. Please try again later.",
     "login": {
         "title": "Login",
         "button": "Login",
         "success": "Login succesful. Redirecting to homepage...",
         "validate": {
-        "nickname": "Nickname is required",
-        "password": "Password is required"
-        },
-    "label": { "username": "Nickname:", "password": "Password:" }   
+            "nickname": "Nickname is required",
+            "password": "Password is required"
+        }
     },
+    "register": {
+        "title": "Register",
+        "button": "Register",
+        "success": "Register succesful. Logging in then redirecting to homepage...",
+        "validate": {
+            "name": "Name is required",
+            "email": "Email is required",
+            "emailInvalid": "Email is invalid",
+            "nickname": "Nickname is required",
+            "password": "Password is required"
+        },
+        "password":{
+            "minLength": "Password length must be at least 6 characters",
+            "uppercase": "Use at least 1 uppercase letter",
+            "number": "Use at least 1 number",
+            "specialChar": "Use at least 1 special character"
+        }
+    },
+    "label": { "nickname": "Nickname:", "password": "Password:", "name": "Name:", "email": "Email:"},
     "header": {
         "welcome": "Welcome",
         "nav": {
             "home": "Home",
             "group": "Group",
             "login": "Login",
-            "logout": "Logout"
+            "logout": "Logout",
+            "register": "Register"
         },
         "description": "This is a shared Grocery List App you can use with your family or friends."
     }
