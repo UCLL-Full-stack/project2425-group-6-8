@@ -226,10 +226,13 @@ groupRouter.post('/', async (req: Request, res: Response, next: NextFunction) =>
  *                    $ref: '#/components/schemas/Group'
  */
 groupRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
+    console.log("GET /groups - Request received"); // Log route hit
     try {
         const result = await groupService.getAllGroups();
+        console.log("GET /groups - Result:", JSON.stringify(result, null, 2)); // Log result
         res.status(200).json(result);
     } catch (error) {
+        console.error("GET /groups - Error:", error); // Log error
         next(error);
     }
 });
