@@ -58,7 +58,13 @@ const createUser = async ({
 }): Promise<User> => {
     try {
         const userPrisma = await database.user.create({
-            data: { name, nickname, email, password,role },
+            data: {
+            name: name ?? '',
+            nickname,
+            email: email ?? '',
+            password,
+            role: role ?? ''
+            }
         });
 
         return User.from(userPrisma);

@@ -1,153 +1,189 @@
-import { Group } from '../model/group';
-import { User } from '../model/user';
-import { GroceryList } from '../model/groceryList';
-import { Schedule } from '../model/schedule';
-import { Message } from '../model/message';
-import database from './database'; 
-import {
-    Group as GroupPrisma,
-    User as UserPrisma,
-    GroceryList as GroceryListPrisma,
-    Schedule as SchedulePrisma,
-    Message as MessagePrisma,
-    Item as ItemPrisma,
-} from '@prisma/client';
+    import { Group } from '../model/group';
+    import { User } from '../model/user';
+    import { GroceryList } from '../model/groceryList';
+    import { Schedule } from '../model/schedule';
+    import { Message } from '../model/message';
+    import database from './database';
+    import {
+        Group as GroupPrisma,
+        User as UserPrisma,
+        GroceryList as GroceryListPrisma,
+        Schedule as SchedulePrisma,
+        Message as MessagePrisma,
+        Item as ItemPrisma,
+    } from '@prisma/client';
 
-Group.from = function ({
-    id,
-    name,
-    users,
-    groceryLists,
-    schedules,
-    messages,
-    createdAt,
-    updatedAt,
-}: GroupPrisma & {
-    users: UserPrisma[];
-    groceryLists?: GroceryListPrisma[];  
-    schedules?: SchedulePrisma[];
-    messages?: MessagePrisma[];
-}): Group {
-    return new Group({
+    // Group.from Method
+    Group.from = function ({
         id,
         name,
-        users: users.map(User.from),
-        groceryLists: groceryLists ? groceryLists.map(GroceryList.from) : [], 
-        schedules: schedules ? schedules.map(Schedule.from) : [],
-        messages: messages ? messages.map(Message.from) : [],
+        users,
+        groceryLists,
+        schedules,
+        messages,
         createdAt,
         updatedAt,
-    });
-};
+    }: GroupPrisma & {
+        users: UserPrisma[];
+        groceryLists?: GroceryListPrisma[];
+        schedules?: SchedulePrisma[];
+        messages?: MessagePrisma[];
+    }): Group {
+        console.log("[DEBUG] Group.from received data:", {
+            id,
+            name,
+            users,
+            groceryLists,
+            schedules,
+            messages,
+            createdAt,
+            updatedAt,
+        });
 
-const createGroup = async (group: Group): Promise<Group> => {
-    try {
-        const usersWithValidIds = group.getUsers().map((user) => {
-            const userId = user.getId();
-            if (!userId) {
-                throw new Error(`User ID is missing for user: ${JSON.stringify(user)}`);
+        const mappedGroup = new Group({
+            id,
+            name,
+            users: users.map(User.from),
+            groceryLists: groceryLists ? groceryLists.map(GroceryList.from) : [],
+            schedules: schedules ? schedules.map(Schedule.from) : [],
+            messages: messages ? messages.map(Message.from) : [],
+            createdAt,
+            updatedAt,
+        });
+
+        console.log("[DEBUG] Group.from mapped to domain model:", mappedGroup);
+        return mappedGroup;
+    };
+
+    // Create Group
+    const createGroup = async (group: Group): Promise<Group> => {
+        try {
+            console.log("[INFO] Creating group:", group);
+
+            const usersWithValidIds = group.getUsers().map((user) => {
+                const userId = user.getId();
+                if (!userId) {
+                    console.error("[ERROR] User ID missing:", user);
+                    throw new Error(`User ID is missing for user: ${JSON.stringify(user)}`);
+                }
+                return { id: userId };
+            });
+
+            const groupPrisma = await database.group.create({
+                data: {
+                    name: group.getName(),
+                    users: {
+                        connect: usersWithValidIds,
+                    },
+                },
+                include: {
+                    users: true,
+                    groceryLists: {
+                        include: {
+                            items: true,
+                        },
+                    },
+                    schedules: true,
+                    messages: true,
+                },
+            });
+
+            console.log("[DEBUG] Created group data from Prisma:", groupPrisma);
+            return Group.from(groupPrisma);
+        } catch (error) {
+            console.error("[ERROR] Failed to create group:", { error, group });
+            throw new Error("Failed to create group. See server logs for details.");
+        }
+    };
+
+    // Get Group by ID
+    const getGroupById = async (id: number): Promise<Group | undefined> => {
+        try {
+            console.log("[INFO] Fetching group by ID:", id);
+
+            const groupPrisma = await database.group.findUnique({
+                where: { id },
+                include: {
+                    users: true,
+                    groceryLists: {
+                        include: {
+                            items: true,
+                        },
+                    },
+                    schedules: true,
+                    messages: { include: { user: true } },
+                },
+            });
+
+            if (!groupPrisma) {
+                console.warn(`[WARNING] No group found with ID: ${id}`);
+                return undefined;
             }
-            return { id: userId };
-        });
 
-        const groupPrisma = await database.group.create({
-            data: {
-                name: group.getName(),
-                users: {
-                    connect: usersWithValidIds,
+            console.log("[DEBUG] Group data fetched from Prisma:", groupPrisma);
+            return Group.from(groupPrisma);
+        } catch (error) {
+            console.error("[ERROR] Failed to fetch group by ID:", { id, error });
+            throw new Error("Failed to fetch group by ID. See server logs for details.");
+        }
+    };
+
+    // Get All Groups
+    const getAllGroups = async (): Promise<Group[]> => {
+        try {
+            console.log("[INFO] Fetching all groups");
+
+            const groupsPrisma = await database.group.findMany({
+                include: {
+                    users: true,
+                    groceryLists: {
+                        include: {
+                            items: true,
+                        },
+                    },
+                    schedules: true,
+                    messages: { include: { user: true } }, 
                 },
-            },
-            include: {
-                users: true,
-                groceryLists: {
-                    include: {
-                        items: true,
+            });
+
+            console.log("[DEBUG] Fetched groups data from Prisma:", groupsPrisma);
+            return groupsPrisma.map(Group.from);
+        } catch (error) {
+            console.error("[ERROR] Failed to fetch all groups:", error);
+            throw new Error("Failed to fetch all groups. See server logs for details.");
+        }
+    };
+
+    // Add User to Group
+    const addUserToGroup = async (groupId: number, userId: number): Promise<Group> => {
+        try {
+            console.log("[INFO] Adding user to group:", { groupId, userId });
+
+            const updatedGroup = await database.group.update({
+                where: { id: groupId },
+                data: {
+                    users: {
+                        connect: { id: userId },
                     },
                 },
-                schedules: true,
-                messages: true,
-            },
-        });
-
-        return Group.from(groupPrisma);
-    } catch (error) {
-        console.error('Database error:', error);
-        throw new Error('Failed to create group. See server logs for details.');
-    }
-};
-
-
-const getGroupById = async (id: number): Promise<Group | undefined> => {
-    try {
-        const groupPrisma = await database.group.findUnique({
-            where: { id },
-            include: {
-                users: true,
-                groceryLists: {
-                    include: {
-                        items: true,
+                include: {
+                    users: true,
+                    groceryLists: {
+                        include: {
+                            items: true,
+                        },
                     },
+                    schedules: true,
+                    messages: true,
                 },
-                schedules: true,
-                messages: true,
-            },
-        });
+            });
 
-        return groupPrisma ? Group.from(groupPrisma) : undefined;
-    } catch (error) {
-        console.error('Database error:', error);
-        throw new Error('Failed to fetch group by ID. See server logs for details.');
-    }
-};
+            console.log("[DEBUG] Updated group data from Prisma:", updatedGroup);
+            return Group.from(updatedGroup);
+        } catch (error) {
+            console.error("[ERROR] Failed to add user to group:", { groupId, userId, error });
+            throw new Error("Failed to add user to group. See server logs for details.");
+        }
+    };
 
-const getAllGroups = async (): Promise<Group[]> => {
-    try {
-        const groupsPrisma = await database.group.findMany({
-            include: {
-                users: true,
-                groceryLists: {
-                    include: {
-                        items: true,
-                    },
-                },
-                schedules: true,
-                messages: true,
-            },
-        });
-
-        return groupsPrisma.map(Group.from);
-    } catch (error) {
-        console.error('Database error:', error);
-        throw new Error('Failed to fetch all groups. See server logs for details.');
-    }
-};
-
-const addUserToGroup = async (groupId: number, userId: number): Promise<Group> => {
-    try {
-        const updatedGroup = await database.group.update({
-            where: { id: groupId },
-            data: {
-                users: {
-                    connect: { id: userId },
-                },
-            },
-            include: {
-                users: true,
-                groceryLists: {
-                    include: {
-                        items: true,
-                    },
-                },
-                schedules: true,
-                messages: true,
-            },
-        });
-
-        return Group.from(updatedGroup);
-    } catch (error) {
-        console.error('Database error:', error);
-        throw new Error('Failed to add user to group. See server logs for details.');
-    }
-};
-
-export default { createGroup, getGroupById, getAllGroups, addUserToGroup };
+    export default { createGroup, getGroupById, getAllGroups, addUserToGroup };

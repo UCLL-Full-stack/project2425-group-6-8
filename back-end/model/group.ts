@@ -81,30 +81,31 @@ export class Group {
         }
     }
 
-       static from({
+   static from({
+    id,
+    name,
+    users,
+    groceryLists = [],
+    schedules = [],
+    messages = [],
+    createdAt,
+    updatedAt,
+}: GroupPrisma & {
+    users: UserPrisma[];
+    groceryLists?: GroceryListPrisma[];
+    schedules?: SchedulePrisma[];
+    messages?: MessagePrisma[];
+}): Group {
+    return new Group({
         id,
         name,
-        users,
-        groceryLists, 
-        schedules,
-        messages,
+        users: users.map(User.from),
+        groceryLists: groceryLists.map(GroceryList.from),
+        schedules: schedules.map(Schedule.from),
+        messages: messages.map(Message.from),
         createdAt,
         updatedAt,
-    }: GroupPrisma & { 
-        users: UserPrisma[]; 
-        groceryLists: GroceryListPrisma[]; 
-        schedules: SchedulePrisma[]; 
-        messages?: MessagePrisma[]; 
-    }): Group {
-        return new Group({
-            id,
-            name,
-            users: users?.map(User.from),
-            groceryLists: groceryLists?.map(GroceryList.from), 
-            schedules: schedules?.map(Schedule.from),
-            messages: messages?.map(Message.from),
-            createdAt,
-            updatedAt,
-        });  
-    }
+    });
+}
+
 }
