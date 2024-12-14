@@ -30,6 +30,12 @@
             "specialChar": "Use at least 1 special character"
         }
     },
+    "group": {
+        "title": "Groups",
+        "validate": {
+            "noGroups": "There are no groups"
+        }
+    },
     "label": { "nickname": "Nickname:", "password": "Password:", "name": "Name:", "email": "Email:"},
     "header": {
         "welcome": "Welcome",

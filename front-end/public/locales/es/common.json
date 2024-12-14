@@ -28,6 +28,12 @@
             "specialChar": "Utilice al menos 1 carácter especial"
         }
     },
+    "group": {
+        "title": "Grupos",
+        "validate": {
+            "noGroups": "No hay grupos"
+        }
+    },
     "label": { "nickname": "Apodo:", "password": "Contraseña:", "name": "Nombre:", "email": "Correo electrónico:" },
     "header": {
         "welcome": "Bienvenido",
