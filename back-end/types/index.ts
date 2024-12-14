@@ -54,6 +54,7 @@ type GroupInput = {
 };
 
 type AuthenticationResponse = {
+    id?: number;
     token: string;
     nickname: string;
     name: string;
