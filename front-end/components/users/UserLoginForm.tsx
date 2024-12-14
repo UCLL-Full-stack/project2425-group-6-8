@@ -52,11 +52,11 @@ const UserLoginForm: React.FC = () => {
       const data = await response.json();
 
       if (response.status === 200) {
-        const { name, role, token } = data;
+        const { id, nickname, name, role, token } = data;
 
         localStorage.setItem(
           "loggedInUser",
-          JSON.stringify({ name, role, token })
+          JSON.stringify({ id, nickname, name, role, token })
         );
 
         setStatusMessages([
