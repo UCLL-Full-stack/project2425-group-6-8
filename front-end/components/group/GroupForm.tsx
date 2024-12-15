@@ -7,13 +7,12 @@ import Head from 'next/head';
 
 const GroupForm: React.FC = () => {
     const [showCreateGroupForm, setShowCreateGroupForm] = useState(false);
-  
     const [name, setName] = useState("");
     const [users, setUsers] = useState("");
     const [message, setMessage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
-  
+
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
   
@@ -36,106 +35,99 @@ const GroupForm: React.FC = () => {
         console.error(error);
       }
     };
-  
+
     return (
-        <>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "70vh" }}>
-                {!showCreateGroupForm ? (
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "70vh" }}>
+            {!showCreateGroupForm ? (
                 <div style={{ textAlign: "center" }}>
                     <button
-                    onClick={() => alert("Join a group feature not implemented yet!")}
-                    style={{
-                        padding: "15px 30px",
-                        marginBottom: "20px",
-                        fontSize: "16px",
-                        backgroundColor: "#007BFF",
-                        color: "white",
-                        border: "none",
-                        cursor: "pointer",
-                    }}
+                        onClick={() => alert("Join a group feature not implemented yet!")}
+                        style={{
+                            padding: "15px 30px",
+                            marginBottom: "20px",
+                            fontSize: "16px",
+                            backgroundColor: "#007BFF",
+                            color: "white",
+                            border: "none",
+                            cursor: "pointer",
+                        }}
                     >
-                    Join a Group
+                        Join a Group
                     </button>
-        
                     <button
-                    onClick={() => setShowCreateGroupForm(true)}
-                    style={{
-                        padding: "15px 30px",
-                        fontSize: "16px",
-                        backgroundColor: "#28a745",
-                        color: "white",
-                        border: "none",
-                        cursor: "pointer",
-                    }}
+                        onClick={() => setShowCreateGroupForm(true)}
+                        style={{
+                            padding: "15px 30px",
+                            fontSize: "16px",
+                            backgroundColor: "#28a745",
+                            color: "white",
+                            border: "none",
+                            cursor: "pointer",
+                        }}
                     >
-                    Create a Group
+                        Create a Group
                     </button>
                 </div>
-                ) : (
+            ) : (
                 <div style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>
                     <h1>Create a New Group</h1>
                     {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
                     {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
-        
                     <form onSubmit={handleSubmit}>
-                    <div style={{ marginBottom: "10px" }}>
-                        <label>
-                        <strong>Group Name:</strong>
-                        <input
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="Enter group name"
-                            required
-                            style={{ width: "100%", padding: "8px", marginTop: "5px" }}
-                        />
-                        </label>
-                    </div>
-        
-                    <div style={{ marginBottom: "10px" }}>
-                        <label>
-                        <strong>Users (comma-separated IDs):</strong>
-                        <input
-                            type="text"
-                            value={users}
-                            onChange={(e) => setUsers(e.target.value)}
-                            placeholder="e.g., 1, 2, 3"
-                            required
-                            style={{ width: "100%", padding: "8px", marginTop: "5px" }}
-                        />
-                        </label>
-                    </div>
-        
-                    <div style={{ marginBottom: "10px" }}>
-                        <label>
-                        <strong>Message:</strong>
-                        <textarea
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                            placeholder="Enter a welcome message (optional)"
-                            style={{ width: "100%", padding: "8px", marginTop: "5px" }}
-                        />
-                        </label>
-                    </div>
-        
-                    <button
-                        type="submit"
-                        style={{
-                        padding: "10px 15px",
-                        backgroundColor: "#007BFF",
-                        color: "white",
-                        border: "none",
-                        cursor: "pointer",
-                        }}
-                    >
-                        Create Group
-                    </button>
+                        <div style={{ marginBottom: "10px" }}>
+                            <label>
+                                <strong>Group Name:</strong>
+                                <input
+                                    type="text"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    placeholder="Enter group name"
+                                    required
+                                    style={{ width: "100%", padding: "8px", marginTop: "5px" }}
+                                />
+                            </label>
+                        </div>
+                        <div style={{ marginBottom: "10px" }}>
+                            <label>
+                                <strong>Users (comma-separated IDs):</strong>
+                                <input
+                                    type="text"
+                                    value={users}
+                                    onChange={(e) => setUsers(e.target.value)}
+                                    placeholder="e.g., 1, 2, 3"
+                                    required
+                                    style={{ width: "100%", padding: "8px", marginTop: "5px" }}
+                                />
+                            </label>
+                        </div>
+                        <div style={{ marginBottom: "10px" }}>
+                            <label>
+                                <strong>Message:</strong>
+                                <textarea
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                    placeholder="Enter a welcome message (optional)"
+                                    style={{ width: "100%", padding: "8px", marginTop: "5px" }}
+                                />
+                            </label>
+                        </div>
+                        <button
+                            type="submit"
+                            style={{
+                                padding: "10px 15px",
+                                backgroundColor: "#007BFF",
+                                color: "white",
+                                border: "none",
+                                cursor: "pointer",
+                            }}
+                        >
+                            Create Group
+                        </button>
                     </form>
                 </div>
-                )}
-            </div>
-        </>
+            )}
+        </div>
     );
-  };
-  
-  export default GroupForm;
+};
+
+export default GroupForm;

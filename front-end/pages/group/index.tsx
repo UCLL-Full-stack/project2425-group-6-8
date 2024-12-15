@@ -1,6 +1,6 @@
 import Head from "next/head";
 import Header from "@components/header";
-import GroupList from "@components/group/GroupList"; 
+import GroupList from "@components/group/GroupList";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
 import { GetServerSideProps } from "next"; 
