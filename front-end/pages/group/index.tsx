@@ -1,25 +1,29 @@
 import Head from "next/head";
 import Header from "@components/header";
-import GroupList from "@components/group/GroupList"; 
+import GroupList from "@components/group/GroupList";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
-import { GetServerSideProps } from "next"; 
+import { GetServerSideProps } from "next";
+import GroupService, { Group } from "@services/GroupService"; 
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  const res = await fetch("http://localhost:3000/api/group");
-  const groups = await res.json();
-
-  return {
-    props: {
-      groups,
-      ...(await serverSideTranslations(locale ?? 'en', ["common"])),
-    },
-  };
-};
-
-type Group = {
-  id: string;
-  name: string;
+  try {
+    const groups = await GroupService.getAllGroups(); 
+    return {
+      props: {
+        groups,
+        ...(await serverSideTranslations(locale ?? "en", ["common"])),
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching groups:", error);
+    return {
+      props: {
+        groups: [],
+        ...(await serverSideTranslations(locale ?? "en", ["common"])),
+      },
+    };
+  }
 };
 
 const GroupPage: React.FC<{ groups: Group[] }> = ({ groups }) => {

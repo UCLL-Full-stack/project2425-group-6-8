@@ -1,29 +1,33 @@
-import Link from "next/link";
+import React from "react";
 
+// Define the Group type
 type Group = {
   id: string;
   name: string;
+  message?: string;
 };
 
-type GroupListProps = {
+// Update the props type for GroupList
+interface GroupListProps {
   groups: Group[];
-};
+}
 
 const GroupList: React.FC<GroupListProps> = ({ groups }) => {
   return (
-    <ul className="w-full max-w-lg">
-      {groups.map((group) => (
-        <li
-          key={group.id}
-          className="border-b py-4 flex justify-between items-center"
-        >
-          <span className="text-lg">{group.name}</span>
-          <Link href={`/groups/${group.id}`}>
-            <a className="text-blue-500 hover:underline">View Details</a>
-          </Link>
-        </li>
-      ))}
-    </ul>
+    <div style={{ padding: "20px" }}>
+      <h1>Group List</h1>
+      {groups.length > 0 ? (
+        <ul>
+          {groups.map((group) => (
+            <li key={group.id}>
+              <strong>{group.name}</strong> - {group.message || "No message"}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No groups available.</p>
+      )}
+    </div>
   );
 };
 
