@@ -20,14 +20,31 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   };
 };
 
+
+
 const GroupPage: React.FC = () => {
   const { t } = useTranslation("common");
   const [groups, setGroups] = useState<Array<Group>>();
   const [error, setError] = useState<string>();
+  const loggedInUserData = (() => {
+    if (typeof localStorage === "undefined") {
+        console.warn("localStorage is not defined.");
+        return null;
+    }
+    const item = localStorage.getItem("loggedInUser");
+    return item ? JSON.parse(item) : null;
+  })();
+
 
   const getGroups = async () => {
     setError("");
-    const response = await GroupService.getAllGroups();
+
+    if (!loggedInUserData || !loggedInUserData.id) {
+      setError("Unauthorized: User is not logged in.");
+      return; 
+    }
+
+    const response = await GroupService.getGroupsOfUser(loggedInUserData.id);
 
     if (!response.ok) {
         setError(response.statusText);
@@ -44,7 +61,7 @@ const GroupPage: React.FC = () => {
   return (
     <>
       <Head>
-        <title>{t("header.nav.group")}</title>
+        <title>{t('group.title')}</title>
       </Head>
       <Header />
       <main className="p-6 min-h-screen flex flex-col items-center">

@@ -32,6 +32,12 @@ const getAllGroups = async (): Promise<Group[]> => {
     return await groupDb.getAllGroups();
 };
 
+const getGroupsOfUser = async (userId: number): Promise<Group[] | undefined> => {
+    const groups = await groupDb.getGroupsOfUser(userId);
+    if(!groups) throw new Error("This user is not currently in any group");
+    return groups;
+}
+
 const addUserToGroup = async (groupId: number, userId: number): Promise<Group> => {
     if (!groupId || groupId <= 0) throw new Error('Invalid group ID');
     if (!userId || userId <= 0) throw new Error('Invalid user ID');
@@ -45,4 +51,4 @@ const addUserToGroup = async (groupId: number, userId: number): Promise<Group> =
     return await groupDb.addUserToGroup(groupId, userId);
 };
 
-export default { createGroup, getGroupById, getAllGroups, addUserToGroup };
+export default { createGroup, getGroupById, getAllGroups, addUserToGroup,getGroupsOfUser };

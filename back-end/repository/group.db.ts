@@ -181,4 +181,36 @@
         }
     };
 
-    export default { createGroup, getGroupById, getAllGroups, addUserToGroup };
+    const getGroupsOfUser = async (userId: number): Promise<Group[] | undefined> => {
+        try {
+            console.log("[INFO] Retrieving groups for certain user:", { userId });
+
+            const groupForUser = await database.group.findMany({
+                where: { 
+                    users: { 
+                        some: {
+                            id: userId
+                        }
+                    }
+                },
+                include: {
+                    users: true,
+                    groceryLists: {
+                        include: {
+                            items: true,
+                        },
+                    },
+                    schedules: true,
+                    messages: { include: { user: true } }, 
+                },
+            });
+
+            console.log("[DEBUG] Retrieved group data from Prisma:", groupForUser);
+            return groupForUser.map(Group.from);
+        } catch (error) {
+            console.error("[ERROR] Failed to retrieve groups for user:", { userId, error });
+            throw new Error("Failed to retrieve groups for user. See server logs for details.");
+        }
+    };
+
+    export default { createGroup, getGroupById, getAllGroups, addUserToGroup, getGroupsOfUser};

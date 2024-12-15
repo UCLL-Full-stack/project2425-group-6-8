@@ -1,3 +1,13 @@
+const loggedInUserData = (() => {
+  if (typeof localStorage === "undefined") {
+      console.warn("localStorage is not defined.");
+      return null;
+  }
+  const item = localStorage.getItem("loggedInUser");
+  return item ? JSON.parse(item) : null;
+})();
+
+
 const createGroup = async (name: string, users: number[], message: string) => {
     try {
       const groupData = {
@@ -27,9 +37,18 @@ const createGroup = async (name: string, users: number[], message: string) => {
   };
 
 const getAllGroups = async () => {
-  const loggedInUserData = JSON.parse(localStorage.getItem("loggedInUser"));
-
   return fetch(process.env.NEXT_PUBLIC_API_URL + "/groups", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${loggedInUserData.token}`
+    },
+  });
+}
+
+const getGroupsOfUser = async (userId: number) => {
+
+  return fetch(process.env.NEXT_PUBLIC_API_URL + `/groups/${userId}/users`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -40,7 +59,8 @@ const getAllGroups = async () => {
 
 const GroupService = {
   createGroup,
-  getAllGroups
+  getAllGroups,
+  getGroupsOfUser
 }
   
 export default GroupService;

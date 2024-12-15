@@ -283,6 +283,51 @@ groupRouter.get('/:id', async (req: Request, res: Response, next: NextFunction) 
 
 /**
  * @swagger
+ * /groups/{userId}/users:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Retrieve groups of a user.
+ *     parameters:
+ *        - in: path
+ *          name: userId
+ *          required: true
+ *          description: ID of the user to retrieve the groups he is in.
+ *          schema:
+ *            type: integer
+ *     responses:
+ *         200:
+ *            description: The requested group.
+ *            content:
+ *              application/json:
+ *                schema:
+ *                  $ref: '#/components/schemas/Group'
+ *         404:
+ *            description: Group not found.
+ *            content:
+ *              application/json:
+ *                schema:
+ *                  type: object
+ *                  properties:
+ *                    message:
+ *                      type: string
+ */
+groupRouter.get('/:userId/users', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const id = parseInt(req.params.userId, 10);
+        const result = await groupService.getGroupsOfUser(id);
+        if (result) {
+            res.status(200).json(result);
+        } else {
+            res.status(404).json({ message: 'Group not found' });
+        }
+    } catch (error) {
+        next(error);
+    }
+});
+
+/**
+ * @swagger
  * /groups/{id}/users:
  *   post:
  *     security:
