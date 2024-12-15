@@ -40,6 +40,7 @@ type GroceryListInput = {
 type MessageInput = {
     id?: number;
     user: UserInput;
+    group: GroupInput;
     timestamp: Date;
     message: string;
 };

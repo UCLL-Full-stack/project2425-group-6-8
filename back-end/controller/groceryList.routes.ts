@@ -148,7 +148,6 @@ groceryListRouter.get('/:id', async (req: Request, res: Response) => {
 groceryListRouter.post('/', async (req: Request, res: Response) => {
     const { name, items } = req.body;
     try {
-        const { name, items } = req.body; 
         const newGroceryList = await groceryListService.createGroceryList(name, items);
         res.status(201).json(newGroceryList);
     } catch (error) {
@@ -156,8 +155,6 @@ groceryListRouter.post('/', async (req: Request, res: Response) => {
         res.status(400).json({ error: 'Failed to create grocery list' });
     }
 });
-
-
 
 /**
  * @swagger
@@ -195,9 +192,6 @@ groceryListRouter.post('/:id/items', (req: Request, res: Response, next: NextFun
     const groceryListId = parseInt(req.params.id, 10);
     const { itemIds } = req.body;
 
-    console.log('Grocery List ID:', groceryListId);
-    console.log('Item IDs:', itemIds);
-
     try {
         const updatedGroceryList = groceryListService.addItemsToGroceryList(groceryListId, itemIds);
         res.status(200).json(updatedGroceryList);
@@ -206,6 +200,5 @@ groceryListRouter.post('/:id/items', (req: Request, res: Response, next: NextFun
         next(error);
     }
 });
-
 
 export { groceryListRouter };

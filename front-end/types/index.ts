@@ -27,6 +27,13 @@ export type GroceryList = {
     quantity?: number | null;
 };
 
+export type Message = {
+    id?: number;
+    user: User;
+    timestamp: Date;
+    message: string;
+};
+
 export type Group = {
     id?: number;
     name?: string;

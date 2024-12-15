@@ -63,21 +63,31 @@ const createMessage = async (message: Message): Promise<Message> => {
     }
 };
 
-const getAllMessages = async (): Promise<Message[]> => {
+const getAllMessages = async (groupId?: number): Promise<Message[]> => {
     try {
-        console.log('Fetching all messages');
+        let messagesPrisma;
 
-        const messagesPrisma = await database.message.findMany({
-            include: { user: true },
-        });
+        if (groupId) {
+            console.log(`Fetching messages for group ID: ${groupId}`);
+            messagesPrisma = await database.message.findMany({
+                where: { groupId }, 
+                include: { user: true },
+            });
+        } else {
+            console.log('Fetching all messages');
+            messagesPrisma = await database.message.findMany({
+                include: { user: true },
+            });
+        }
 
         console.log(`Fetched ${messagesPrisma.length} messages from database`);
         return messagesPrisma.map((messagePrisma) => Message.from(messagePrisma));
     } catch (error) {
-        console.error('Error fetching all messages:', error);
+        console.error('Error fetching messages:', error);
         throw new Error('Database error. See server log for details');
     }
 };
+
 
 const getMessageById = async (id: number): Promise<Message | null> => {
     try {

@@ -1,13 +1,41 @@
+const loggedInUserData = (() => {
+  if (typeof localStorage === "undefined") {
+      console.warn("localStorage is not defined.");
+      return null;
+  }
+  const item = localStorage.getItem("loggedInUser");
+  return item ? JSON.parse(item) : null;
+})();
 
 
-const createMessage = async (messageData: { userId: number; groupId: number; message: string }) => {
+
+const createMessage = async (messageData: { groupId: number; message: string }) => {
   try {
+    const loggedInUserData = (() => {
+      if (typeof localStorage === "undefined") {
+        console.warn("localStorage is not defined.");
+        return null;
+      }
+      const item = localStorage.getItem("loggedInUser");
+      return item ? JSON.parse(item) : null;
+    })();
+
+    if (!loggedInUserData) {
+      throw new Error("User not logged in.");
+    }
+
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/messages`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${loggedInUserData.token}`,
       },
-      body: JSON.stringify(messageData),
+      body: JSON.stringify({
+        user: { id: loggedInUserData.id },  
+        groupId: messageData.groupId,       
+        message: messageData.message,
+        timestamp: new Date().toISOString(),
+      }),
     });
 
     if (!response.ok) {
@@ -22,12 +50,18 @@ const createMessage = async (messageData: { userId: number; groupId: number; mes
   }
 };
 
-const getAllMessages = async () => {
+
+const getAllMessages = async (groupId?: number) => {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/messages`, {
+    const url = groupId
+      ? `${process.env.NEXT_PUBLIC_API_URL}/messages?groupId=${groupId}`
+      : `${process.env.NEXT_PUBLIC_API_URL}/messages`;
+
+    const response = await fetch(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${loggedInUserData.token}`
       },
     });
 
@@ -43,31 +77,9 @@ const getAllMessages = async () => {
   }
 };
 
-const getMessageById = async (messageId: number) => {
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/messages/${messageId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error: ${response.statusText}`);
-    }
-
-    const message = await response.json();
-    return message;
-  } catch (error) {
-    console.error(`Failed to retrieve message with ID ${messageId}:`, error);
-    throw error;
-  }
-};
-
 const MessageService = {
   createMessage,
   getAllMessages,
-  getMessageById,
 };
 
 export default MessageService;

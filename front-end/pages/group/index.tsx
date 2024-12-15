@@ -7,6 +7,7 @@ import { GetServerSideProps } from "next";
 import { Group } from "@types";
 import { useState, useEffect } from "react";
 import GroupService from "@services/GroupService";
+import Link from "next/link";  // Import Link from next/link
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   const res = await fetch("http://localhost:3000/api/group");
@@ -19,8 +20,6 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
     },
   };
 };
-
-
 
 const GroupPage: React.FC = () => {
   const { t } = useTranslation("common");
@@ -68,9 +67,15 @@ const GroupPage: React.FC = () => {
         <section>
           {error && <div className="text-red-800">{error}</div>}
           {groups && (
-              <GroupList
-                  group={groups}
-              />
+            <div className="group-list">
+              {groups.map(group => (
+                <div key={group.id} className="group-item">
+                  <Link href={`/group/${group.id}`}>
+                    <span className="group-name">{group.name}</span>
+                  </Link>
+                </div>
+              ))}
+            </div>
           )}
         </section>
       </main>

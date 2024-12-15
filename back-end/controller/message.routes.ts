@@ -1,49 +1,6 @@
-/**
- * @swagger
- * components:
- *   securitySchemes:
- *     bearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
- *   schemas:
- *     Message:
- *       type: object
- *       properties:
- *         id:
- *           type: number
- *           format: int64
- *           description: The unique identifier for the message.
- *         message:
- *           type: string
- *           description: The content of the message.
- *         userId:
- *           type: number
- *           format: int64
- *           description: The ID of the user who sent the message.
- *         groupId:
- *           type: number
- *           format: int64
- *           description: The ID of the group to which the message belongs.
- *     MessageInput:
- *       type: object
- *       properties:
- *         userId:
- *           type: number
- *           format: int64
- *           description: The ID of the user who is sending the message.
- *         groupId:
- *           type: number
- *           format: int64
- *           description: The ID of the group to which the message will be sent.
- */
-
-
-
 import express, { NextFunction, Request, Response } from 'express';
 import messageService from '../service/message.service';
 import { MessageInput } from '../types';
-import { User } from '../model';
 
 const messageRouter = express.Router();
 
@@ -84,20 +41,35 @@ messageRouter.post('/', async (req: Request, res: Response, next: NextFunction) 
  *   get:
  *     security:
  *       - bearerAuth: []
- *     summary: Retrieve all messages.
+ *     summary: Retrieve all messages or messages for a specific group.
+ *     parameters:
+ *        - in: query
+ *          name: groupId
+ *          required: false
+ *          description: The ID of the group to filter messages by.
+ *          schema:
+ *            type: integer
  *     responses:
- *         200:
- *            description: A list of messages.
- *            content:
- *              application/json:
- *                schema:
- *                  type: array
- *                  items:
- *                    $ref: '#/components/schemas/Message'
+ *       200:
+ *         description: List of messages.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Message'
  */
 messageRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const result = await messageService.getAllMessages();
+        const { groupId } = req.query;  // Get groupId from query parameters
+        
+        let result;
+        if (groupId) {
+            result = await messageService.getAllMessages(parseInt(groupId as string, 10));
+        } else {
+            result = await messageService.getAllMessages(); // Get all if no groupId
+        }
+
         res.status(200).json(result);
     } catch (error) {
         next(error);
