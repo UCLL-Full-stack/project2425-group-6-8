@@ -4,7 +4,7 @@ import Language from "./language/Language";
 import { useTranslation } from "next-i18next";
 
 const Header: React.FC = () => {
-  const [loggedInUser, setLoggedInUser] = useState<String>(null);
+const [loggedInUser, setLoggedInUser] = useState<string | null>(null);
   const { t } = useTranslation("common");
 
   useEffect(() => {

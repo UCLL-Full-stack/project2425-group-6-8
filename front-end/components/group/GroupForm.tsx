@@ -1,8 +1,8 @@
-import Head from 'next/head';
 import { useEffect, useState } from 'react';
+import  GroupService  from "../../services/GroupService";
 import Header from '@components/header';
-import  createGroup from "../../services/GroupService";
 import styles from '@styles/home.module.css';
+import Head from 'next/head';
 
 
 const GroupForm: React.FC = () => {
@@ -25,7 +25,7 @@ const GroupForm: React.FC = () => {
       }
   
       try {
-        const newGroup = await createGroup(name, userArray, message);
+        const newGroup = await GroupService.createGroup(name, userArray, message);
         setSuccessMessage(`Group "${newGroup.name}" created successfully!`);
         setErrorMessage("");
         setName("");

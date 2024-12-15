@@ -1,3 +1,7 @@
+//SNIPPET TWO
+
+
+
 import { StatusMessage } from "@types";
 import classNames from "classnames";
 import { useRouter } from "next/router";
@@ -73,7 +77,7 @@ const UserRegisterForm: React.FC = () => {
     });
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: { preventDefault: () => void; }) => {
     event.preventDefault();
     clearErrors();
 
