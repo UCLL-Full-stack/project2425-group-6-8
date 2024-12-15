@@ -13,7 +13,6 @@
         Item as ItemPrisma,
     } from '@prisma/client';
 
-    // Group.from Method
     Group.from = function ({
         id,
         name,
@@ -55,7 +54,6 @@
         return mappedGroup;
     };
 
-    // Create Group
     const createGroup = async (group: Group): Promise<Group> => {
         try {
             console.log("[INFO] Creating group:", group);
@@ -84,7 +82,7 @@
                         },
                     },
                     schedules: true,
-                    messages: true,
+                    messages: { include: { user: true } },
                 },
             });
 
@@ -96,7 +94,6 @@
         }
     };
 
-    // Get Group by ID
     const getGroupById = async (id: number): Promise<Group | undefined> => {
         try {
             console.log("[INFO] Fetching group by ID:", id);
@@ -128,7 +125,6 @@
         }
     };
 
-    // Get All Groups
     const getAllGroups = async (): Promise<Group[]> => {
         try {
             console.log("[INFO] Fetching all groups");
@@ -154,7 +150,6 @@
         }
     };
 
-    // Add User to Group
     const addUserToGroup = async (groupId: number, userId: number): Promise<Group> => {
         try {
             console.log("[INFO] Adding user to group:", { groupId, userId });
@@ -174,7 +169,7 @@
                         },
                     },
                     schedules: true,
-                    messages: true,
+                    messages: { include: { user: true } },
                 },
             });
 
