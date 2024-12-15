@@ -1,26 +1,19 @@
 import Link from "next/link";
+import { Group } from "@types";
 
-type Group = {
-  id: string;
-  name: string;
+type Props = {
+  group: Group[]; // Change this to an array of Group objects
 };
 
-type GroupListProps = {
-  groups: Group[];
-};
-
-const GroupList: React.FC<GroupListProps> = ({ groups }) => {
+const GroupList: React.FC<Props> = ({ group }: Props) => {
   return (
     <ul className="w-full max-w-lg">
-      {groups.map((group) => (
+      {group.map((groupItem) => (
         <li
-          key={group.id}
+          key={groupItem.id}
           className="border-b py-4 flex justify-between items-center"
         >
-          <span className="text-lg">{group.name}</span>
-          <Link href={`/groups/${group.id}`}>
-            <a className="text-blue-500 hover:underline">View Details</a>
-          </Link>
+          <span className="text-lg">{groupItem.name}</span>
         </li>
       ))}
     </ul>

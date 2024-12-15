@@ -25,6 +25,23 @@ const createGroup = async (name: string, users: number[], message: string) => {
       throw error;
     }
   };
+
+const getAllGroups = async () => {
+  const loggedInUserData = JSON.parse(localStorage.getItem("loggedInUser"));
+
+  return fetch(process.env.NEXT_PUBLIC_API_URL + "/groups", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${loggedInUserData.token}`
+    },
+  });
+}
+
+const GroupService = {
+  createGroup,
+  getAllGroups
+}
   
-export default createGroup;
+export default GroupService;
   

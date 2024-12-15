@@ -28,6 +28,7 @@ export type GroceryList = {
 };
 
 export type Group = {
+    id?: number;
     name?: string;
     users?: User[];
     groceryList?: GroceryList;
