@@ -1,11 +1,11 @@
 import { User } from './user';
-import {
-    Message as MessagePrisma,
-    User as UserPrisma,
-} from '@prisma/client';
+import { Group } from './group';  
+import { Message as MessagePrisma, User as UserPrisma, Group as GroupPrisma } from '@prisma/client';
+
 export class Message {
     private id?: number | undefined;
     private user: User;
+    private group: Group;  
     private timestamp: Date;
     private message: string;
     private createdAt?: Date;
@@ -14,6 +14,7 @@ export class Message {
     constructor(message: {
         id?: number;
         user: User;
+        group: Group;  
         timestamp: Date;
         message: string;
         createdAt?: Date;
@@ -23,13 +24,13 @@ export class Message {
 
         this.id = message.id;
         this.user = message.user;
+        this.group = message.group;
         this.timestamp = message.timestamp;
         this.message = message.message;
         this.createdAt = message.createdAt;
         this.updatedAt = message.updatedAt;
     }
 
-    
     getId(): number | undefined {
         return this.id;
     }
@@ -38,7 +39,11 @@ export class Message {
         return this.user;
     }
 
-    getTimestamp(): Date { 
+    getGroup(): Group  {
+        return this.group;
+    }
+
+    getTimestamp(): Date {
         return this.timestamp;
     }
 
@@ -54,9 +59,12 @@ export class Message {
         return this.updatedAt;
     }
 
-    validate(message: { user: User; timestamp: Date; message: string }): void {
+    validate(message: { user: User; group: Group; timestamp: Date; message: string }): void {
         if (!message.user) {
             throw new Error('User is required');
+        }
+        if (!message.group) {
+            throw new Error('Group is required');
         }
         if (!message.timestamp) {
             throw new Error('Timestamp is required');
@@ -66,23 +74,29 @@ export class Message {
         }
     }
 
-  static from(message: MessagePrisma & { user?: UserPrisma | null } | undefined): Message {
-    if (!message) {
-        throw new Error('Invalid message data'); 
-    }
-
-    if (!message.user) {
-        throw new Error('Message must include a valid user relation');
-    }
-
+static from({
+    id,
+    user,
+    group,
+    timestamp,
+    message,
+    createdAt,
+    updatedAt,
+}: MessagePrisma & {
+    user: UserPrisma;
+    group: GroupPrisma & {
+        users: UserPrisma[];
+    };
+}) {
     return new Message({
-        id: message.id,
-        user: User.from(message.user),
-        timestamp: message.timestamp,
-        message: message.message,
-        createdAt: message.createdAt,
-        updatedAt: message.updatedAt,
-    });
+        id,
+        user: User.from(user),
+        group: Group.from(group),
+        timestamp,
+        message,
+        createdAt,
+        updatedAt
+    })
 }
 
 }

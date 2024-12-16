@@ -1,4 +1,6 @@
-    import { Group } from '../model/group';
+   //group.db.ts
+
+   import { Group } from '../model/group';
     import { User } from '../model/user';
     import { GroceryList } from '../model/groceryList';
     import { Schedule } from '../model/schedule';
@@ -28,16 +30,6 @@
         schedules?: SchedulePrisma[];
         messages?: MessagePrisma[];
     }): Group {
-        console.log("[DEBUG] Group.from received data:", {
-            id,
-            name,
-            users,
-            groceryLists,
-            schedules,
-            messages,
-            createdAt,
-            updatedAt,
-        });
 
         const mappedGroup = new Group({
             id,
@@ -45,7 +37,6 @@
             users: users.map(User.from),
             groceryLists: groceryLists ? groceryLists.map(GroceryList.from) : [],
             schedules: schedules ? schedules.map(Schedule.from) : [],
-            messages: messages ? messages.map(Message.from) : [],
             createdAt,
             updatedAt,
         });

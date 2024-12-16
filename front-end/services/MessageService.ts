@@ -7,23 +7,15 @@ const loggedInUserData = (() => {
   return item ? JSON.parse(item) : null;
 })();
 
-
-
 const createMessage = async (messageData: { groupId: number; message: string }) => {
-  try {
-    const loggedInUserData = (() => {
-      if (typeof localStorage === "undefined") {
-        console.warn("localStorage is not defined.");
-        return null;
-      }
-      const item = localStorage.getItem("loggedInUser");
-      return item ? JSON.parse(item) : null;
-    })();
+  console.log('Logged in user data:', loggedInUserData);
 
+  try {
     if (!loggedInUserData) {
       throw new Error("User not logged in.");
     }
 
+    console.log('Creating message for group ID:', messageData.groupId);
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/messages`, {
       method: "POST",
       headers: {
@@ -31,8 +23,8 @@ const createMessage = async (messageData: { groupId: number; message: string }) 
         Authorization: `Bearer ${loggedInUserData.token}`,
       },
       body: JSON.stringify({
-        user: { id: loggedInUserData.id },  
-        groupId: messageData.groupId,       
+        user: { id: loggedInUserData.id },
+        group: { id: messageData.groupId },  
         message: messageData.message,
         timestamp: new Date().toISOString(),
       }),
@@ -43,6 +35,7 @@ const createMessage = async (messageData: { groupId: number; message: string }) 
     }
 
     const createdMessage = await response.json();
+    console.log('Created message response:', createdMessage);
     return createdMessage;
   } catch (error) {
     console.error("Failed to create message:", error);
@@ -50,8 +43,9 @@ const createMessage = async (messageData: { groupId: number; message: string }) 
   }
 };
 
-
 const getAllMessages = async (groupId?: number) => {
+  console.log("Logged in user token:", loggedInUserData?.token);
+
   try {
     const url = groupId
       ? `${process.env.NEXT_PUBLIC_API_URL}/messages?groupId=${groupId}`
@@ -70,6 +64,7 @@ const getAllMessages = async (groupId?: number) => {
     }
 
     const messages = await response.json();
+    console.log('Messages fetched:', messages);
     return messages;
   } catch (error) {
     console.error("Failed to retrieve messages:", error);

@@ -11,7 +11,6 @@ const MessageList: React.FC<MessageListProps> = ({ groupId }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Function to fetch messages
   const fetchMessages = async () => {
     if (!groupId) return;
 
@@ -19,7 +18,7 @@ const MessageList: React.FC<MessageListProps> = ({ groupId }) => {
     try {
       const fetchedMessages = await MessageService.getAllMessages(groupId);
       setMessages(fetchedMessages);
-      setError(null); // Clear previous errors
+      setError(null);
     } catch (err) {
       setError("Failed to load messages.");
       console.error(err);
@@ -28,16 +27,10 @@ const MessageList: React.FC<MessageListProps> = ({ groupId }) => {
     }
   };
 
-  // Start polling when the component mounts
+
   useEffect(() => {
-    fetchMessages(); // Initial fetch
+    fetchMessages();
 
-    const interval = setInterval(() => {
-      fetchMessages(); // Polling every 5 seconds (adjust as needed)
-    }, 5000);
-
-    // Cleanup interval on component unmount
-    return () => clearInterval(interval);
   }, [groupId]); // Depend on groupId to refetch messages when it changes
 
   if (loading) return <div>Loading messages...</div>;

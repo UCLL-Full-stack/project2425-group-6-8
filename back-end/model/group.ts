@@ -87,14 +87,12 @@ export class Group {
     users,
     groceryLists = [],
     schedules = [],
-    messages = [],
     createdAt,
     updatedAt,
 }: GroupPrisma & {
-    users: UserPrisma[] | [];
+    users: UserPrisma[];
     groceryLists?: GroceryListPrisma[];
     schedules?: SchedulePrisma[];
-    messages?: MessagePrisma[];
 }): Group {
     return new Group({
         id,
@@ -102,7 +100,6 @@ export class Group {
         users: users.map(User.from),
         groceryLists: groceryLists.map(GroceryList.from),
         schedules: schedules.map(Schedule.from),
-        messages: messages.map(Message.from),
         createdAt,
         updatedAt,
     });
