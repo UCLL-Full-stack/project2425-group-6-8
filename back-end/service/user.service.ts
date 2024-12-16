@@ -10,10 +10,10 @@ const SALT_ROUNDS = 10;
 
 const getAllUsers = async (): Promise<User[]> => userDB.getAllUsers();
 
-const getUserByNickName = async ({ nickname }: { nickname: string }): Promise<User> => {
-    const user = await userDB.getUserByNickName({ nickname });
+const getUserByNickName = async (nickname: string): Promise<User> => {
+    const user = await userDB.getUserByNickName(nickname);
     if (!user) {
-        throw new Error(`User with username: ${name} does not exist.`);
+        throw new Error(`User with username: ${nickname} does not exist.`);
     }
     return user;
 };
@@ -28,7 +28,7 @@ const createUser = async (userInput: {
     const { name, nickname, email, password } = userInput;
 
     // Step 1: Check if user already exists
-    const existingUser = await userDB.getUserByNickName({ nickname });
+    const existingUser = await userDB.getUserByNickName(nickname);
     if (existingUser) {
         throw new Error(`User with username: ${name} already exists.`);
     }
@@ -61,7 +61,7 @@ const getUserById = async (id: number): Promise<User | null> => {
  * @returns An AuthenticationResponse containing username, token, and fullname.
  */
 const authenticate = async ({ nickname, password }: UserInput): Promise<AuthenticationResponse> => {
-    const user = await getUserByNickName({ nickname });
+    const user = await getUserByNickName(nickname);
 
     const isValidPassword = await bcrypt.compare(password, user.getPassword());
 
