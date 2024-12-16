@@ -39,8 +39,8 @@
     timestamp DateTime @default(now())
     userId    Int      // Remove @unique here
     user      User     @relation(fields: [userId], references: [id])
-    group     Group?   @relation(fields: [groupId], references: [id])
-    groupId   Int?
+    group     Group   @relation(fields: [groupId], references: [id])
+    groupId   Int
 }
 
 

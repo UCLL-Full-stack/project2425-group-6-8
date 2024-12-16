@@ -91,7 +91,7 @@ export class Group {
     createdAt,
     updatedAt,
 }: GroupPrisma & {
-    users: UserPrisma[];
+    users: UserPrisma[] | [];
     groceryLists?: GroceryListPrisma[];
     schedules?: SchedulePrisma[];
     messages?: MessagePrisma[];

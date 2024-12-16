@@ -1,9 +1,11 @@
+import { Group } from '.';
 import { User } from './user';
-import { Message as MessagePrisma, User as UserPrisma } from '@prisma/client';
+import { Message as MessagePrisma, User as UserPrisma, Group as GroupPrisma } from '@prisma/client';
 
 export class Message {
     private id?: number | undefined;
     private user: User;
+    private group: Group; 
     private timestamp: Date;
     private message: string;
     private createdAt?: Date;
@@ -12,6 +14,7 @@ export class Message {
     constructor(message: {
         id?: number;
         user: User;
+        group: Group;  
         timestamp: Date;
         message: string;
         createdAt?: Date;
@@ -21,6 +24,7 @@ export class Message {
 
         this.id = message.id;
         this.user = message.user;
+        this.group = message.group;  
         this.timestamp = message.timestamp;
         this.message = message.message;
         this.createdAt = message.createdAt;
@@ -37,6 +41,11 @@ export class Message {
     getUser(): User {
         console.log(`Message.getUser called for user ID: ${this.user.getId()}`);
         return this.user;
+    }
+
+    getGroup(): Group {
+        console.log(`Message.getgroup called: ${this.group}`);
+        return this.group;
     }
 
     getTimestamp(): Date {
@@ -59,12 +68,16 @@ export class Message {
         return this.updatedAt;
     }
 
-    validate(message: { user: User; timestamp: Date; message: string }): void {
+    validate(message: { user: User; group: Group; timestamp: Date; message: string }): void {
         console.log('Validating message data:', message);
 
         if (!message.user) {
             console.error('Validation failed: User is required');
             throw new Error('User is required');
+        }
+        if (!message.group) {  
+            console.error('Validation failed: Group ID is required');
+            throw new Error('Group ID is required');
         }
         if (!message.timestamp) {
             console.error('Validation failed: Timestamp is required');
@@ -78,14 +91,12 @@ export class Message {
         console.log('Message validation successful');
     }
 
-   static from(message: MessagePrisma & { user?: UserPrisma | null } | undefined): Message {
+    static from(message: MessagePrisma & { user?: UserPrisma | null, group?: GroupPrisma | null } | undefined): Message {
     if (!message) {
         console.error('Message.from - Invalid message data:', message);
         throw new Error('Invalid message data');
     }
 
-    // Log user data to verify it is included in the message
-    console.debug('Message.from - Received message data:', message);
     if (!message.user) {
         console.error(
             `Message.from - Missing user relation for message ID ${message.id || 'unknown'}:`,
@@ -94,10 +105,19 @@ export class Message {
         throw new Error('Message must include a valid user relation');
     }
 
+    if (!message.group) {
+        console.error(
+            `Message.from - Missing group relation for message ID ${message.id || 'unknown'}:`,
+            message
+        );
+        throw new Error('Message must include a valid group relation');
+    }
+
     try {
         return new Message({
             id: message.id,
-            user: User.from(message.user),  // This might throw if user data is still invalid
+            user: User.from(message.user),
+            group: Group.from(message.group),  
             timestamp: message.timestamp,
             message: message.message,
             createdAt: message.createdAt,
