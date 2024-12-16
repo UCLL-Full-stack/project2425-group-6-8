@@ -7,15 +7,38 @@ const loggedInUserData = (() => {
   return item ? JSON.parse(item) : null;
 })();
 
+const getMessagesStream = (groupId: number) => {
+  if (!loggedInUserData?.token) {
+    throw new Error("No token found");
+  }
+
+  const url = `${process.env.NEXT_PUBLIC_API_URL}/messages/stream?groupId=${groupId}&token=${loggedInUserData.token}`;
+
+  const eventSource = new EventSource(url, { withCredentials: true });
+
+  eventSource.onmessage = (event) => {
+    try {
+      const newMessages = JSON.parse(event.data);
+      console.log("New messages received:", newMessages);
+    } catch (error) {
+      console.error("Error parsing SSE data:", error);
+    }
+  };
+
+  eventSource.onerror = (error) => {
+    console.error("Error with SSE connection:", error);
+    eventSource.close();
+  };
+
+  return eventSource;
+};
+
 const createMessage = async (messageData: { groupId: number; message: string }) => {
-  console.log('Logged in user data:', loggedInUserData);
+  if (!loggedInUserData?.token) {
+    throw new Error("User not logged in.");
+  }
 
   try {
-    if (!loggedInUserData) {
-      throw new Error("User not logged in.");
-    }
-
-    console.log('Creating message for group ID:', messageData.groupId);
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/messages`, {
       method: "POST",
       headers: {
@@ -35,7 +58,7 @@ const createMessage = async (messageData: { groupId: number; message: string }) 
     }
 
     const createdMessage = await response.json();
-    console.log('Created message response:', createdMessage);
+    console.log("Created message response:", createdMessage);
     return createdMessage;
   } catch (error) {
     console.error("Failed to create message:", error);
@@ -44,7 +67,9 @@ const createMessage = async (messageData: { groupId: number; message: string }) 
 };
 
 const getAllMessages = async (groupId?: number) => {
-  console.log("Logged in user token:", loggedInUserData?.token);
+  if (!loggedInUserData?.token) {
+    throw new Error("User not logged in.");
+  }
 
   try {
     const url = groupId
@@ -55,7 +80,7 @@ const getAllMessages = async (groupId?: number) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${loggedInUserData.token}`
+        Authorization: `Bearer ${loggedInUserData.token}`,
       },
     });
 
@@ -64,7 +89,7 @@ const getAllMessages = async (groupId?: number) => {
     }
 
     const messages = await response.json();
-    console.log('Messages fetched:', messages);
+    console.log("Messages fetched:", messages);
     return messages;
   } catch (error) {
     console.error("Failed to retrieve messages:", error);
@@ -75,6 +100,7 @@ const getAllMessages = async (groupId?: number) => {
 const MessageService = {
   createMessage,
   getAllMessages,
+  getMessagesStream,
 };
 
 export default MessageService;

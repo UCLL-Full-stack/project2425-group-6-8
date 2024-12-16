@@ -16,7 +16,7 @@ const GroupPage: React.FC = () => {
       if (groupId) {
         setLoading(true);
         try {
-          const response = await fetch(`http://localhost:3000/api/group/${groupId}`);
+          const response = await fetch(`http://localhost:3000/group/${groupId}`);
           const data = await response.json();
           setGroupDetails(data);
         } catch (err) {

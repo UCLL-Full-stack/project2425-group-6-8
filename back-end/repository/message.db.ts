@@ -4,6 +4,7 @@ import { User } from '../model/user';
 import { Group } from '../model/group';
 import database from './database';
 
+const prisma = database;
 Message.from = function ({
     id,
     user,
@@ -23,19 +24,16 @@ Message.from = function ({
         updatedAt,
     });
 };
-
 const createMessage = async (message: Message): Promise<Message> => {
     try {
         console.log('Received message object:', message);
 
-        // Logging the user and group information
         const user = message.getUser();
         const group = message.getGroup();
 
         console.log('User object:', user);
         console.log('Group object:', group);
 
-        // Ensure the user and group IDs are present
         const userId = user ? user.getId() : null;
         const groupId = group ? group.getId() : null;
 
@@ -54,7 +52,6 @@ const createMessage = async (message: Message): Promise<Message> => {
 
         console.log(`Creating message for user ID: ${userId} in group ID: ${groupId}`);
 
-        // Perform the database operation
         const messagePrisma = await database.message.create({
             data: {
                 userId: userId,
@@ -72,7 +69,6 @@ const createMessage = async (message: Message): Promise<Message> => {
 
         console.log('Message created in database:', messagePrisma);
 
-        // Return the created message mapped to the Message model
         return Message.from(messagePrisma);
     } catch (error) {
         console.error('Error creating message:', error);
@@ -111,13 +107,23 @@ const getAllMessages = async (groupId?: number): Promise<Message[]> => {
     }
 };
 
-// Fetch message by ID (ensure users in group are included)
+
 const getMessageById = async (id: number): Promise<Message | null> => {
     try {
+        console.log(`Received message ID to fetch: ${id}`);
+
+
+        if (isNaN(id)) {
+            console.error('Invalid ID received:', id);
+            throw new Error('Invalid ID');
+        }
+
         console.log(`Fetching message by ID: ${id}`);
 
         const messagePrisma = await database.message.findUnique({
-            where: { id },
+            where: {
+                id: id,
+            },
             include: {
                 user: true,
                 group: { include: { users: true } },
@@ -137,8 +143,37 @@ const getMessageById = async (id: number): Promise<Message | null> => {
     }
 };
 
+const getNewMessages = async (groupId: number, lastTimestamp: string): Promise<Message[]> => {
+    try {
+        const messagesPrisma = await prisma.message.findMany({
+            where: {
+                groupId: groupId,
+                timestamp: {
+                    gt: lastTimestamp, 
+                },
+            },
+            orderBy: {
+                timestamp: 'asc', 
+            },
+            include: {
+                user: true,
+                group: { include: { users: true } },
+            },
+        });
+
+        console.log(`Fetched ${messagesPrisma.length} new messages.`);
+        
+        return messagesPrisma.map((messagePrisma) => Message.from(messagePrisma));
+    } catch (error) {
+        console.error('Error fetching new messages:', error);
+        throw new Error('Database error. See server log for details.');
+    }
+};
+
+
 export default {
     createMessage,
     getAllMessages,
     getMessageById,
+    getNewMessages,
 };

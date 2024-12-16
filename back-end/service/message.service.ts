@@ -23,8 +23,6 @@ const createMessage = async (messageData: MessageInput): Promise<Message> => {
             throw new Error('Message content is required');
         }
 
-
-
         console.log(`Fetching user with ID: ${messageData.user.id}`);
         const user = await UserService.getUserById(messageData.user.id);
         if (!user) {
@@ -58,7 +56,7 @@ const createMessage = async (messageData: MessageInput): Promise<Message> => {
         return createdMessage;
     } catch (error) {
         console.error('Error during message creation:', error);
-        throw error;  // Optionally rethrow or return an error response
+        throw error;  
     }
 };
 
@@ -72,4 +70,10 @@ const getAllMessages = async (groupId?: number): Promise<Message[]> => {
     return await messageDb.getAllMessages(groupId);
 };
 
-export default { createMessage, getMessageById, getAllMessages };
+const getNewMessages = async (groupId: number, lastTimestamp: string): Promise<Message[]> => {
+    console.log(`Fetching new messages for group ID ${groupId} after ${lastTimestamp}`);
+    return await messageDb.getNewMessages(groupId, lastTimestamp);
+};
+
+
+export default { createMessage, getMessageById, getAllMessages,getNewMessages };

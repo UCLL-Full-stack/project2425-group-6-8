@@ -27,11 +27,32 @@ const MessageList: React.FC<MessageListProps> = ({ groupId }) => {
     }
   };
 
-
   useEffect(() => {
-    fetchMessages();
+    fetchMessages(); 
 
-  }, [groupId]); // Depend on groupId to refetch messages when it changes
+    if (!groupId) return;
+
+    const eventSource = MessageService.getMessagesStream(groupId);
+
+    eventSource.onmessage = (event) => {
+      try {
+        const newMessages: Message[] = JSON.parse(event.data);
+
+        setMessages((prevMessages) => [...prevMessages, ...newMessages]);
+      } catch (parseError) {
+        console.error("Error parsing SSE data:", parseError);
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error("Error with SSE connection:", error);
+      eventSource.close();
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, [groupId]);
 
   if (loading) return <div>Loading messages...</div>;
   if (error) return <div>{error}</div>;

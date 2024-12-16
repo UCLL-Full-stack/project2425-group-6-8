@@ -1,6 +1,4 @@
-   //group.db.ts
-
-   import { Group } from '../model/group';
+    import { Group } from '../model/group';
     import { User } from '../model/user';
     import { GroceryList } from '../model/groceryList';
     import { Schedule } from '../model/schedule';

@@ -61,13 +61,13 @@ messageRouter.post('/', async (req: Request, res: Response, next: NextFunction) 
  */
 messageRouter.get('/', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { groupId } = req.query;  // Get groupId from query parameters
+        const { groupId } = req.query;  
         
         let result;
         if (groupId) {
             result = await messageService.getAllMessages(parseInt(groupId as string, 10));
         } else {
-            result = await messageService.getAllMessages(); // Get all if no groupId
+            result = await messageService.getAllMessages(); 
         }
 
         res.status(200).json(result);
@@ -75,6 +75,61 @@ messageRouter.get('/', async (req: Request, res: Response, next: NextFunction) =
         next(error);
     }
 });
+
+/**
+ * @swagger
+ * /messages/stream:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Stream messages in real-time.
+ *     parameters:
+ *        - in: query
+ *          name: groupId
+ *          required: true
+ *          description: The ID of the group to stream messages for.
+ *          schema:
+ *            type: integer
+ *     responses:
+ *       200:
+ *         description: A stream of messages.
+ */
+messageRouter.get('/stream', async (req: Request, res: Response) => {
+    const { groupId, streamEnabled } = req.query;
+
+    if (streamEnabled === 'false') {
+        return res.status(200).send({ message: 'Streaming is temporarily disabled' });
+    }
+
+    if (!groupId) {
+        return res.status(400).send({ error: 'Group ID is required' });
+    }
+
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    let lastSentTimestamp = new Date().toISOString();
+
+    const interval = setInterval(async () => {
+        try {
+            const messages = await messageService.getNewMessages(parseInt(groupId as string, 10), lastSentTimestamp);
+            if (messages.length > 0) {
+                lastSentTimestamp = messages[messages.length - 1].getTimestamp().toISOString();
+                res.write(`data: ${JSON.stringify(messages)}\n\n`);
+            }
+        } catch (error) {
+            console.error('Error streaming messages:', error);
+        }
+    }, 3000);
+
+    req.on('close', () => {
+        clearInterval(interval);
+        res.end();
+    });
+});
+
+
 
 /**
  * @swagger
@@ -98,18 +153,31 @@ messageRouter.get('/', async (req: Request, res: Response, next: NextFunction) =
  *                schema:
  *                  $ref: '#/components/schemas/Message'
  */
-messageRouter.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const id = parseInt(req.params.id, 10);
-        const result = await messageService.getMessageById(id);
-        if (result) {
-            res.status(200).json(result);
-        } else {
-            res.status(404).json({ message: 'Message not found' });
-        }
-    } catch (error) {
-        next(error);
+messageRouter.get('/:id', async (req, res) => {
+  const messageId = parseInt(req.params.id, 10);
+  console.log("THE MESSAGE ID ========= " + messageId)
+
+  if (isNaN(messageId)) {
+    console.error(`Invalid message ID received: ${req.params.id}`);
+    return res.status(400).send({ error: 'Invalid message ID' });
+  }
+
+  try {
+    console.log(`Fetching message by ID: ${messageId}`);
+    const message = await messageService.getMessageById(messageId);
+
+    if (!message) {
+      return res.status(404).send({ error: 'Message not found' });
     }
+
+    res.json(message);
+  } catch (error) {
+    console.error('Error fetching message by ID:', error);
+    res.status(500).send({ error: 'Failed to fetch message' });
+  }
 });
+
+
+
 
 export { messageRouter };
