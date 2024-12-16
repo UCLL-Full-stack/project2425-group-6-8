@@ -37,7 +37,7 @@
     updatedAt DateTime @updatedAt
     message   String
     timestamp DateTime @default(now())
-    userId    Int      // Remove @unique here
+    userId    Int     
     user      User     @relation(fields: [userId], references: [id])
     group     Group   @relation(fields: [groupId], references: [id])
     groupId   Int
