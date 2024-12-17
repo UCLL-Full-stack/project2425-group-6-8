@@ -45,7 +45,7 @@
  *         users:
  *           type: array
  *           items:
- *             type: integer
+ *             type: string
  *             description: User IDs that are to be added to the group.
  *         groceryList:
  *           type: array
@@ -192,7 +192,7 @@ groupRouter.post('/', async (req: Request, res: Response, next: NextFunction) =>
     try {
         const groupData = {
             name: req.body.name,
-            userIds: req.body.users, 
+            nicknames: req.body.users, 
             groceryList: req.body.groceryList,
             schedule: req.body.schedule,
             message: req.body.message,

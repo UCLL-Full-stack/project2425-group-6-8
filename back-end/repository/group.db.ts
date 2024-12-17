@@ -48,12 +48,12 @@
             console.log("[INFO] Creating group:", group);
 
             const usersWithValidIds = group.getUsers().map((user) => {
-                const userId = user.getId();
-                if (!userId) {
+                const nickname = user.getNickname();
+                if (!nickname) {
                     console.error("[ERROR] User ID missing:", user);
                     throw new Error(`User ID is missing for user: ${JSON.stringify(user)}`);
                 }
-                return { id: userId };
+                return { nickname: nickname };
             });
 
             const groupPrisma = await database.group.create({

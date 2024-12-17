@@ -30,9 +30,9 @@ const getUserById = async (id: number): Promise<User | null> => {
 };
 
 
-const getUserByNickName = async ({ nickname }: { nickname: string }): Promise<User | null> => {
+const getUserByNickName = async (nickname: string): Promise<User | null> => {
     try {
-        const userPrisma = await database.user.findFirst({
+        const userPrisma = await database.user.findUnique({
             where: { nickname },
         });
 

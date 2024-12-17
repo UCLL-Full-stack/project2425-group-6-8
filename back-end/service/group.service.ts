@@ -2,14 +2,14 @@ import groupDb from '../repository/group.db';
 import { Group } from '../model/group';
 import UserService from './user.service';
 
-const createGroup = async (groupInput: { name: string; userIds: number[] }): Promise<Group> => {
+const createGroup = async (groupInput: { name: string; nicknames: string[] }): Promise<Group> => {
     if (!groupInput.name?.trim()) throw new Error('Group name is required');
-    if (!groupInput.userIds || groupInput.userIds.length === 0) throw new Error('At least one user is required');
+    if (!groupInput.nicknames || groupInput.nicknames.length === 0) throw new Error('At least one user is required');
 
     const existingUsers = await Promise.all(
-        groupInput.userIds.map(async (userId) => {
-            const user = await UserService.getUserById(userId);
-            if (!user) throw new Error(`User with ID ${userId} not found`);
+        groupInput.nicknames.map(async (nicknames) => {
+            const user = await UserService.getUserByNickName(nicknames);
+            if (!user) throw new Error(`User with ID ${nicknames} not found`);
             return user;
         })
     );

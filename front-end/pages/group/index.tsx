@@ -1,5 +1,6 @@
 import Head from "next/head";
 import Header from "@components/header";
+import GroupForm from "@components/group/GroupForm";
 import GroupList from "@components/group/GroupList";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
@@ -7,7 +8,7 @@ import { GetServerSideProps } from "next";
 import { Group } from "@types";
 import { useState, useEffect } from "react";
 import GroupService from "@services/GroupService";
-import Link from "next/link";  // Import Link from next/link
+import Link from "next/link";  
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   const res = await fetch("http://localhost:3000/api/group");
@@ -23,60 +24,63 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
 
 const GroupPage: React.FC = () => {
   const { t } = useTranslation("common");
-  const [groups, setGroups] = useState<Array<Group>>();
-  const [error, setError] = useState<string>();
+  const [groups, setGroups] = useState<Array<Group>>([]);
+  const [error, setError] = useState<string>("");
+  const [loggedInUser, setLoggedInUser] = useState<string | null>(null);
   const loggedInUserData = (() => {
     if (typeof localStorage === "undefined") {
-        console.warn("localStorage is not defined.");
-        return null;
+      console.warn("localStorage is not defined.");
+      return null;
     }
     const item = localStorage.getItem("loggedInUser");
     return item ? JSON.parse(item) : null;
   })();
 
-
   const getGroups = async () => {
     setError("");
 
-    if (!loggedInUserData || !loggedInUserData.id) {
+    if (!loggedInUserData) {
       setError("Unauthorized: User is not logged in.");
-      return; 
+      return;
     }
 
-    const response = await GroupService.getGroupsOfUser(loggedInUserData.id);
+    try {
+      const response = await GroupService.getGroupsOfUser(loggedInUserData.id);
+      const groups = await response.json();
 
-    if (!response.ok) {
-        setError(response.statusText);
-    } else {
-        const groups = await response.json();
-        setGroups(groups);
+      if (groups.length < 1) {
+        setError("You are not in any group yet, please create one or join one.");
+      }
+      setGroups(groups);
+    } catch (err) {
+      setError("Failed to fetch groups. Please try again.");
     }
   };
 
+  const refreshGroups = () => {
+    getGroups();
+  };
+
   useEffect(() => {
+    setLoggedInUser(loggedInUserData?.name);
     getGroups();
   }, []);
 
   return (
     <>
       <Head>
-        <title>{t('group.title')}</title>
+        <title>{t("group.title")}</title>
       </Head>
       <Header />
       <main className="p-6 min-h-screen flex flex-col items-center">
         <section>
+          {loggedInUser && <GroupForm refreshGroups={refreshGroups} />}
           {error && <div className="text-red-800">{error}</div>}
-          {groups && (
-            <div className="group-list">
-              {groups.map(group => (
-                <div key={group.id} className="group-item">
-                  <Link href={`/group/${group.id}`}>
-                    <span className="group-name">{group.name}</span>
-                  </Link>
-                </div>
-              ))}
-            </div>
-          )}
+          {!error && 
+            <GroupList
+              group={groups}
+            />
+          }
         </section>
       </main>
     </>

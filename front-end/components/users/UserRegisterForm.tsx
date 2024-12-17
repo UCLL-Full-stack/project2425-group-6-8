@@ -100,13 +100,16 @@ const UserRegisterForm: React.FC = () => {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const loginData = await response2.json();
+            
+            if(response2.ok)
+            {
+              const { id, nickname, name, role, token } = loginData;
 
-            const { name, role, token } = loginData;
-
-            localStorage.setItem(
-                "loggedInUser",
-                JSON.stringify({ name, role, token })
-            );
+              localStorage.setItem(
+                  "loggedInUser",
+                  JSON.stringify({ id, nickname, name, role, token })
+              );
+            }
         } catch (error) {
             setStatusMessages([{ message: t("general.error"), type: "error" }]);
         }
