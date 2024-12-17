@@ -72,5 +72,4 @@ const MessageList: React.FC<MessageListProps> = ({ groupId, messages }) => {
     </div>
   );
 };
-
 export default MessageList;

@@ -4,6 +4,9 @@ import GroupService from "../../services/GroupService";
 import MessageList from "@components/messages/MessageList";
 import MessageForm from "@components/messages/MessageForm";
 import MessageService from "../../services/MessageService";
+import { Head } from "next/document";
+import Header from "@components/header";
+import { t } from "i18next";
 
 const GroupDetails: React.FC = () => {
   const router = useRouter();
@@ -62,7 +65,10 @@ const GroupDetails: React.FC = () => {
   if (error) return <div>{error}</div>;
 
   return (
+    
     <div className="group-page flex flex-col h-screen">
+     
+      <Header />
       <div className="flex-grow">
         <h1>{groupDetails?.name || "Group Details"}</h1>
         <MessageList groupId={Number(groupId)} messages={messages} /> 
