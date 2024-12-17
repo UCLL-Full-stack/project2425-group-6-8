@@ -119,7 +119,7 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Enter group name"
                   required
-                  style={{ width: "100%", padding: "8px", marginTop: "5px" }}
+                  style={{ width: "100%", padding: "8px", marginTop: "5px", border: "1px solid black" }}
                 />
               </label>
             </div>
@@ -132,7 +132,7 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
                   onChange={(e) => setUsers(e.target.value)}
                   placeholder="e.g., bob56,sam4334"
                   required
-                  style={{ width: "100%", padding: "8px", marginTop: "5px" }}
+                  style={{ width: "100%", padding: "8px", marginTop: "5px", border: "1px solid black" }}
                 />
               </label>
             </div>
@@ -143,7 +143,7 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Enter a welcome message (optional)"
-                  style={{ width: "100%", padding: "8px", marginTop: "5px" }}
+                  style={{ width: "100%", padding: "8px", marginTop: "5px", border: "1px solid black" }}
                 />
               </label>
             </div>
@@ -191,7 +191,7 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
                   onChange={(e) => setGroupId(e.target.value)}
                   placeholder="Enter group ID"
                   required
-                  style={{ width: "100%", padding: "8px", marginTop: "5px" }}
+                  style={{ width: "100%", padding: "8px", marginTop: "5px", border: "1px solid black" }}
                 />
               </label>
             </div>
