@@ -63,7 +63,7 @@ const MessageList: React.FC<MessageListProps> = ({ groupId, messages }) => {
         messages.map((message) => (
           <div key={message.id} className="mb-4 p-3 bg-white rounded-lg shadow-sm">
             <p className="text-sm text-gray-700">
-              <strong className="text-blue-600">{message.user.name}</strong>: {message.message}
+              <strong className="text-blue-600">{message.user.nickname}</strong>: {message.message}
             </p>
             <small className="text-gray-400">{new Date(message.timestamp).toLocaleString()}</small>
           </div>

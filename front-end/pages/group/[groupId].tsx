@@ -1,12 +1,26 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import Head from "next/head";
+import Header from "@components/header";
 import GroupService from "../../services/GroupService";
 import MessageList from "@components/messages/MessageList";
 import MessageForm from "@components/messages/MessageForm";
 import MessageService from "../../services/MessageService";
-import { Head } from "next/document";
-import Header from "@components/header";
-import { t } from "i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next";
+import { GetServerSideProps } from "next"; 
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  const res = await fetch("http://localhost:3000/api/group");
+  const groups = await res.json();
+
+  return {
+    props: {
+      groups,
+      ...(await serverSideTranslations(locale ?? 'en', ["common"])),
+    },
+  };
+};
 
 const GroupDetails: React.FC = () => {
   const router = useRouter();
@@ -15,6 +29,8 @@ const GroupDetails: React.FC = () => {
   const [messages, setMessages] = useState<any[]>([]); 
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation("common");
+  const [isSliderOpen, setIsSliderOpen] = useState<boolean>(false); 
 
   useEffect(() => {
     if (router.query.groupId) {
@@ -37,7 +53,6 @@ const GroupDetails: React.FC = () => {
         }
       }
     };
-  
     fetchGroupDetails();
   }, [groupId]);
 
@@ -53,7 +68,6 @@ const GroupDetails: React.FC = () => {
         }
       }
     };
-
     fetchMessages();
   }, [groupId]);
 
@@ -65,19 +79,63 @@ const GroupDetails: React.FC = () => {
   if (error) return <div>{error}</div>;
 
   return (
-    
-    <div className="group-page flex flex-col h-screen">
-     
+    <>
+      <Head>
+        <title>{t("group.title")}</title>
+      </Head>
       <Header />
-      <div className="flex-grow">
-        <h1>{groupDetails?.name || "Group Details"}</h1>
-        <MessageList groupId={Number(groupId)} messages={messages} /> 
-      </div>
+      <div className="group-page flex flex-col h-screen relative">
+        <button
+          onClick={() => setIsSliderOpen(true)}
+          className="absolute top-4 left-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600"
+        >
+          View Users
+        </button>
 
-      <div className="absolute bottom-0 w-full p-4 bg-white shadow-lg">
-        <MessageForm groupId={Number(groupId)} onMessageSent={handleNewMessage} /> 
+        <div
+          className={`fixed top-0 left-0 h-full w-64 bg-gray-100 shadow-lg transform ${
+            isSliderOpen ? "translate-x-0" : "-translate-x-full"
+          } transition-transform duration-300 ease-in-out z-50`}
+        >
+          <div className="flex items-center justify-between p-4 bg-gradient-to-br from-green-900 to-green-500 text-white">
+            <h3 className="text-gray-300">Group Users</h3>
+            <button
+              onClick={() => setIsSliderOpen(false)}
+              className="text-white text-2xl leading-none"
+            >
+              &times;
+            </button>
+          </div>
+          <div className="p-4 from-green-900 to-green-500">
+            {groupDetails?.users && groupDetails.users.length > 0 ? (
+              <ul>
+                {groupDetails.users.map((user: any, index: number) => (
+                  <li key={user.id || index} className="py-2 border-b border-gray-300">
+                    <span className="font-semibold">{user.nickname}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No users available</p>
+            )}
+          </div>
+
+        </div>
+
+        <div className="flex-grow">
+          <h1>{groupDetails?.name || "Group Details"}</h1>
+          <h4 className="px-0 text-l font-semibold text-gray-800 dark:text-black text-center">
+            Group Id: {groupDetails?.id || "error no id available"}
+          </h4>
+          <MessageList groupId={Number(groupId)} messages={messages} /> 
+        </div>
+
+        {/* Message Form */}
+        <div className="absolute bottom-0 w-full p-4 bg-white shadow-lg">
+          <MessageForm groupId={Number(groupId)} onMessageSent={handleNewMessage} /> 
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
