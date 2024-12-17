@@ -60,7 +60,7 @@
 
 
     model Group {
-      id           Int           @id @default(autoincrement())
+      id           Int           @id @unique
       createdAt    DateTime      @default(now())
       updatedAt    DateTime      @updatedAt
       name         String
