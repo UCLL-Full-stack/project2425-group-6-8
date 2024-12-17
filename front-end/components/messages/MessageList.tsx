@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import MessageService from "../../services/MessageService";
-import { Message } from "@types"; 
+import { Message } from "@types";
 
 interface MessageListProps {
   groupId?: number;
@@ -28,7 +28,7 @@ const MessageList: React.FC<MessageListProps> = ({ groupId }) => {
   };
 
   useEffect(() => {
-    fetchMessages(); 
+    fetchMessages();
 
     if (!groupId) return;
 
@@ -37,7 +37,6 @@ const MessageList: React.FC<MessageListProps> = ({ groupId }) => {
     eventSource.onmessage = (event) => {
       try {
         const newMessages: Message[] = JSON.parse(event.data);
-
         setMessages((prevMessages) => [...prevMessages, ...newMessages]);
       } catch (parseError) {
         console.error("Error parsing SSE data:", parseError);
@@ -54,20 +53,20 @@ const MessageList: React.FC<MessageListProps> = ({ groupId }) => {
     };
   }, [groupId]);
 
-  if (loading) return <div>Loading messages...</div>;
-  if (error) return <div>{error}</div>;
+  if (loading) return <div className="text-center text-gray-500">Loading messages...</div>;
+  if (error) return <div className="text-center text-red-500">{error}</div>;
 
   return (
-    <div className="message-list">
+    <div className="h-96 overflow-y-auto border rounded-lg p-4 bg-gray-50 shadow-md">
       {messages.length === 0 ? (
-        <div>No messages found.</div>
+        <div className="text-center text-gray-500">No messages found.</div>
       ) : (
         messages.map((message) => (
-          <div key={message.id} className="message-item">
-            <p>
-              <strong>{message.user.name}</strong>: {message.message}
+          <div key={message.id} className="mb-4 p-3 bg-white rounded-lg shadow-sm">
+            <p className="text-sm text-gray-700">
+              <strong className="text-blue-600">{message.user.name}</strong>: {message.message}
             </p>
-            <small>{new Date(message.timestamp).toLocaleString()}</small>
+            <small className="text-gray-400">{new Date(message.timestamp).toLocaleString()}</small>
           </div>
         ))
       )}

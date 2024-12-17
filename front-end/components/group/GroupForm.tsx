@@ -8,7 +8,7 @@ type Props = {
 const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
   const [showCreateGroupForm, setShowCreateGroupForm] = useState(false);
   const [showJoinGroupForm, setShowJoinGroupForm] = useState(false);
-  const [name, setName] = useState("");
+  const [name, setName] = c;
   const [users, setUsers] = useState("");
   const [message, setMessage] = useState("");
   const [groupId, setGroupId] = useState("");

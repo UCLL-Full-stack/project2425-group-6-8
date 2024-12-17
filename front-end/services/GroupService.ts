@@ -97,11 +97,43 @@ const addUserToExistingGroup = async (groupId: number,userId: number) => {
 }
 
 
+const getGroupById = async (groupId: number) => {
+  const loggedInUserData = (() => {
+    if (typeof localStorage === "undefined") {
+        console.warn("localStorage is not defined.");
+        return null;
+    }
+    const item = localStorage.getItem("loggedInUser");
+    return item ? JSON.parse(item) : null;
+  })();
+
+  try {
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL + `/groups/${groupId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${loggedInUserData.token}`
+      },
+    });
+
+    if(!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
+    }
+
+    const foundGroup = await response.json();
+    return foundGroup;
+  } catch (error){
+    console.error("Failed to create group:", error);
+    throw error;
+  }
+}
+
 const GroupService = {
   createGroup,
   getAllGroups,
   getGroupsOfUser,
-  addUserToExistingGroup
+  addUserToExistingGroup,
+  getGroupById
 }
   
 export default GroupService;
