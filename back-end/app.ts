@@ -43,7 +43,7 @@ app.use(
 app.use('/groceryLists', groceryListRouter);
 app.use('/groups', groupRouter);
 app.use('/items', itemRouter);
-// app.use('/messages', messageRouter);
+app.use('/messages', messageRouter);
 app.use('/schedules', scheduleRouter);
 app.use('/users', userRouter);
 

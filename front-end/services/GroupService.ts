@@ -74,10 +74,34 @@ const getGroupsOfUser = async (userId: number) => {
   });
 }
 
+const addUserToExistingGroup = async (groupId: number,userId: number) => {
+  const loggedInUserData = (() => {
+    if (typeof localStorage === "undefined") {
+        console.warn("localStorage is not defined.");
+        return null;
+    }
+    const item = localStorage.getItem("loggedInUser");
+    return item ? JSON.parse(item) : null;
+  })();
+  
+  return fetch(process.env.NEXT_PUBLIC_API_URL + `/groups/${groupId}/users`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${loggedInUserData.token}`
+    },
+    body:JSON.stringify({
+      userId, 
+    }),
+  });
+}
+
+
 const GroupService = {
   createGroup,
   getAllGroups,
-  getGroupsOfUser
+  getGroupsOfUser,
+  addUserToExistingGroup
 }
   
 export default GroupService;

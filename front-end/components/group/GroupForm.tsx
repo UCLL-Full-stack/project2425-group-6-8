@@ -7,9 +7,11 @@ type Props = {
 
 const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
   const [showCreateGroupForm, setShowCreateGroupForm] = useState(false);
+  const [showJoinGroupForm, setShowJoinGroupForm] = useState(false);
   const [name, setName] = useState("");
   const [users, setUsers] = useState("");
   const [message, setMessage] = useState("");
+  const [groupId, setGroupId] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -22,7 +24,8 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
     return item ? JSON.parse(item) : null;
   })();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Handle creating a group
+  const handleCreateGroup = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const userArray = users.split(",").map((nickname) => nickname.trim());
@@ -48,12 +51,33 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
     }
   };
 
+  // Handle joining a group
+  const handleJoinGroup = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!groupId) {
+      setErrorMessage("Please enter a group ID.");
+      return;
+    }
+
+    try {
+      await GroupService.addUserToExistingGroup(Number(groupId), loggedInUserData.id);
+      setSuccessMessage(`Successfully joined group with ID "${groupId}"!`);
+      setErrorMessage("");
+      setGroupId("");
+      refreshGroups();
+    } catch (error) {
+      setErrorMessage("Failed to join group. Please try again.");
+      console.error(error);
+    }
+  };
+
   return (
     <div className="row">
-      {!showCreateGroupForm ? (
+      {!showCreateGroupForm && !showJoinGroupForm ? (
         <div style={{ textAlign: "center" }}>
           <button
-            onClick={() => alert("Join a group feature not implemented yet!")}
+            onClick={() => setShowJoinGroupForm(true)}
             style={{
               padding: "15px 30px",
               marginBottom: "20px",
@@ -80,12 +104,12 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
             Create a Group
           </button>
         </div>
-      ) : (
+      ) : showCreateGroupForm ? (
         <div style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>
           <h1>Create a New Group</h1>
           {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
           {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleCreateGroup}>
             <div style={{ marginBottom: "10px" }}>
               <label>
                 <strong>Group Name:</strong>
@@ -139,6 +163,54 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
               <button
                 type="button"
                 onClick={() => setShowCreateGroupForm(false)}
+                style={{
+                  padding: "10px 15px",
+                  backgroundColor: "#dc3545",
+                  color: "white",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Back
+              </button>
+            </div>
+          </form>
+        </div>
+      ) : (
+        <div style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>
+          <h1>Join a Group</h1>
+          {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
+          {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+          <form onSubmit={handleJoinGroup}>
+            <div style={{ marginBottom: "10px" }}>
+              <label>
+                <strong>Group ID:</strong>
+                <input
+                  type="text"
+                  value={groupId}
+                  onChange={(e) => setGroupId(e.target.value)}
+                  placeholder="Enter group ID"
+                  required
+                  style={{ width: "100%", padding: "8px", marginTop: "5px" }}
+                />
+              </label>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <button
+                type="submit"
+                style={{
+                  padding: "10px 15px",
+                  backgroundColor: "#007BFF",
+                  color: "white",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Join Group
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowJoinGroupForm(false)}
                 style={{
                   padding: "10px 15px",
                   backgroundColor: "#dc3545",
