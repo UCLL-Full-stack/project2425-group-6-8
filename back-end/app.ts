@@ -19,7 +19,6 @@ app.use(helmet());
 app.use(
     helmet.contentSecurityPolicy({
         directives: {
-            // Allow connections to own server and the external API
             connectSrc: ["'self'", 'https://api.ucll.be'],
         },
     })

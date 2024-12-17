@@ -4,10 +4,10 @@ import { Message } from "@types";
 
 interface MessageListProps {
   groupId?: number;
+  messages: Message[];
 }
 
-const MessageList: React.FC<MessageListProps> = ({ groupId }) => {
-  const [messages, setMessages] = useState<Message[]>([]);
+const MessageList: React.FC<MessageListProps> = ({ groupId, messages }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,7 +17,6 @@ const MessageList: React.FC<MessageListProps> = ({ groupId }) => {
     setLoading(true);
     try {
       const fetchedMessages = await MessageService.getAllMessages(groupId);
-      setMessages(fetchedMessages);
       setError(null);
     } catch (err) {
       setError("Failed to load messages.");
@@ -27,29 +26,29 @@ const MessageList: React.FC<MessageListProps> = ({ groupId }) => {
     }
   };
 
-  useEffect(() => {
-    fetchMessages();
+  const handleNewMessages = (newMessages: Message[]) => {
+    messages = [...messages, ...newMessages];
+  };
 
+  useEffect(() => {
     if (!groupId) return;
 
-    const eventSource = MessageService.getMessagesStream(groupId);
+    fetchMessages();
 
-    eventSource.onmessage = (event) => {
-      try {
-        const newMessages: Message[] = JSON.parse(event.data);
-        setMessages((prevMessages) => [...prevMessages, ...newMessages]);
-      } catch (parseError) {
-        console.error("Error parsing SSE data:", parseError);
-      }
+    const startPolling = async () => {
+      const stopPolling = await MessageService.getMessagesStream(groupId, handleNewMessages);
+
+      return stopPolling; 
     };
 
-    eventSource.onerror = (error) => {
-      console.error("Error with SSE connection:", error);
-      eventSource.close();
-    };
+    startPolling().then((stopPolling) => {
+      return () => {
+        stopPolling(); 
+      };
+    });
 
     return () => {
-      eventSource.close();
+      startPolling().then((stopPolling) => stopPolling());
     };
   }, [groupId]);
 

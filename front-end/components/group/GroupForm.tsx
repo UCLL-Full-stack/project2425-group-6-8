@@ -8,7 +8,7 @@ type Props = {
 const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
   const [showCreateGroupForm, setShowCreateGroupForm] = useState(false);
   const [showJoinGroupForm, setShowJoinGroupForm] = useState(false);
-  const [name, setName] = c;
+  const [name, setName] = useState("");
   const [users, setUsers] = useState("");
   const [message, setMessage] = useState("");
   const [groupId, setGroupId] = useState("");
@@ -24,7 +24,6 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
     return item ? JSON.parse(item) : null;
   })();
 
-  // Handle creating a group
   const handleCreateGroup = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -51,7 +50,6 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
     }
   };
 
-  // Handle joining a group
   const handleJoinGroup = async (e: React.FormEvent) => {
     e.preventDefault();
 
