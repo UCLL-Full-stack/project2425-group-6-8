@@ -56,20 +56,26 @@ const MessageList: React.FC<MessageListProps> = ({ groupId, messages }) => {
   if (error) return <div className="text-center text-red-500">{error}</div>;
 
   return (
-    <div className="h-96 overflow-y-auto border rounded-lg p-4 bg-gray-50 shadow-md">
-      {messages.length === 0 ? (
-        <div className="text-center text-gray-500">No messages found.</div>
-      ) : (
-        messages.map((message) => (
-          <div key={message.id} className="mb-4 p-3 bg-white rounded-lg shadow-sm">
-            <p className="text-sm text-gray-700">
-              <strong className="text-blue-600">{message.user.nickname}</strong>: {message.message}
-            </p>
-            <small className="text-gray-400">{new Date(message.timestamp).toLocaleString()}</small>
-          </div>
-        ))
-      )}
+  <div className="w-full max-w-5xl mx-auto px-4">
+  {messages.length === 0 ? (
+    <div className="text-center text-gray-500">No messages found.</div>
+  ) : (
+    <div className="space-y-4">
+      {messages.map((message) => (
+        <div key={message.id} className="p-4 bg-white rounded-lg shadow-sm">
+          <p className="text-sm text-gray-700">
+            <strong className="text-blue-600">{message.user.nickname}</strong>: {message.message}
+          </p>
+          <small className="text-gray-400">
+            {new Date(message.timestamp).toLocaleString()}
+          </small>
+        </div>
+      ))}
     </div>
+  )}
+</div>
+
+
   );
 };
 export default MessageList;

@@ -5,32 +5,46 @@ import Header from "@components/header";
 import GroupService from "../../services/GroupService";
 import MessageList from "@components/messages/MessageList";
 import MessageForm from "@components/messages/MessageForm";
+import GroceryList from "@components/groceryList/groceryListList";
 import MessageService from "../../services/MessageService";
+import CreateGroceryListModal from "../../components/groceryList/CreateGroceryListModal";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
 import { GetServerSideProps } from "next"; 
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  const res = await fetch("http://localhost:3000/api/group");
+  const res = await fetch("http://localhost:3000/group");
   const groups = await res.json();
 
   return {
     props: {
       groups,
-      ...(await serverSideTranslations(locale ?? 'en', ["common"])),
+      ...(await serverSideTranslations(locale ?? "en", ["common"])),
     },
   };
 };
 
-const GroupDetails: React.FC = () => {
+const groupchat: React.FC = () => {
   const router = useRouter();
   const [groupId, setGroupId] = useState<number | null>(null);
-  const [groupDetails, setGroupDetails] = useState<any>(null);
+  const [groupchat, setgroupchat] = useState<any>(null);
   const [messages, setMessages] = useState<any[]>([]); 
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation("common");
+
   const [isSliderOpen, setIsSliderOpen] = useState<boolean>(false); 
+  const [isGroceryListOpen, setIsGroceryListOpen] = useState<boolean>(false); 
+
+  
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
 
   useEffect(() => {
     if (router.query.groupId) {
@@ -39,12 +53,12 @@ const GroupDetails: React.FC = () => {
   }, [router.query.groupId]);
 
   useEffect(() => {
-    const fetchGroupDetails = async () => {
+    const fetchgroupchat = async () => {
       if (groupId !== null) {
         setLoading(true);
         try {
           const group = await GroupService.getGroupById(groupId);
-          setGroupDetails(group);
+          setgroupchat(group);
         } catch (err) {
           setError("Failed to load group details.");
           console.error(err);
@@ -53,7 +67,7 @@ const GroupDetails: React.FC = () => {
         }
       }
     };
-    fetchGroupDetails();
+    fetchgroupchat();
   }, [groupId]);
 
   useEffect(() => {
@@ -85,6 +99,7 @@ const GroupDetails: React.FC = () => {
       </Head>
       <Header />
       <div className="group-page flex flex-col h-screen relative">
+        {/* Group Users Button */}
         <button
           onClick={() => setIsSliderOpen(true)}
           className="absolute top-4 left-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600"
@@ -92,6 +107,15 @@ const GroupDetails: React.FC = () => {
           View Users
         </button>
 
+        {/* Grocery List Button */}
+        <button
+          onClick={() => setIsGroceryListOpen(true)}
+          className="absolute top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-600"
+        >
+          View Grocery List
+        </button>
+
+        {/* Group Users Sliding Panel */}
         <div
           className={`fixed top-0 left-0 h-full w-64 bg-gray-100 shadow-lg transform ${
             isSliderOpen ? "translate-x-0" : "-translate-x-full"
@@ -107,9 +131,9 @@ const GroupDetails: React.FC = () => {
             </button>
           </div>
           <div className="p-4 from-green-900 to-green-500">
-            {groupDetails?.users && groupDetails.users.length > 0 ? (
+            {groupchat?.users && groupchat.users.length > 0 ? (
               <ul>
-                {groupDetails.users.map((user: any, index: number) => (
+                {groupchat.users.map((user: any, index: number) => (
                   <li key={user.id || index} className="py-2 border-b border-gray-300">
                     <span className="font-semibold">{user.nickname}</span>
                   </li>
@@ -119,24 +143,51 @@ const GroupDetails: React.FC = () => {
               <p>No users available</p>
             )}
           </div>
-
         </div>
 
+        {/* Grocery List Sliding Panel */}
+        <div
+          className={`fixed top-0 right-0 h-full w-64 bg-gray-100 shadow-lg transform ${
+            isGroceryListOpen ? "translate-x-0" : "translate-x-full"
+          } transition-transform duration-300 ease-in-out z-50`}
+        >
+          <div className="flex items-center justify-between p-4 bg-gradient-to-br from-green-500 to-green-900 text-white">
+            <h3>Grocery List</h3>
+            <button
+              onClick={() => setIsGroceryListOpen(false)}
+              className="text-white text-2xl leading-none"
+            >
+              &times;
+            </button>
+          </div>
+          <div className="p-4">
+            {groupId && <GroceryList groupId={groupId} />}
+          </div>
+        </div>
+
+        {/* Main Content */}
         <div className="flex-grow">
-          <h1>{groupDetails?.name || "Group Details"}</h1>
+          <h1>{groupchat?.name || "Group Details"}</h1>
           <h4 className="px-0 text-l font-semibold text-gray-800 dark:text-black text-center">
-            Group Id: {groupDetails?.id || "error no id available"}
+            Group Id: {groupchat?.id || "error no id available"}
           </h4>
-          <MessageList groupId={Number(groupId)} messages={messages} /> 
+           <button onClick={handleOpenModal}>Create Grocery List</button>
+              {isModalOpen && (
+                <CreateGroceryListModal groupId={Number(groupId)} onClose={handleCloseModal} />
+              )}
+          <div className="flex-grow overflow-y-auto px-4 py-2 bg-gray-50">
+            <MessageList groupId={Number(groupId)} messages={messages} />
+            
+          </div>
         </div>
 
         {/* Message Form */}
-        <div className="absolute bottom-0 w-full p-4 bg-white shadow-lg">
-          <MessageForm groupId={Number(groupId)} onMessageSent={handleNewMessage} /> 
+         <div className="sticky bottom-0 w-full bg-white shadow-lg p-4">
+          < MessageForm groupId={Number(groupId)} onMessageSent={handleNewMessage} />
         </div>
       </div>
     </>
   );
 };
 
-export default GroupDetails;
+export default groupchat;

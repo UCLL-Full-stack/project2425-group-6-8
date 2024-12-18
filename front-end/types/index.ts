@@ -12,7 +12,7 @@ export type User = {
 };
 
 export type Item = {
-    Id?: number;
+    id?: number;
     description: string;
     name: string;
     consumableType: ConsumableType;

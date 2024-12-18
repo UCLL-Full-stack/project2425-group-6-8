@@ -11,7 +11,7 @@ import GroupService from "@services/GroupService";
 import Link from "next/link";  
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  const res = await fetch("http://localhost:3000/api/group");
+  const res = await fetch("http://localhost:3000/group");
   const groups = await res.json();
 
   return {

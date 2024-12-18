@@ -75,6 +75,105 @@ groceryListRouter.get('/', async (req: Request, res: Response) => {
     }
 });
 
+
+/**
+ *@swagger
+ * /put/grocerylists/{id}:
+ *   put:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Edit a grocery list
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the grocery list to edit
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Updated Weekly Shopping
+ *               addItemIds:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *                 example: [101, 102]
+ *               removeItemIds:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *                 example: [103]
+ *     responses:
+ *       200:
+ *         description: Updated grocery list
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/GroceryList'
+ *       400:
+ *         description: Error updating grocery list
+ */
+
+groceryListRouter.put('/:id', async (req: Request, res: Response, next: NextFunction) => {
+    const groceryListId = parseInt(req.params.id, 10);
+    const { name, addItemIds, removeItemIds } = req.body;
+
+    try {
+        const updatedGroceryList = await groceryListService.updateGroceryList(
+            groceryListId,
+            name,
+            addItemIds,
+            removeItemIds
+        );
+        res.status(200).json(updatedGroceryList);
+    } catch (error) {
+        console.error(`Error updating grocery list with ID ${groceryListId}:`, error);
+        next(error);
+    }
+});
+
+/**
+ *@swagger
+ * /delete/grocerylists/{id}:
+ *   delete:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Delete a grocery list
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the grocery list to delete
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       204:
+ *         description: Grocery list deleted successfully
+ *       400:
+ *         description: Error deleting grocery list
+ */
+
+groceryListRouter.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
+    const groceryListId = parseInt(req.params.id, 10);
+
+    try {
+        await groceryListService.deleteGroceryList(groceryListId);
+        res.status(204).send(); // No content
+    } catch (error) {
+        console.error(`Error deleting grocery list with ID ${groceryListId}:`, error);
+        next(error);
+    }
+});
+
+
+
 /**
  * @swagger
  * /grocerylists/{id}:
@@ -135,6 +234,10 @@ groceryListRouter.get('/:id', async (req: Request, res: Response) => {
  *                 items:
  *                   type: integer
  *                 description: Array of item IDs to include in the grocery list
+ *               groupId:
+ *                 type: integer
+ *                 example: 1
+ *                 description: ID of the group the grocery list belongs to
  *     responses:
  *       201:
  *         description: Grocery list created successfully
@@ -146,15 +249,34 @@ groceryListRouter.get('/:id', async (req: Request, res: Response) => {
  *         description: Validation error
  */
 groceryListRouter.post('/', async (req: Request, res: Response) => {
-    const { name, items } = req.body;
+    const { name, items, groupId } = req.body;
+
+    console.log("Received request to create grocery list");
+    console.log("Request body:", req.body); // Log the full request body for debugging
+
+    if (!groupId) {
+        console.warn("Missing groupId in request");
+        return res.status(400).json({ error: 'groupId is required to create a grocery list' });
+    }
+
     try {
-        const newGroceryList = await groceryListService.createGroceryList(name, items);
+        console.log("Calling createGroceryList service with the following parameters:");
+        console.log("name:", name);
+        console.log("items:", items);
+        console.log("groupId:", groupId);
+
+        const newGroceryList = await groceryListService.createGroceryList(name, items, groupId);
+
+        console.log("Grocery list created successfully:", newGroceryList);
+
         res.status(201).json(newGroceryList);
     } catch (error) {
-        console.error('Error creating grocery list:', error);
+        console.error("Error creating grocery list:", error);
         res.status(400).json({ error: 'Failed to create grocery list' });
     }
 });
+
+
 
 /**
  * @swagger
