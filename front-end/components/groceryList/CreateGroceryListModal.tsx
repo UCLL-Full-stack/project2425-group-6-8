@@ -42,8 +42,6 @@ const handleItemChange = (index: number, value: string) => {
   }
 };
 
-
-
   const handleAddItemField = () => {
     setItemInputFields([...itemInputFields, itemInputFields.length]);
   };

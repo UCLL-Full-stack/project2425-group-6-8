@@ -147,23 +147,24 @@ const groupchat: React.FC = () => {
 
         {/* Grocery List Sliding Panel */}
         <div
-          className={`fixed top-0 right-0 h-full w-64 bg-gray-100 shadow-lg transform ${
-            isGroceryListOpen ? "translate-x-0" : "translate-x-full"
-          } transition-transform duration-300 ease-in-out z-50`}
-        >
-          <div className="flex items-center justify-between p-4 bg-gradient-to-br from-green-500 to-green-900 text-white">
-            <h3>Grocery List</h3>
-            <button
-              onClick={() => setIsGroceryListOpen(false)}
-              className="text-white text-2xl leading-none"
-            >
-              &times;
-            </button>
+            className={`fixed top-0 right-0 h-full w-64 bg-gray-100 shadow-lg transform ${
+              isGroceryListOpen ? "translate-x-0" : "translate-x-full"
+            } transition-transform duration-300 ease-in-out z-50`}
+          >
+            <div className="flex items-center justify-between p-4 bg-gradient-to-br from-green-500 to-green-900 text-white">
+              <h3>Grocery List</h3>
+              <button
+                onClick={() => setIsGroceryListOpen(false)}
+                className="text-white text-2xl leading-none"
+              >
+                &times;
+              </button>
+            </div>
+            <div className="p-4 overflow-y-auto flex flex-col gap-4">
+              {groupId && <GroceryList groupId={groupId} />}
+            </div>
           </div>
-          <div className="p-4">
-            {groupId && <GroceryList groupId={groupId} />}
-          </div>
-        </div>
+
 
         {/* Main Content */}
         <div className="flex-grow">

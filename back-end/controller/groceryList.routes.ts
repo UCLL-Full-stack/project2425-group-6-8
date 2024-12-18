@@ -212,6 +212,65 @@ groceryListRouter.get('/:id', async (req: Request, res: Response) => {
     }
 });
 
+
+/**
+ * @swagger
+ * /group/{groupId}:
+ *   get:
+ *     summary: Get all grocery lists for a specific group
+ *     description: Fetch all grocery lists associated with a specific group ID.
+ *     parameters:
+ *       - in: path
+ *         name: groupId
+ *         required: true
+ *         description: The ID of the group to fetch the grocery lists for.
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: A list of grocery lists for the group
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   name:
+ *                     type: string
+ *                   items:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: integer
+ *                         name:
+ *                           type: string
+ *                         description:
+ *                           type: string
+ *       404:
+ *         description: No grocery lists found for the group
+ *       500:
+ *         description: Internal server error
+ */
+groceryListRouter.get('/group/:groupId', async (req: Request, res: Response) => {
+    const groupId = parseInt(req.params.groupId, 10); 
+    try {
+        const groceryLists = await groceryListService.getGroceryListsByGroupId(groupId); 
+        if (!groceryLists || groceryLists.length === 0) {
+            return res.status(404).json({ error: 'No grocery lists found for this group' });
+        }
+        res.status(200).json(groceryLists);
+    } catch (error) {
+        console.error(`Error fetching grocery lists for group ID ${groupId}:`, error);
+        res.status(500).json({ error: 'Failed to fetch grocery lists' });
+    }
+});
+
+
 /**
  * @swagger
  * /grocerylists:

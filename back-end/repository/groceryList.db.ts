@@ -19,16 +19,17 @@ GroceryList.from = function ({
     });
 };
 
+// Create grocery list with groupId association
 const createGroceryList = async (
     name: string,
+    itemIds: number[],
     groupId: number,
-    itemIds: number[]
 ): Promise<GroceryList> => {
     try {
         const groceryListPrisma = await database.groceryList.create({
             data: {
                 name,
-                groupId,
+                groupId,  // Store the groupId correctly
                 items: {
                     connect: itemIds.map((itemId) => ({ id: itemId })),
                 },
@@ -43,7 +44,7 @@ const createGroceryList = async (
     }
 };
 
-
+// Fetch grocery list by its unique ID
 const getGroceryListById = async (id: number): Promise<GroceryList | null> => {
     try {
         const groceryListPrisma = await database.groceryList.findUnique({
@@ -58,8 +59,21 @@ const getGroceryListById = async (id: number): Promise<GroceryList | null> => {
     }
 };
 
+// Fetch all grocery lists associated with a specific groupId
+const getGroceryListsByGroupId = async (groupId: number): Promise<GroceryList[]> => {
+    try {
+        const groceryListsPrisma = await database.groceryList.findMany({
+            where: { groupId }, // Filter by groupId
+            include: { items: true },
+        });
+        return groceryListsPrisma.map((groceryList) => GroceryList.from(groceryList));
+    } catch (error) {
+        console.error(error);
+        throw new Error('Database error. See server log for details');
+    }
+};
 
-
+// Fetch all grocery lists
 const getAllGroceryLists = async (): Promise<GroceryList[]> => {
     try {
         const groceryListsPrisma = await database.groceryList.findMany({
@@ -72,6 +86,7 @@ const getAllGroceryLists = async (): Promise<GroceryList[]> => {
     }
 };
 
+// Update grocery list
 const updateGroceryList = async (
     groceryListId: number,
     name?: string,
@@ -102,7 +117,7 @@ const updateGroceryList = async (
     }
 };
 
-
+// Add items to a grocery list
 const addItemsToGroceryList = async (groceryListId: number, itemIds: number[]): Promise<GroceryList> => {
     try {
         const updatedGroceryListPrisma = await database.groceryList.update({
@@ -122,6 +137,7 @@ const addItemsToGroceryList = async (groceryListId: number, itemIds: number[]): 
     }
 };
 
+// Delete grocery list
 const deleteGroceryList = async (groceryListId: number): Promise<void> => {
     try {
         await database.groceryList.delete({
@@ -133,13 +149,12 @@ const deleteGroceryList = async (groceryListId: number): Promise<void> => {
     }
 };
 
-
 export default {
     createGroceryList,
     getGroceryListById,
     getAllGroceryLists,
+    getGroceryListsByGroupId, 
     addItemsToGroceryList,
     updateGroceryList, 
     deleteGroceryList, 
 };
-

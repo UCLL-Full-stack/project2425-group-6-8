@@ -6,44 +6,51 @@ interface GroceryListProps {
 }
 
 const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
-  const [groceryList, setGroceryList] = useState<any | null>(null);
+  const [groceryLists, setGroceryLists] = useState<any | null>(null); // Array of grocery lists
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchGroceryList = async () => {
+    const fetchGroceryLists = async () => {
       setLoading(true);
       setError(null);
       try {
-        const list = await GroceryListService.getGroceryListById(groupId);
-        setGroceryList(list);
+        const lists = await GroceryListService.getGroceryListsByGroupId(groupId);
+        setGroceryLists(lists);
       } catch (err) {
         console.error(err);
-        setError("Failed to fetch the grocery list.");
+        setError("Failed to fetch the grocery lists.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchGroceryList();
+    fetchGroceryLists();
   }, [groupId]);
 
-  if (loading) return <div>Loading grocery list...</div>;
+  if (loading) return <div>Loading grocery lists...</div>;
   if (error) return <div>{error}</div>;
 
   return (
-    <div className="p-4 bg-white shadow-md rounded-lg">
-      <h2 className="text-xl font-semibold mb-4">Group Grocery List</h2>
-      {groceryList?.items?.length > 0 ? (
-        <ul>
-          {groceryList.items.map((item: any) => (
-            <li key={item.id} className="py-2 border-b">
-              {item.name}
-            </li>
-          ))}
-        </ul>
+    <div className="flex flex-col gap-4">
+      {groceryLists?.length > 0 ? (
+        groceryLists.map((groceryList: any) => (
+          <div
+            key={groceryList.id}
+            className="p-4 bg-white shadow-md rounded-lg border border-gray-200"
+          >
+            <h4 className="text-lg font-semibold">{groceryList.name}</h4>
+            <ul>
+              {groceryList.items.map((item: any) => (
+                <li key={item.id} className="text-sm text-gray-700">
+                  {item.name}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
       ) : (
-        <p>No items in this grocery list.</p>
+        <p>No grocery lists in this group.</p>
       )}
     </div>
   );

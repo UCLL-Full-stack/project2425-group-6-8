@@ -21,22 +21,26 @@ const createGroceryList = async (
         throw new Error("itemIds array is empty");
     }
 
-    // Iterate through itemIds to check if all items exist in the repository
     for (const itemId of itemIds) {
         const item = await itemRepository.getItemById(itemId);
         if (!item) throw new Error(`Item with ID ${itemId} not found`);
     }
 
-    return groceryListRepository.createGroceryList(name, groupId, itemIds);
+    return groceryListRepository.createGroceryList(name, itemIds, groupId);
 };
-
-
 
 const getGroceryListById = async (id: number): Promise<GroceryList | null> => {
     const groceryList = await groceryListRepository.getGroceryListById(id);
     if (!groceryList) throw new Error(`Grocery list with ID ${id} not found`);
     return groceryList;
 };
+
+
+const getGroceryListsByGroupId = async (groupId: number) => {
+    return groceryListRepository.getGroceryListsByGroupId(groupId);
+};
+
+
 
 const getAllGroceryLists = async (): Promise<GroceryList[]> => {
     return await groceryListRepository.getAllGroceryLists();
@@ -90,4 +94,6 @@ export default {
     addItemsToGroceryList,
     updateGroceryList, 
     deleteGroceryList, 
+    getGroceryListsByGroupId,
+    
 };

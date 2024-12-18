@@ -28,6 +28,22 @@ const GroceryListService = {
     return response.json();
   },
 
+  async getGroceryListsByGroupId(groupId: number): Promise<GroceryList[]> {
+    const response = await fetch(`${BASE_URL}/group/${groupId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getLoggedInUserData()?.token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch grocery lists for the group.");
+    }
+
+    return response.json();
+  },
+
   async getGroceryListById(id: number): Promise<GroceryList> {
     const response = await fetch(`${BASE_URL}/${id}`, {
       method: "GET",
@@ -49,7 +65,7 @@ const GroceryListService = {
 
   async createGroceryList(name: string, itemIds: number[], groupId: number): Promise<GroceryList> {
     const requestBody = { name, groupId, items: itemIds };
-    console.log("Request body being sent:", requestBody); // Add this line to inspect the body
+    console.log("Request body being sent:", requestBody); 
 
     const response = await fetch(BASE_URL, {
       method: "POST",
