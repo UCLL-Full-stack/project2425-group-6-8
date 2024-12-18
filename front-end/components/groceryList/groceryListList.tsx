@@ -6,13 +6,15 @@ interface GroceryListProps {
 }
 
 const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
-  const [groceryLists, setGroceryLists] = useState<any | null>(null); // Array of grocery lists
+  const [groceryLists, setGroceryLists] = useState<any | null>(null); 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   
-  // To track the added and removed items
   const [addedItems, setAddedItems] = useState<any[]>([]);
   const [removedItems, setRemovedItems] = useState<any[]>([]);
+
+  const [editMode, setEditMode] = useState<number | null>(null);
+  const [editableItem, setEditableItem] = useState<any>(null);
 
   useEffect(() => {
     const fetchGroceryLists = async () => {
@@ -32,7 +34,6 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
     fetchGroceryLists();
   }, [groupId]);
 
-  // Handle editing a list
   const handleEditClick = (groceryListId: number) => {
     setGroceryLists((prevLists: any[]) =>
       prevLists.map((list: any) =>
@@ -41,11 +42,10 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
     );
   };
 
-  // Add a new item to a grocery list
   const handleAddItem = (groceryListId: number) => {
     const itemName = prompt("Enter the item name:");
     if (itemName) {
-      const newItem = { id: Date.now(), name: itemName }; // Temporarily assign a unique ID
+      const newItem = { id: Date.now(), name: itemName }; 
       setGroceryLists((prevLists: any[]) =>
         prevLists.map((list: any) =>
           list.id === groceryListId
@@ -118,21 +118,24 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
             className="p-4 bg-white shadow-md rounded-lg border border-gray-200"
           >
             <h4 className="text-lg font-semibold">{groceryList.name}</h4>
-            <ul>
-              {groceryList.items.map((item: any) => (
-                <li key={item.id} className="flex justify-between text-sm text-gray-700">
-                  <span>{item.name}</span>
-                  {groceryList.editMode && (
-                    <button
-                      onClick={() => handleDeleteItem(groceryList.id, item.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      Delete
-                    </button>
-                  )}
-                </li>
-              ))}
-            </ul>
+            <ul className="divide-y divide-gray-300">
+      {groceryList.items.map((item: any) => (
+        <li key={item.id} className="py-2">
+          <div className="flex justify-between items-center gap-4">
+            <span className="font-medium text-gray-800">{item.name}</span>
+            <span className="text-sm text-gray-600">{item.description}</span>
+            <span className="text-sm text-gray-600">{item.consumableType}</span>
+            <span className="text-sm text-gray-600">€{item.price.toFixed(2)}</span>
+            <span className="text-sm text-gray-600">
+              {item.weight ? `${item.weight} kg` : "N/A"}
+            </span>
+            <span className="text-sm text-gray-600">
+              {item.quantity ? `Qty: ${item.quantity}` : "N/A"}
+            </span>
+          </div>
+        </li>
+      ))}
+    </ul>
             {groceryList.editMode ? (
               <div className="flex justify-between mt-4">
                 <button

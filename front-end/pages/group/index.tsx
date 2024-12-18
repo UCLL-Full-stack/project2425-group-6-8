@@ -21,7 +21,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
     },
   };
 };
-
+ 
 const GroupPage: React.FC = () => {
   const { t } = useTranslation("common");
   const [groups, setGroups] = useState<Array<Group>>([]);
