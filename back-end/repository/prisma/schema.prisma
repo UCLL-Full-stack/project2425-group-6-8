@@ -7,27 +7,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int         @id @default(autoincrement())
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+ model User {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   name      String
   email     String
-  nickname  String      @unique
+  nickname  String    @unique
   password  String
   role      String
-  groups    Group[]     @relation("UserGroups")
+  groups    Group[]   @relation("UserGroups")
   messages  Message[]
 }
 
 model Schedule {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   name      String
   startDate DateTime
   endDate   DateTime
-  group     Group?   @relation(fields: [groupId], references: [id])
+  group     Group?    @relation(fields: [groupId], references: [id])
   groupId   Int?
 }
 
@@ -37,25 +37,35 @@ model Message {
   updatedAt DateTime @updatedAt
   message   String
   timestamp DateTime @default(now())
-  userId    Int
+  userId    Int     
   user      User     @relation(fields: [userId], references: [id])
   group     Group    @relation(fields: [groupId], references: [id])
   groupId   Int
 }
 
 model Item {
-  id             Int          @id @default(autoincrement())
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  name           String
-  description    String
-  consumableType String
-  groceryList    GroceryList? @relation(fields: [groceryListId], references: [id])
-  groceryListId  Int?
-  price          Float
-  weight         Float?
-  quantity       Int?
+  id              Int         @id @default(autoincrement())
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  name            String
+  description     String
+  consumableType  String
+  price           Float
+  weight          Int?
+  quantity        Float?
+  groceryLists    GroceryList[] @relation("ItemGroceryLists")
 }
+
+model GroceryList {
+  id        Int        @id @default(autoincrement())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  name      String
+  group     Group?     @relation(fields: [groupId], references: [id])
+  groupId   Int?
+  items     Item[]     @relation("ItemGroceryLists")
+}
+
 
 model Group {
   id           Int           @id @unique
@@ -68,15 +78,7 @@ model Group {
   messages     Message[]
 }
 
-model GroceryList {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  name      String
-  items     Item[]
-  group     Group?   @relation(fields: [groupId], references: [id])
-  groupId   Int?
-}
+
 
 enum consumableTypeEnum {
   FOOD

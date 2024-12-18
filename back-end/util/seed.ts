@@ -67,8 +67,11 @@ const main = async () => {
   });
   console.log('Created groceryList1:', groceryList1.id);
 
-  const group1 = await prisma.group.create({
+    const randomGroupId = Math.floor(Math.random() * 1000000);
+
+   const group1 = await prisma.group.create({
     data: {
+      id: randomGroupId, 
       name: 'Household Family',
       users: {
         connect: [{ id: user1.id }, { id: user2.id }],
@@ -78,7 +81,7 @@ const main = async () => {
       },
     },
   });
-  console.log('Created group1:', group1.id); 
+  console.log('Created group1:', group1.id);
 
   const message1 = await prisma.message.create({
     data: {
