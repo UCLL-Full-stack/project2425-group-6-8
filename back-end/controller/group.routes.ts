@@ -394,5 +394,76 @@ groupRouter.post('/:id/users', async (req: Request, res: Response, next: NextFun
     }
 });
 
+/**
+ * @swagger
+ * /groups/{id}/users:
+ *   delete:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Remove a user from an existing group.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the group from which the user will be removed.
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: integer
+ *                 description: ID of the user to remove from the group.
+ *     responses:
+ *       200:
+ *         description: User successfully removed from the group.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Group'
+ *       404:
+ *         description: Group or user not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: Bad request due to invalid or missing data.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ */
+groupRouter.delete('/:id/users', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const groupId = parseInt(req.params.id, 10);
+        const { userId } = req.body;
+
+        if (!userId) {
+            return res.status(400).json({ message: 'User ID is required.' });
+        }
+
+        const result = await groupService.removeUserFromGroup(groupId, userId);
+        if (result) {
+            res.status(200).json(result);
+        } else {
+            res.status(404).json({ message: 'Group or user not found.' });
+        }
+    } catch (error) {
+        next(error);
+    }
+});
+
+
 
 export { groupRouter };

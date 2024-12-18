@@ -70,10 +70,10 @@ const getAllMessages = async (groupId?: number): Promise<Message[]> => {
     return await messageDb.getAllMessages(groupId);
 };
 
-const getNewMessages = async (groupId: number, lastTimestamp: string): Promise<Message[]> => {
-    console.log(`Fetching new messages for group ID ${groupId} after ${lastTimestamp}`);
-    return await messageDb.getNewMessages(groupId, lastTimestamp);
+const getNewMessages = async (groupId: number, lastSentTimestamp: string): Promise<Message[]> => {
+    return await messageDb.getNewMessages(groupId, new Date(lastSentTimestamp).toISOString());
 };
+
 
 
 export default { createMessage, getMessageById, getAllMessages,getNewMessages };

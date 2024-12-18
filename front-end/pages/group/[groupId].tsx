@@ -8,7 +8,7 @@ import MessageForm from "@components/messages/MessageForm";
 import MessageService from "../../services/MessageService";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
-import { GetServerSideProps } from "next"; 
+import { GetServerSideProps } from "next";
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   const res = await fetch("http://localhost:3000/api/group");
@@ -17,7 +17,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   return {
     props: {
       groups,
-      ...(await serverSideTranslations(locale ?? 'en', ["common"])),
+      ...(await serverSideTranslations(locale ?? "en", ["common"])),
     },
   };
 };
@@ -26,11 +26,21 @@ const GroupDetails: React.FC = () => {
   const router = useRouter();
   const [groupId, setGroupId] = useState<number | null>(null);
   const [groupDetails, setGroupDetails] = useState<any>(null);
-  const [messages, setMessages] = useState<any[]>([]); 
+  const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation("common");
-  const [isSliderOpen, setIsSliderOpen] = useState<boolean>(false); 
+  const [isSliderOpen, setIsSliderOpen] = useState<boolean>(false);
+
+  // Retrieve logged-in user data
+  const loggedInUserData = (() => {
+    if (typeof localStorage === "undefined") {
+      console.warn("localStorage is not defined.");
+      return null;
+    }
+    const item = localStorage.getItem("loggedInUser");
+    return item ? JSON.parse(item) : null;
+  })();
 
   useEffect(() => {
     if (router.query.groupId) {
@@ -75,6 +85,22 @@ const GroupDetails: React.FC = () => {
     setMessages((prevMessages) => [...prevMessages, ...newMessages]);
   };
 
+  const handleLeaveGroup = async () => {
+    if (!groupId || !loggedInUserData?.id) {
+      setError("Unable to leave group.");
+      return;
+    }
+
+    try {
+      await GroupService.removeUserFromExistingGroup(groupId, loggedInUserData.id);
+      alert("You have left the group successfully.");
+      router.push("/group"); // Redirect to the groups page
+    } catch (err) {
+      console.error(err);
+      setError("Failed to leave group.");
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
 
@@ -84,13 +110,21 @@ const GroupDetails: React.FC = () => {
         <title>{t("group.title")}</title>
       </Head>
       <Header />
-      <div className="group-page flex flex-col h-screen relative">
-        <button
-          onClick={() => setIsSliderOpen(true)}
-          className="absolute top-4 left-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600"
-        >
-          View Users
-        </button>
+      <div className="group-page flex flex-col h-auto relative max-w-5xl mx-auto">
+        <div className="absolute top-4 right-4 flex space-x-4">
+          <button
+            onClick={handleLeaveGroup}
+            className="bg-red-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-600"
+          >
+            Leave Group
+          </button>
+          <button
+            onClick={() => setIsSliderOpen(true)}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600"
+          >
+            View Users
+          </button>
+        </div>
 
         <div
           className={`fixed top-0 left-0 h-full w-64 bg-gray-100 shadow-lg transform ${
@@ -119,20 +153,18 @@ const GroupDetails: React.FC = () => {
               <p>No users available</p>
             )}
           </div>
-
         </div>
 
-        <div className="flex-grow">
+        <div className="flex-grow p-1">
           <h1>{groupDetails?.name || "Group Details"}</h1>
           <h4 className="px-0 text-l font-semibold text-gray-800 dark:text-black text-center">
             Group Id: {groupDetails?.id || "error no id available"}
           </h4>
-          <MessageList groupId={Number(groupId)} messages={messages} /> 
+          <MessageList groupId={Number(groupId)} messages={messages} />
         </div>
 
-        {/* Message Form */}
-        <div className="absolute bottom-0 w-full p-4 bg-white shadow-lg">
-          <MessageForm groupId={Number(groupId)} onMessageSent={handleNewMessage} /> 
+        <div className="w-full p-4 bg-white shadow-lg mt-10">
+          <MessageForm groupId={Number(groupId)} onMessageSent={handleNewMessage} />
         </div>
       </div>
     </>

@@ -5,29 +5,23 @@ import * as bodyParser from 'body-parser';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { expressjwt } from 'express-jwt';
-import { groceryListRouter }  from './controller/groceryList.routes';
-import { groupRouter }  from './controller/group.routes';
-import { itemRouter }  from './controller/item.routes';
-import { messageRouter }  from './controller/message.routes';
-import { scheduleRouter }  from './controller/schedule.routes';
-import { userRouter }  from './controller/user.routes';
+import { groceryListRouter } from './controller/groceryList.routes';
+import { groupRouter } from './controller/group.routes';
+import { itemRouter } from './controller/item.routes';
+import { messageRouter } from './controller/message.routes';
+import { scheduleRouter } from './controller/schedule.routes';
+import { userRouter } from './controller/user.routes';
 import helmet from 'helmet';
 
 const app = express();
 app.use(helmet());
 
-app.use(
-    helmet.contentSecurityPolicy({
-        directives: {
-            connectSrc: ["'self'", 'https://api.ucll.be'],
-        },
-    })
-);
-
 dotenv.config();
 const port = process.env.APP_PORT || 3000;
 
-app.use(cors({ origin: 'http://localhost:8080' }));
+// Set up CORS to allow requests from frontend at localhost:8080
+app.use(cors({ origin: 'http://localhost:8080', credentials: true }));
+
 app.use(bodyParser.json());
 
 app.use(
@@ -35,7 +29,7 @@ app.use(
         secret: process.env.JWT_SECRET || 'default_secret',
         algorithms: ['HS256'],
     }).unless({
-        path: ['/api-docs', /^\/api-docs\/.*/, '/users/login', '/users/register', '/status'],
+        path: ['/api-docs', /^\/api-docs\/.*/, '/users/login', '/users/register', '/status', '/messages'],
     })
 );
 
@@ -63,6 +57,7 @@ const swaggerOpts = {
 const swaggerSpec = swaggerJSDoc(swaggerOpts);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+// Handle errors
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     if (err.name === 'UnauthorizedError') {
         res.status(401).json({ status: 'unauthorized', message: err.message });

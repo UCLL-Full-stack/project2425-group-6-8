@@ -1,87 +1,85 @@
-    generator client {
-      provider = "prisma-client-js"
-    }
-
-    datasource db {
-      provider = "postgresql"
-      url      = env("DATABASE_URL")
-    }
-
-    model User {
-      id        Int       @id @default(autoincrement())
-      createdAt DateTime  @default(now())
-      updatedAt DateTime  @updatedAt
-      name      String
-      email     String
-      nickname  String    @unique
-      password  String
-      role      String
-      groups    Group[]   @relation("UserGroups")
-      messages  Message[]
-    }
-
-    model Schedule {
-      id        Int       @id @default(autoincrement())
-      createdAt DateTime  @default(now())
-      updatedAt DateTime  @updatedAt
-      name      String
-      startDate DateTime
-      endDate   DateTime
-      group     Group?    @relation(fields: [groupId], references: [id])
-      groupId   Int?
-    }
-
-   model Message {
-    id        Int      @id @default(autoincrement())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    message   String
-    timestamp DateTime @default(now())
-    userId    Int     
-    user      User     @relation(fields: [userId], references: [id])
-    group     Group    @relation(fields: [groupId], references: [id])
-    groupId   Int
+generator client {
+  provider = "prisma-client-js"
 }
 
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
-  model Item {
-      id              Int      @id @default(autoincrement())
-      createdAt       DateTime @default(now())
-      updatedAt       DateTime @updatedAt
-      name            String
-      description     String
-      consumableType  String
-      groceryList    GroceryList?  @relation(fields: [groceryListId], references: [id])
-      groceryListId   Int?
-      price           Float
-      weight          Float?
-      quantity        Int?
-  }
+model User {
+  id        Int         @id @default(autoincrement())
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  name      String
+  email     String
+  nickname  String      @unique
+  password  String
+  role      String
+  groups    Group[]     @relation("UserGroups")
+  messages  Message[]
+}
 
+model Schedule {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  startDate DateTime
+  endDate   DateTime
+  group     Group?   @relation(fields: [groupId], references: [id])
+  groupId   Int?
+}
 
-    model Group {
-      id           Int           @id @unique
-      createdAt    DateTime      @default(now())
-      updatedAt    DateTime      @updatedAt
-      name         String
-      users        User[]        @relation("UserGroups")
-      groceryLists GroceryList[]
-      schedules    Schedule[]
-      messages     Message[]
-    }
+model Message {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  message   String
+  timestamp DateTime @default(now())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  group     Group    @relation(fields: [groupId], references: [id])
+  groupId   Int
+}
 
-    model GroceryList {
-      id        Int     @id @default(autoincrement())
-      createdAt DateTime @default(now())
-      updatedAt DateTime @updatedAt
-      name      String
-      items     Item[]
-      group     Group?  @relation(fields: [groupId], references: [id])
-      groupId   Int?
-    }
+model Item {
+  id             Int          @id @default(autoincrement())
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  name           String
+  description    String
+  consumableType String
+  groceryList    GroceryList? @relation(fields: [groceryListId], references: [id])
+  groceryListId  Int?
+  price          Float
+  weight         Float?
+  quantity       Int?
+}
 
-    enum consumableTypeEnum {
-      FOOD
-      DRINK
-      OTHER
-    }
+model Group {
+  id           Int           @id @unique
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  name         String
+  users        User[]        @relation("UserGroups")
+  groceryLists GroceryList[]
+  schedules    Schedule[]
+  messages     Message[]
+}
+
+model GroceryList {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  items     Item[]
+  group     Group?   @relation(fields: [groupId], references: [id])
+  groupId   Int?
+}
+
+enum consumableTypeEnum {
+  FOOD
+  DRINK
+  OTHER
+}
