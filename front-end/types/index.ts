@@ -17,14 +17,14 @@ export type Item = {
     name: string;
     consumableType: ConsumableType;
     price: number;
+    weight?: number;
+    quantity?: number;
 };
 
 export type GroceryList = {
     name: string;
     id?: number;
     items: Item[];
-    weight?: number | null;
-    quantity?: number | null;
 };
 
 export type Message = {
