@@ -1,17 +1,15 @@
 import { User, GroceryList, Schedule, Message } from './index';
 import {
     Group as GroupPrisma,
-    User as UserPrisma,
+    UserGroup as UserGroupPrisma,
     GroceryList as GroceryListPrisma,
     Schedule as SchedulePrisma,
-    Message as MessagePrisma,
-    Item as ItemPrisma,
 } from '@prisma/client';
 
 export class Group {
     private name: string;
     private id?: number | undefined;
-    private users: User[];
+    private userGroups: UserGroupPrisma[]; 
     private groceryLists?: GroceryList[];
     private schedules?: Schedule[];
     private messages?: Message[];
@@ -21,7 +19,7 @@ export class Group {
     constructor(group: { 
         name: string; 
         id?: number; 
-        users: User[]; 
+        userGroups: UserGroupPrisma[]; 
         groceryLists?: GroceryList[];
         schedules?: Schedule[]; 
         messages?: Message[]; 
@@ -32,7 +30,7 @@ export class Group {
 
         this.name = group.name;
         this.id = group.id;
-        this.users = group.users;
+        this.userGroups = group.userGroups;
         this.groceryLists = group.groceryLists; 
         this.schedules = group.schedules;
         this.messages = group.messages;
@@ -48,8 +46,8 @@ export class Group {
         return this.id;
     }
 
-    getUsers(): User[] {
-        return this.users;
+    getUserGroups(): UserGroupPrisma[] {
+        return this.userGroups;
     }
 
     getGroceryList(): GroceryList[] | undefined {
@@ -72,37 +70,36 @@ export class Group {
         return this.updatedAt;
     }
 
-    validate(group: { name: string; users?: User[] }) {
+    validate(group: { name: string; userGroups?: UserGroupPrisma[] }) {
         if (!group.name?.trim()) {
             throw new Error('Group name is required');
         }
-        if (!group.users || group.users.length === 0) {
+        if (!group.userGroups || group.userGroups.length === 0) {
             throw new Error('Group must contain at least one user');
         }
     }
 
-   static from({
-    id,
-    name,
-    users,
-    groceryLists = [],
-    schedules = [],
-    createdAt,
-    updatedAt,
-}: GroupPrisma & {
-    users: UserPrisma[];
-    groceryLists?: GroceryListPrisma[];
-    schedules?: SchedulePrisma[];
-}): Group {
-    return new Group({
+    static from({
         id,
         name,
-        users: users.map(User.from),
-        groceryLists: groceryLists.map(GroceryList.from),
-        schedules: schedules.map(Schedule.from),
+        userGroups,
+        groceryLists = [],
+        schedules = [],
         createdAt,
         updatedAt,
-    });
-}
-
+    }: GroupPrisma & {
+        userGroups: UserGroupPrisma[];
+        groceryLists?: GroceryListPrisma[];
+        schedules?: SchedulePrisma[];
+    }): Group {
+        return new Group({
+            id,
+            name,
+            userGroups,
+            groceryLists: groceryLists.map(GroceryList.from),
+            schedules: schedules.map(Schedule.from),
+            createdAt,
+            updatedAt,
+        });
+    }
 }

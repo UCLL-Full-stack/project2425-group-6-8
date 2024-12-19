@@ -1,4 +1,4 @@
-const createGroup = async (name: string, users: string[], message: string) => {
+const createGroup = async (name: string, users: string[]) => {
   const loggedInUserData = (() => {
     if (typeof localStorage === "undefined") {
         console.warn("localStorage is not defined.");
@@ -12,7 +12,6 @@ const createGroup = async (name: string, users: string[], message: string) => {
     const groupData = {
       name,
       users,
-      message,
     };
 
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/groups`, {

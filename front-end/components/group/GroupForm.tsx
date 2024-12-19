@@ -11,7 +11,6 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
   const [showJoinGroupForm, setShowJoinGroupForm] = useState(false);
   const [name, setName] = useState("");
   const [users, setUsers] = useState("");
-  const [message, setMessage] = useState("");
   const [groupId, setGroupId] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -36,14 +35,11 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
     }
 
     try {
-      const newGroup = await GroupService.createGroup(name, userArray, message);
-      loggedInUserData.role = 'GroupAdmin';
-      localStorage.setItem('loggedInUser', JSON.stringify(loggedInUserData));
+      const newGroup = await GroupService.createGroup(name, userArray);
       setSuccessMessage(`Group "${newGroup.name}" created successfully!`);
       setErrorMessage("");
       setName("");
       setUsers("");
-      setMessage("");
 
       refreshGroups();
     } catch (error) {
@@ -132,17 +128,6 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
                   onChange={(e) => setUsers(e.target.value)}
                   placeholder="e.g., bob56,sam4334"
                   required
-                  style={{ width: "100%", padding: "8px", marginTop: "5px", border: "1px solid black" }}
-                />
-              </label>
-            </div>
-            <div style={{ marginBottom: "10px" }}>
-              <label>
-                <strong>Message:</strong>
-                <textarea
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Enter a welcome message (optional)"
                   style={{ width: "100%", padding: "8px", marginTop: "5px", border: "1px solid black" }}
                 />
               </label>

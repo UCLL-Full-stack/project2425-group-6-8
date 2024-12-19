@@ -1,6 +1,6 @@
 import { User } from './user';
 import { Group } from './group';  
-import { Message as MessagePrisma, User as UserPrisma, Group as GroupPrisma } from '@prisma/client';
+import { Message as MessagePrisma, User as UserPrisma, Group as GroupPrisma, UserGroup as UserGroupPrisma } from '@prisma/client';
 
 export class Message {
     private id?: number | undefined;
@@ -39,7 +39,7 @@ export class Message {
         return this.user;
     }
 
-    getGroup(): Group  {
+    getGroup(): Group {
         return this.group;
     }
 
@@ -74,29 +74,37 @@ export class Message {
         }
     }
 
-static from({
-    id,
-    user,
-    group,
-    timestamp,
-    message,
-    createdAt,
-    updatedAt,
-}: MessagePrisma & {
-    user: UserPrisma;
-    group: GroupPrisma & {
-        users: UserPrisma[];
-    };
-}) {
-    return new Message({
+    static from({
         id,
-        user: User.from(user),
-        group: Group.from(group),
+        user,
+        group,
         timestamp,
         message,
         createdAt,
-        updatedAt
-    })
-}
-
+        updatedAt,
+    }: MessagePrisma & {
+        user: UserPrisma;
+        group: GroupPrisma & {
+            userGroups: (UserGroupPrisma & { user: UserPrisma })[];
+        };
+    }) {
+        return new Message({
+            id,
+            user: User.from(user),
+            group: Group.from({
+                ...group,
+                userGroups: group.userGroups.map((userGroup) => ({
+                    id: userGroup.id,
+                    userId: userGroup.userId,
+                    groupId: userGroup.groupId,
+                    role: userGroup.role,
+                    user: User.from(userGroup.user),
+                })),
+            }),
+            timestamp,
+            message,
+            createdAt,
+            updatedAt,
+        });
+    }
 }
