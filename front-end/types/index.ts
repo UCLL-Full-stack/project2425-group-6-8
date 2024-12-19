@@ -1,4 +1,4 @@
-import { ConsumableType } from '../../back-end/model/consumableTypeEnum';
+import { ConsumableType } from './ConsumableType';
 
 type Role = 'ApplicationAdmin' | 'user' | 'GroupAdmin';
 
@@ -45,4 +45,6 @@ export type StatusMessage = {
     message: string;
     type: "error" | "success";
 };
+
+export { ConsumableType };
   

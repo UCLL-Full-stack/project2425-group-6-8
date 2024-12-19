@@ -34,4 +34,14 @@
     .customDatePickerWidth>div>div.react-datepicker__input-container .customDatePickerWidth>div>div.react-datepicker__input-container input {
         @apply w-full
     }
+
+    ul {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .groceryListPanel {
+        height: calc(100vh - 80px);
+        overflow-y: auto;
+    }
 }

@@ -154,8 +154,7 @@
 
 import express, { NextFunction, Request, Response } from 'express';
 import groupService from '../service/group.service';
-import { GroupInput } from '../types';
-
+import itemService from '../service/item.service';  
 const groupRouter = express.Router();
 
 /**
@@ -321,6 +320,57 @@ groupRouter.get('/:userId/users', async (req: Request, res: Response, next: Next
         }
     } catch (error) {
         next(error);
+    }
+});
+
+/**
+ * @swagger
+ * /groups/{groupId}/items:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Retrieve all items within a specific group.
+ *     parameters:
+ *       - in: path
+ *         name: groupId
+ *         required: true
+ *         description: The group ID for which you want to fetch items.
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: A list of items belonging to the group.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Item'
+ *       404:
+ *         description: No items found for this group.
+ *       400:
+ *         description: Invalid group ID.
+ */
+groupRouter.get('/:groupId/items', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const groupId = parseInt(req.params.groupId, 10);
+        
+        // Validate groupId
+        if (!groupId || groupId <= 0) {
+            return res.status(400).json({ message: 'Invalid group ID.' });
+        }
+
+        // Call the service to fech items related to the group
+        const items = await itemService.getItemsByGroupId(groupId);
+
+        if (items.length === 0) {
+            return res.status(404).json({ message: 'No items found for this group.' });
+        }
+
+        // Send back the items
+        res.status(200).json(items);
+    } catch (error) {
+        next(error); // Forward error to the error handler
     }
 });
 

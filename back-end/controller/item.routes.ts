@@ -1,67 +1,3 @@
-/**
- * @swagger
- * components:
- *   securitySchemes:
- *     bearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
- *   schemas:
- *     Item:
- *       type: object
- *       properties:
- *         id:
- *           type: number
- *           format: int64
- *           description: The unique identifier for the item.
- *         name:
- *           type: string
- *           description: The name of the item.
- *         description:
- *           type: string
- *           description: A brief description of the item.
- *         consumableType:
- *           type: string
- *           description: The type of consumable (e.g., perishable, non-perishable).
- *         price:
- *           type: number
- *           format: float
- *           description: The price of the item.
- *         weight:
- *           type: number
- *           format: float
- *           description: The weight of the item in grams.
- *         quantity:
- *           type: number
- *           format: int32
- *           description: The quantity of the item.
- *     ItemInput:
- *       type: object
- *       properties:
- *         name:
- *           type: string
- *           description: The name of the item.
- *         description:
- *           type: string
- *           description: A brief description of the item.
- *         consumableType:
- *           type: string
- *           description: The type of consumable (e.g., perishable, non-perishable).
- *         price:
- *           type: number
- *           format: float
- *           description: The price of the item.
- *         weight:
- *           type: number
- *           format: float
- *           description: The weight of the item in grams.
- *         quantity:
- *           type: number
- *           format: int32
- *           description: The quantity of the item.
- */
-
-
 import express, { NextFunction, Request, Response } from 'express';
 import itemService from '../service/item.service';
 import { ItemInput } from '../types';
@@ -153,6 +89,85 @@ itemRouter.get('/:id', async (req: Request, res: Response, next: NextFunction) =
         const result = await itemService.getItemById(id);
         if (result) {
             res.status(200).json(result);
+        } else {
+            res.status(404).json({ message: 'Item not found' });
+        }
+    } catch (error) {
+        next(error);
+    }
+});
+
+/**
+ * @swagger
+ * /items/{id}:
+ *   put:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Update an existing item by ID.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the item to update.
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ItemInput'
+ *     responses:
+ *       200:
+ *         description: The updated item.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Item'
+ *       404:
+ *         description: Item not found.
+ */
+itemRouter.put('/:id', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const id = parseInt(req.params.id, 10);
+        const itemData: ItemInput = req.body;
+        const result = await itemService.updateItem(id, itemData);
+        if (result) {
+            res.status(200).json(result);
+        } else {
+            res.status(404).json({ message: 'Item not found' });
+        }
+    } catch (error) {
+        next(error);
+    }
+});
+
+/**
+ * @swagger
+ * /items/{id}:
+ *   delete:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Delete an item by ID.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the item to delete.
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Item deleted successfully.
+ *       404:
+ *         description: Item not found.
+ */
+itemRouter.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const id = parseInt(req.params.id, 10);
+        const result = await itemService.deleteItem(id);
+        if (result) {
+            res.status(200).json({ message: 'Item deleted successfully' });
         } else {
             res.status(404).json({ message: 'Item not found' });
         }
