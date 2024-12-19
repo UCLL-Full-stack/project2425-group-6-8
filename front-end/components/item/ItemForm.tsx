@@ -9,6 +9,7 @@ type EditableItemProps = {
 const EditableItem: React.FC<EditableItemProps> = ({ item, onSave }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [editableItem, setEditableItem] = useState<Item>({ ...item });
+  const [itemDetailsVisible, setItemDetailsVisible] = useState<boolean>(false);
 
   const handleFieldChange = (field: keyof Item, value: any) => {
     setEditableItem((prev) => ({
@@ -19,7 +20,6 @@ const EditableItem: React.FC<EditableItemProps> = ({ item, onSave }) => {
 
   const handleSave = async () => {
     try {
-      // Call the parent's onSave to handle the database update
       onSave(editableItem);
       setIsEditing(false);
     } catch (error) {
@@ -32,8 +32,26 @@ const EditableItem: React.FC<EditableItemProps> = ({ item, onSave }) => {
     setIsEditing(false);
   };
 
+  const toggleItemDetails = () => {
+    setItemDetailsVisible((prev) => !prev);
+  };
+
   return (
-    <div className="flex flex-col p-4 border rounded shadow-md bg-white">
+     <div
+      className={`relative flex flex-col p-4 border rounded shadow-md bg-white transition-all duration-300 ${
+        itemDetailsVisible ? "min-h-[20rem]" : "min-h-[10rem]"
+      }`}
+    >
+      {/* Toggle Button */}
+      <button
+        type="button"
+        onClick={toggleItemDetails}
+        className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center bg-blue-500 text-white rounded-full shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+        title={itemDetailsVisible ? "Hide Details" : "Show Details"}
+      >
+        {itemDetailsVisible ? "-" : "+"}
+      </button>
+
       {/* Name */}
       <div className="flex items-center">
         <label className="mr-2 font-semibold">Name:</label>
@@ -64,28 +82,6 @@ const EditableItem: React.FC<EditableItemProps> = ({ item, onSave }) => {
         )}
       </div>
 
-      {/* Consumable Type */}
-      <div className="flex items-center mt-2">
-        <label className="mr-2 font-semibold">Type:</label>
-        {isEditing ? (
-          <select
-            value={editableItem.consumableType}
-            onChange={(e) =>
-              handleFieldChange("consumableType", e.target.value as ConsumableType)
-            }
-            className="border p-2 rounded"
-          >
-            {Object.values(ConsumableType).map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
-        ) : (
-          <span onDoubleClick={() => setIsEditing(true)}>{item.consumableType}</span>
-        )}
-      </div>
-
       {/* Price */}
       <div className="flex items-center mt-2">
         <label className="mr-2 font-semibold">Price:</label>
@@ -101,43 +97,70 @@ const EditableItem: React.FC<EditableItemProps> = ({ item, onSave }) => {
         )}
       </div>
 
-      {/* Weight */}
-      <div className="flex items-center mt-2">
-        <label className="mr-2 font-semibold">Weight:</label>
-        {isEditing ? (
-          <input
-            type="number"
-            value={editableItem.weight ?? ""}
-            onChange={(e) =>
-              handleFieldChange("weight", e.target.value ? parseFloat(e.target.value) : undefined)
-            }
-            className="border p-2 rounded"
-          />
-        ) : (
-          <span onDoubleClick={() => setIsEditing(true)}>
-            {item.weight ? `${item.weight} kg` : "N/A"}
-          </span>
-        )}
-      </div>
+      {/* Item Details */}
+      {itemDetailsVisible && (
+        <div className="mt-4 space-y-2">
+          {/* Consumable Type */}
+          <div className="flex items-center mt-2">
+            <label className="mr-2 font-semibold">Type:</label>
+            {isEditing ? (
+              <select
+                value={editableItem.consumableType}
+                onChange={(e) =>
+                  handleFieldChange("consumableType", e.target.value as ConsumableType)
+                }
+                className="border p-2 rounded"
+              >
+                {Object.values(ConsumableType).map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <span onDoubleClick={() => setIsEditing(true)}>{item.consumableType}</span>
+            )}
+          </div>
 
-      {/* Quantity */}
-      <div className="flex items-center mt-2">
-        <label className="mr-2 font-semibold">Quantity:</label>
-        {isEditing ? (
-          <input
-            type="number"
-            value={editableItem.quantity ?? ""}
-            onChange={(e) =>
-              handleFieldChange("quantity", e.target.value ? parseInt(e.target.value) : undefined)
-            }
-            className="border p-2 rounded"
-          />
-        ) : (
-          <span onDoubleClick={() => setIsEditing(true)}>
-            {item.quantity ?? "N/A"}
-          </span>
-        )}
-      </div>
+          {/* Weight */}
+          <div className="flex items-center">
+            <label className="mr-2 font-semibold">Weight:</label>
+            {isEditing ? (
+              <input
+                type="number"
+                value={editableItem.weight ?? ""}
+                onChange={(e) =>
+                  handleFieldChange("weight", e.target.value ? parseFloat(e.target.value) : undefined)
+                }
+                className="border p-2 rounded"
+              />
+            ) : (
+              <span onDoubleClick={() => setIsEditing(true)}>
+                {item.weight ? `${item.weight} kg` : "N/A"}
+              </span>
+            )}
+          </div>
+
+          {/* Quantity */}
+          <div className="flex items-center">
+            <label className="mr-2 font-semibold">Quantity:</label>
+            {isEditing ? (
+              <input
+                type="number"
+                value={editableItem.quantity ?? ""}
+                onChange={(e) =>
+                  handleFieldChange("quantity", e.target.value ? parseInt(e.target.value) : undefined)
+                }
+                className="border p-2 rounded"
+              />
+            ) : (
+              <span onDoubleClick={() => setIsEditing(true)}>
+                {item.quantity ?? "N/A"}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Save and Cancel Buttons */}
       {isEditing && (
@@ -159,6 +182,5 @@ const EditableItem: React.FC<EditableItemProps> = ({ item, onSave }) => {
     </div>
   );
 };
-
 
 export default EditableItem;

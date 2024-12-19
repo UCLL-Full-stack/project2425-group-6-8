@@ -97,7 +97,7 @@ const groupchat: React.FC = () => {
       <Head>
         <title>{t("group.title")}</title>
       </Head>
-      <Header />
+      <Header className="sticky top-0 z-50 bg-white shadow-md" />
       <div className="group-page flex flex-col h-screen relative">
         {/* Group Users Button */}
         <button
@@ -146,47 +146,51 @@ const groupchat: React.FC = () => {
         </div>
 
         {/* Grocery List Sliding Panel */}
-          <div
-            className={`fixed top-0 right-0 h-full w-[40%] bg-gray-100 shadow-lg transform ${
-              isGroceryListOpen ? "translate-x-0" : "translate-x-full"
-            } transition-transform duration-300 ease-in-out z-50`}
-          >
-            <div className="flex items-center justify-between p-4 bg-gradient-to-br from-green-500 to-green-900 text-white">
-              <h3 className="text-lg font-semibold">Grocery List</h3>
-              <button
-                onClick={() => setIsGroceryListOpen(false)}
-                className="text-white text-2xl leading-none"
-              >
-                &times;
-              </button>
-            </div>
-            <div className="p-4 overflow-y-auto flex flex-col gap-4">
-              {groupId && <GroceryList groupId={groupId} />}
-            </div>
+        <div
+          className={`fixed top-0 right-0 h-full w-[40%] bg-gray-100 shadow-lg transform ${
+            isGroceryListOpen ? "translate-x-0" : "translate-x-full"
+          } transition-transform duration-300 ease-in-out z-50`}
+        >
+          <div className="flex items-center justify-between p-4 bg-gradient-to-br from-green-500 to-green-900 text-white">
+            <h3 className="text-lg font-semibold">Grocery List</h3>
+            <button
+              onClick={() => setIsGroceryListOpen(false)}
+              className="text-white text-2xl leading-none"
+            >
+              &times;
+            </button>
           </div>
+          <div className="p-4 overflow-y-auto flex flex-col gap-4">
+            {groupId && <GroceryList groupId={groupId} />}
+          </div>
+        </div>
 
         {/* Main Content */}
-        <div className="flex-grow">
+        <div className="flex-grow overflow-y-auto p-4 bg-gray-50 flex flex-col">
           <h1>{groupchat?.name || "Group Details"}</h1>
-          <h4 className="px-0 text-l font-semibold text-gray-800 dark:text-black text-center">
+          <h4 className="text-l font-semibold text-gray-800 dark:text-black text-center">
             Group Id: {groupchat?.id || "error no id available"}
           </h4>
-           <button onClick={handleOpenModal}>Create Grocery List</button>
-              {isModalOpen && (
-                <CreateGroceryListModal groupId={Number(groupId)} onClose={handleCloseModal} />
-              )}
-          <div className="flex-grow overflow-y-auto px-4 py-2 bg-gray-50">
+          <button
+            onClick={handleOpenModal}
+            className="my-4 px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 max-w-xs w-full"          >
+            Create Grocery List
+          </button>
+          {isModalOpen && (
+            <CreateGroceryListModal groupId={Number(groupId)} onClose={handleCloseModal} />
+          )}
+          <div className="flex-grow overflow-y-auto">
             <MessageList groupId={Number(groupId)} messages={messages} />
-            
           </div>
         </div>
 
         {/* Message Form */}
-         <div className="sticky bottom-0 w-full bg-white shadow-lg p-4">
-          < MessageForm groupId={Number(groupId)} onMessageSent={handleNewMessage} />
+        <div className="sticky bottom-0 w-full bg-white shadow-lg p-4">
+          <MessageForm groupId={Number(groupId)} onMessageSent={handleNewMessage} />
         </div>
       </div>
     </>
+
   );
 };
 

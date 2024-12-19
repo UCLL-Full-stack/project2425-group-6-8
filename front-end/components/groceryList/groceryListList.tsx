@@ -146,10 +146,10 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
                 </div>
               </div>
               
-              {/* Scrollable area for items inside each grocery list */}
-              <ul className="divide-y divide-gray-300 flex-1 overflow-y-auto max-h-[300px]">
+              {/* Grid layout for items */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-4 mt-4">
                 {groceryList.items.map((item: any) => (
-                  <li key={item.id} className="py-2 flex justify-between items-center">
+                  <div key={item.id} className="p-4 bg-white shadow-md rounded-lg border">
                     <EditableItem
                       item={item}
                       onSave={(updatedItem: any) => {
@@ -183,14 +183,14 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
                             );
                           });
                         }}
-                        className="px-2 py-1 bg-red-500 text-white rounded-lg"
+                        className="px-2 py-1 bg-red-500 text-white rounded-lg mt-2 w-full"
                       >
                         Delete
                       </button>
                     )}
-                  </li>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           ))
         ) : (

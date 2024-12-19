@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import Language from "./language/Language";
 import { useTranslation } from "next-i18next";
 
-const Header: React.FC = () => {
-const [loggedInUser, setLoggedInUser] = useState<string | null>(null);
+const Header: React.FC<{ className?: string }> = ({ className }) => {
+  const [loggedInUser, setLoggedInUser] = useState<string | null>(null);
   const { t } = useTranslation("common");
 
   useEffect(() => {
@@ -22,17 +22,17 @@ const [loggedInUser, setLoggedInUser] = useState<string | null>(null);
   };
 
   return (
-    <header className="p-3 mb-3 border-bottom bg-gradient-to-br from-green-900 to-green-500 flex flex-col items-center">
+    <header className={`p-3 mb-3 border-bottom bg-gradient-to-br from-green-900 to-green-500 flex flex-col items-center ${className}`}>
       <a className="flex mb-2 md:mb-5 text-white-50 text-3xl text-gray-300">
         {t('app.title')}
       </a>
       <nav className="items-center flex md:flex-row flex-col">
         <Link href="/" className="px-4 text-xl text-white hover:bg-gray-600 rounded-lg">
-        {t('header.nav.home')}
+          {t('header.nav.home')}
         </Link>
 
         <Link href="/group" className="px-4 text-white text-xl hover:bg-gray-600 rounded-lg">
-        {t('header.nav.group')}
+          {t('header.nav.group')}
         </Link>
 
         {!loggedInUser && (
@@ -40,7 +40,7 @@ const [loggedInUser, setLoggedInUser] = useState<string | null>(null);
             href="/login"
             className="px-4 text-white text-xl hover:bg-gray-600 rounded-lg"
           >
-          {t('header.nav.login')}
+            {t('header.nav.login')}
           </Link>
         )}
 
@@ -49,7 +49,7 @@ const [loggedInUser, setLoggedInUser] = useState<string | null>(null);
             href="/register"
             className="px-4 text-white text-xl hover:bg-gray-600 rounded-lg"
           >
-          {t('header.nav.register')}
+            {t('header.nav.register')}
           </Link>
         )}
 
