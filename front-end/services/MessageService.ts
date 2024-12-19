@@ -1,5 +1,4 @@
-import { Message
- } from "@types";
+import { Message } from "@types";
 
 const getLoggedInUserData = () => {
   if (typeof localStorage === "undefined") {
@@ -76,52 +75,39 @@ const getAllMessages = async (groupId?: number) => {
   }
 };
 
-const getMessagesStream = async (groupId: number, onNewMessage: (messages: Message[]) => void) => {
+// Polling for new messages after the last timestamp
+const getNewMessages = async (groupId: number, lastTimestamp: string, onNewMessages: (messages: Message[]) => void) => {
   const loggedInUserData = getLoggedInUserData();
   if (!loggedInUserData?.token) {
     throw new Error("No token found");
   }
 
   try {
-    const url = `${process.env.NEXT_PUBLIC_API_URL}/messages/stream/${groupId}`;
-    
-    const intervalId = setInterval(async () => {
-      try {
-        const response = await fetch(url, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${loggedInUserData.token}`,
-          },
-        });
+    const url = `${process.env.NEXT_PUBLIC_API_URL}/messages?groupId=${groupId}&timestamp=${lastTimestamp}`;
 
-        if (!response.ok) {
-          throw new Error(`Error fetching new messages: ${response.statusText}`);
-        }
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${loggedInUserData.token}`,
+      },
+    });
 
-        const newMessages: Message[] = await response.json();
-        if (newMessages.length > 0) {
-          onNewMessage(newMessages);  
-        }
-      } catch (error) {
-        console.error("Error fetching new messages:", error);
-        clearInterval(intervalId);  
-      }
-    }, 5000); 
+    if (!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
+    }
 
-    return () => clearInterval(intervalId);  
-
+    const messages: Message[] = await response.json();
+    if (messages.length > 0) {
+      onNewMessages(messages);  // Callback to handle new messages
+    }
   } catch (error) {
-    console.error("Error with SSE connection:", error);
-    throw error;
+    console.error('Error during polling:', error);
+    setTimeout(() => getNewMessages(groupId, lastTimestamp, onNewMessages), 3000); // Retry after a delay
   }
 };
 
-
-const MessageService = {
+export default {
   createMessage,
   getAllMessages,
-  getMessagesStream,
+  getNewMessages,
 };
-
-export default MessageService;

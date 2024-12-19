@@ -10,7 +10,7 @@ import MessageService from "../../services/MessageService";
 import CreateGroceryListModal from "../../components/groceryList/CreateGroceryListModal";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
-import { GetServerSideProps } from "next"; 
+import { GetServerSideProps } from "next";
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   const res = await fetch("http://localhost:3000/group");
@@ -20,6 +20,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
     props: {
       groups,
       ...(await serverSideTranslations(locale ?? "en", ["common"])),
+      ...(await serverSideTranslations(locale ?? "en", ["common"])),
     },
   };
 };
@@ -28,13 +29,23 @@ const groupchat: React.FC = () => {
   const router = useRouter();
   const [groupId, setGroupId] = useState<number | null>(null);
   const [groupchat, setgroupchat] = useState<any>(null);
-  const [messages, setMessages] = useState<any[]>([]); 
+  const [messages, setMessages] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation("common");
 
-  const [isSliderOpen, setIsSliderOpen] = useState<boolean>(false); 
+  const [isSliderOpen, setIsSliderOpen] = useState<boolean>(false);
+
+  // Retrieve logged-in user data
+  const loggedInUserData = (() => {
+    if (typeof localStorage === "undefined") {
+      console.warn("localStorage is not defined.");
+      return null;
+    }
+    const item = localStorage.getItem("loggedInUser");
+    return item ? JSON.parse(item) : null;
+  })();
   const [isGroceryListOpen, setIsGroceryListOpen] = useState<boolean>(false); 
 
   
@@ -89,6 +100,22 @@ const groupchat: React.FC = () => {
     setMessages((prevMessages) => [...prevMessages, ...newMessages]);
   };
 
+  const handleLeaveGroup = async () => {
+    if (!groupId || !loggedInUserData?.id) {
+      setError("Unable to leave group.");
+      return;
+    }
+
+    try {
+      await GroupService.removeUserFromExistingGroup(groupId, loggedInUserData.id);
+      alert("You have left the group successfully.");
+      router.push("/group"); // Redirect to the groups page
+    } catch (err) {
+      console.error(err);
+      setError("Failed to leave group.");
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
 
@@ -98,13 +125,21 @@ const groupchat: React.FC = () => {
         <title>{t("group.title")}</title>
       </Head>
       <Header className="sticky top-0 z-50 bg-white shadow-md" />
-      <div className="group-page flex flex-col h-screen relative">
-        <button
-          onClick={() => setIsSliderOpen(true)}
-          className="absolute top-4 left-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600"
-        >
-          View Users
-        </button>
+      <div className="group-page flex flex-col h-auto relative max-w-5xl mx-auto">
+        <div className="absolute top-4 right-4 flex space-x-4">
+          <button
+            onClick={handleLeaveGroup}
+            className="bg-red-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-600"
+          >
+            Leave Group
+          </button>
+          <button
+            onClick={() => setIsSliderOpen(true)}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600"
+          >
+            View Users
+          </button>
+        </div>
 
         <button
           onClick={() => setIsGroceryListOpen(true)}

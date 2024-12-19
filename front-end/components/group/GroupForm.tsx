@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import GroupService from "../../services/GroupService";
+import UserService from "@services/UserService";
 
 type Props = {
   refreshGroups: () => void;
@@ -27,8 +28,7 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
   const handleCreateGroup = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const userArray = users.split(",").map((nickname) => nickname.trim());
-    userArray.push(loggedInUserData?.nickname);
+    const userArray = [loggedInUserData?.nickname, ...users.split(",").map((nickname) => nickname.trim())];  
 
     if (!name || userArray.length === 0) {
       setErrorMessage("Please fill out all required fields.");
@@ -37,6 +37,8 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
 
     try {
       const newGroup = await GroupService.createGroup(name, userArray, message);
+      loggedInUserData.role = 'GroupAdmin';
+      localStorage.setItem('loggedInUser', JSON.stringify(loggedInUserData));
       setSuccessMessage(`Group "${newGroup.name}" created successfully!`);
       setErrorMessage("");
       setName("");

@@ -51,11 +51,18 @@ const generateUniqueGroupId = async (): Promise<number> => {
 
 const createGroup = async (group: Group): Promise<Group> => {
     const uniqueId = await generateUniqueGroupId();
+
     const usersWithValidIds = group.getUsers().map((user) => {
         const nickname = user.getNickname();
         if (!nickname) throw new Error(`User ID is missing for user: ${JSON.stringify(user)}`);
         return { nickname };
     });
+
+    const creatorNickname = usersWithValidIds[0]?.nickname;
+    if (!creatorNickname) {
+        throw new Error("No creator found for the group.");
+    }
+
     const groupPrisma = await database.group.create({
         data: {
             id: uniqueId,
@@ -69,8 +76,10 @@ const createGroup = async (group: Group): Promise<Group> => {
             messages: { include: { user: true } },
         },
     });
-    return Group.from(groupPrisma);
+
+    return Group.from(groupPrisma)
 };
+
 
 const getGroupById = async (id: number): Promise<Group | undefined> => {
     const groupPrisma = await database.group.findUnique({
@@ -111,6 +120,21 @@ const addUserToGroup = async (groupId: number, userId: number): Promise<Group> =
     return Group.from(updatedGroup);
 };
 
+const removeUserFromGroup = async (groupId: number, userId: number): Promise<Group> => {
+    const updatedGroup = await database.group.update({
+        where: { id: groupId },
+        data: { users: { disconnect: { id: userId } } },
+        include: {
+            users: true,
+            groceryLists: { include: { items: true } },
+            schedules: true,
+            messages: { include: { user: true } },
+        },
+    });
+    return Group.from(updatedGroup);
+};
+
+
 const getGroupsOfUser = async (userId: number): Promise<Group[] | undefined> => {
     const groupForUser = await database.group.findMany({
         where: { users: { some: { id: userId } } },
@@ -124,4 +148,4 @@ const getGroupsOfUser = async (userId: number): Promise<Group[] | undefined> => 
     return groupForUser.map(Group.from);
 };
 
-export default { createGroup, getGroupById, getAllGroups, addUserToGroup, getGroupsOfUser };
+export default { createGroup, getGroupById, getAllGroups, addUserToGroup, getGroupsOfUser, removeUserFromGroup };

@@ -19,7 +19,7 @@ Item.from = function ({
         price
     });
 };
-
+//omd broooooo
 const createItem = async (item: Item): Promise<Item> => {
     const itemPrisma = await database.item.create({
         data: {
