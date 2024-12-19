@@ -1,6 +1,5 @@
 import { Item } from "@types";
 
-// Helper function to get logged-in user data from localStorage
 const getLoggedInUserData = () => {
   if (typeof localStorage === "undefined") {
     console.warn("localStorage is not defined.");
@@ -10,7 +9,6 @@ const getLoggedInUserData = () => {
   return item ? JSON.parse(item) : null;
 };
 
-// Fetch all items
 const getAllItems = async (): Promise<Item[]> => {
   const loggedInUserData = getLoggedInUserData();
   if (!loggedInUserData?.token) {
@@ -29,10 +27,10 @@ const getAllItems = async (): Promise<Item[]> => {
   }
 
   const data = await response.json();
-  return data; // Assuming response is an array of items
+  return data; 
 };
 
-// Fetch items by groupId
+
 const getItemsByGroupId = async (groupId: number): Promise<Item[]> => {
   const loggedInUserData = getLoggedInUserData();
   if (!loggedInUserData?.token) {
@@ -51,10 +49,10 @@ const getItemsByGroupId = async (groupId: number): Promise<Item[]> => {
   }
 
   const data = await response.json();
-  return data; // Assuming response is an array of items for the specific group
+  return data;
 };
 
-// Fetch a single item by ID
+
 const getItemById = async (id: number): Promise<Item> => {
   const loggedInUserData = getLoggedInUserData();
   if (!loggedInUserData?.token) {
@@ -73,10 +71,9 @@ const getItemById = async (id: number): Promise<Item> => {
   }
 
   const data = await response.json();
-  return data; // Assuming response is a single item
+  return data; 
 };
 
-// Create a new item
 const createItem = async (item: Item) => {
   const loggedInUserData = getLoggedInUserData();
   if (!loggedInUserData?.token) {
@@ -96,14 +93,12 @@ const createItem = async (item: Item) => {
     throw new Error("Failed to create item.");
   }
 
-  // Extract the response body as JSON
+
   const data = await response.json();
   
-  return data; // Return the created item (which should include the `id`)
+  return data; 
 };
 
-
-// Update an item by ID
 const updateItem = async (id: number, updatedItem: Item) => {
   const loggedInUserData = getLoggedInUserData();
   if (!loggedInUserData?.token) {
@@ -124,10 +119,9 @@ const updateItem = async (id: number, updatedItem: Item) => {
   }
 
   const data = await response.json();
-  return data; // Assuming the updated item is returned
+  return data; 
 };
 
-// Delete an item by ID
 const deleteItem = async (id: number) => {
   const loggedInUserData = getLoggedInUserData();
   if (!loggedInUserData?.token) {
@@ -145,7 +139,7 @@ const deleteItem = async (id: number) => {
     throw new Error(`Failed to delete item with ID ${id}`);
   }
 
-  return true; // Item deleted successfully
+  return true; 
 };
 
 const ItemService = {

@@ -89,7 +89,7 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
       });
 
       alert("Changes saved successfully!");
-      setEditMode(false); // Disable edit mode after saving
+      setEditMode(false); 
     } catch (error) {
       console.error("Error saving changes:", error);
       alert("Failed to save changes.");
@@ -101,7 +101,6 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      {/* Outer container for scrolling the grocery lists */}
       <div className="flex-1 overflow-y-auto space-y-4 px-4 py-2">
         {groceryLists && groceryLists.length > 0 ? (
           groceryLists.map((groceryList: any) => (
@@ -146,7 +145,6 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
                 </div>
               </div>
               
-              {/* Grid layout for items */}
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-4 mt-4">
                 {groceryList.items.map((item: any) => (
                   <div key={item.id} className="p-4 bg-white shadow-md rounded-lg border">

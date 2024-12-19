@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 import ItemService from "../../services/ItemService";
 import GroceryListService from "../../services/GroceryListService";
 import { Item } from "@types";
-import AddItemModal from "../item/AddItemModal"; // Assuming AddItemModal is created already
+import AddItemModal from "../item/AddItemModal"; 
 
 const CreateGroceryListModal = ({ groupId, onClose }: { groupId: number; onClose: () => void }) => {
   const [name, setName] = useState("");
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [availableItems, setAvailableItems] = useState<Item[]>([]);
-  const [itemInputFields, setItemInputFields] = useState<number[]>([0]); // Start with one item input field
-  const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false); // To handle Add Item modal
+  const [itemInputFields, setItemInputFields] = useState<number[]>([0]); 
+  const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false); 
   
   useEffect(() => {
     const fetchItems = async () => {
@@ -143,8 +143,8 @@ const handleItemAdd = (newItem: Item) => {
       {isAddItemModalOpen && (
         <AddItemModal
           onClose={() => setIsAddItemModalOpen(false)}
-          groupItems={availableItems}  // Pass the available items as groupItems
-          onAdd={handleItemAdd} // Pass the handleItemAdd function to AddItemModal
+          groupItems={availableItems}  
+          onAdd={handleItemAdd} 
         />
       )}
     </div>

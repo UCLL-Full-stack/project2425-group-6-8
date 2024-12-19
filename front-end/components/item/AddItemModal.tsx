@@ -35,17 +35,12 @@ const handleSubmit = async () => {
     if (selectedItem) {
       onAdd(selectedItem);
     } else {
-      // Check if the item exists in the database by its name (or any other unique identifier)
       const existingItem = groupItems.find((item) => item.name === newItem.name);
 
       if (existingItem) {
-        // If the item exists, just add it to the list
         onAdd(existingItem);
       } else {
-        // If the item does not exist, create a new one in the database
-        const createdItem = await ItemService.createItem(newItem); // Now this returns the created item
-
-        // Add the newly created item to the list
+        const createdItem = await ItemService.createItem(newItem);
         onAdd(createdItem);
       }
     }
