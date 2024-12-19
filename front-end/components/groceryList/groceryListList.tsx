@@ -20,6 +20,7 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
   const [showAddItemModal, setShowAddItemModal] = useState<boolean>(false);
   const [currentGroceryListId, setCurrentGroceryListId] = useState<number | null>(null);
   const [editMode, setEditMode] = useState<boolean>(false);
+  const [tempGroceryLists, setTempGroceryLists] = useState<any[] | null>(null); // Temp state for original lists
 
   const handleItemEdit = (editedItem: any) => {
     setEditedItems((prev) => {
@@ -40,6 +41,7 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
       try {
         const lists = await GroceryListService.getGroceryListsByGroupId(groupId);
         setGroceryLists(lists);
+        setTempGroceryLists(JSON.parse(JSON.stringify(lists))); // Save a deep copy of the original list
         const items = await ItemService.getItemsByGroupId(groupId);
         setGroupItems(items);
       } catch (err) {
@@ -59,6 +61,14 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
   };
 
   const handleSaveChanges = async (groceryListId: number, name: string) => {
+    if (groceryLists && groceryLists.length > 0) {
+      const currentList = groceryLists.find((list) => list.id === groceryListId);
+      if (currentList?.items.length === 0) {
+        alert("You need to have at least one item in the list.");
+        return;
+      }
+    }
+
     try {
       await Promise.all(
         editedItems.map((item) =>
@@ -89,11 +99,20 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
       });
 
       alert("Changes saved successfully!");
-      setEditMode(false); 
+      setEditMode(false);
     } catch (error) {
       console.error("Error saving changes:", error);
       alert("Failed to save changes.");
     }
+  };
+
+  const handleCancelChanges = () => {
+    // Revert to original lists before any deletions or edits
+    setGroceryLists(tempGroceryLists);
+    setRemovedItems([]);
+    setAddedItems([]);
+    setEditedItems([]);
+    setEditMode(false);
   };
 
   if (loading) return <div>Loading grocery lists...</div>;
@@ -144,7 +163,7 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
                   </button>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-4 mt-4">
                 {groceryList.items.map((item: any) => (
                   <div key={item.id} className="p-4 bg-white shadow-md rounded-lg border">
