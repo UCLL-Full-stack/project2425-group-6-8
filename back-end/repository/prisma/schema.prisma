@@ -17,6 +17,7 @@ datasource db {
   password  String
   userGroups UserGroup[]
   messages  Message[]
+  globalRole String
 }
 
 model Schedule {

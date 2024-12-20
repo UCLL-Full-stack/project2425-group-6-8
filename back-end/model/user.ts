@@ -1,6 +1,7 @@
 import {
     User as UserPrisma
 } from '@prisma/client';
+import { Role } from '../types';
 
 export class User {
     private id?: number | undefined;
@@ -10,6 +11,7 @@ export class User {
     private password: string;
     private createdAt?: Date;
     private updatedAt?: Date;
+    private globalRole: Role;  
 
     constructor(user: {
         id?: number;
@@ -19,6 +21,7 @@ export class User {
         password: string;
         createdAt?: Date;
         updatedAt?: Date;
+        globalRole: Role;
     }) {
         this.validate(user);
         this.id = user.id;
@@ -28,6 +31,7 @@ export class User {
         this.password = user.password;
         this.createdAt = user.createdAt;
         this.updatedAt = user.updatedAt;
+        this.globalRole = user.globalRole;
     }
 
     getId(): number | undefined {
@@ -70,7 +74,15 @@ export class User {
         return this.password;
     }
 
-    validate(user: { name?: string; email?: string; nickname: string; password: string }): void {
+    getRole(): Role {
+        return this.globalRole;
+    }
+
+    setRole(globalRole: Role): void {
+        this.globalRole = globalRole;
+    }
+
+    validate(user: { name?: string; email?: string; nickname: string; password: string, globalRole: Role; }): void {
         if (!user.name?.trim()) {
             throw new Error('Name is required');
         }
@@ -86,6 +98,9 @@ export class User {
         if (!user.password?.trim()) {
             throw new Error('Password is required');
         }
+        if (!user.globalRole) {
+            throw new Error('Role is required');
+        }
     }
 
     equals(user: User): boolean {
@@ -93,7 +108,8 @@ export class User {
             this.name === user.getName() &&
             this.nickname === user.getNickname() &&
             this.email === user.getEmail() &&
-            this.password === user.getPassword()
+            this.password === user.getPassword() &&
+            this.globalRole === user.getRole()
         );
     }
 
@@ -109,7 +125,8 @@ export class User {
         nickname,
         password,
         createdAt,
-        updatedAt
+        updatedAt,
+        globalRole
     }: UserPrisma): User {
         return new User({
             id,
@@ -119,6 +136,7 @@ export class User {
             password,
             createdAt,
             updatedAt,
+            globalRole: globalRole as Role,
         });
     }
 }

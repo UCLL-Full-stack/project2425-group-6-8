@@ -61,12 +61,14 @@ const createUser = async ({
     name,
     nickname,
     email,
-    password
+    password,
+    globalRole
 }: {
     name?: string;
     nickname: string;
     email?: string;
     password: string;
+    globalRole?: Role
 }): Promise<User> => {
     try {
         const userPrisma = await database.user.create({
@@ -74,7 +76,8 @@ const createUser = async ({
                 name: name ?? '',
                 nickname,
                 email: email ?? '',
-                password
+                password,
+                globalRole: globalRole ?? ''
             }
         });
 
