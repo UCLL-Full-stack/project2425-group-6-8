@@ -1,14 +1,7 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} **/
 module.exports = {
-testEnvironment: 'jsdom',
-transform: {
-'\\.[jt]sx?$': 'esbuild-jest',
-},
-}
-
-// module.exports = {
-//   testEnvironment: "node",
-//   transform: {
-//     "^.+.tsx?$": ["ts-jest",{}],
-//   },
-// };
+  testEnvironment: 'jest-environment-jsdom', // Make sure this matches the installed package
+  transform: {
+    '\\.[jt]sx?$': 'esbuild-jest',
+  },
+};

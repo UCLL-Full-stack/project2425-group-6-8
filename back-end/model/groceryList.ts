@@ -53,9 +53,11 @@ export class GroceryList {
 
     validate(grocerylist: { name: string; items: Item[] }): void {
         if (!grocerylist.name?.trim()) {
-            throw new Error('Name is required');
+            throw new Error('GroceryList name is required');
         }
-     
+        if (!grocerylist.items || grocerylist.items.length === 0) {
+            throw new Error('Grocery list must contain at least one item');
+        }
     }
 
     static from({

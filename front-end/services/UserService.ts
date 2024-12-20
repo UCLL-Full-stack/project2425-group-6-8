@@ -9,6 +9,7 @@ const loginUser = (user: User) => {
         body: JSON.stringify(user),
     });
 };
+// commit to make live easier
 
 const registerUser = (user: User) => {
     return fetch(process.env.NEXT_PUBLIC_API_URL + "/users/register", {

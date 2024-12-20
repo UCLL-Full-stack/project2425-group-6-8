@@ -1,36 +1,34 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import ItemService from "../../services/ItemService";
 import GroceryListService from "../../services/GroceryListService";
 import { Item } from "@types";
-import AddItemModal from "../item/AddItemModal"; 
+import AddItemModal from "../item/AddItemModal";
+import useSWR from "swr";
+
+const fetchItems = async () => {
+  const response = await ItemService.getAllItems();
+  return response;
+};
 
 const CreateGroceryListModal = ({
   groupId,
   onClose,
-  onGroceryListCreated, 
+  onGroceryListCreated,
 }: {
   groupId: number;
   onClose: () => void;
-  onGroceryListCreated: (newGroceryList: any) => void; 
+  onGroceryListCreated: (newGroceryList: any) => void;
 }) => {
   const [name, setName] = useState("");
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
-  const [availableItems, setAvailableItems] = useState<Item[]>([]);
-  const [itemInputFields, setItemInputFields] = useState<number[]>([0]); 
-  const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false); 
-  
-  useEffect(() => {
-    const fetchItems = async () => {
-      try {
-        const data = await ItemService.getAllItems();
-        setAvailableItems(data);
-      } catch (error) {
-        console.error("Error fetching items:", error);
-      }
-    };
+  const [itemInputFields, setItemInputFields] = useState<number[]>([0]);
+  const [isAddItemModalOpen, setIsAddItemModalOpen] = useState(false);
 
-    fetchItems();
-  }, []);
+  const { data: availableItems = [], error } = useSWR("/items", fetchItems);
+
+  if (error) {
+    console.error("Error fetching items:", error);
+  }
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
@@ -55,36 +53,27 @@ const CreateGroceryListModal = ({
   };
 
   const handleCreateGroceryList = async () => {
-  try {
-    const newGroceryList = await GroceryListService.createGroceryList(
-      name,
-      selectedItems,
-      groupId
-    );
-    onGroceryListCreated(newGroceryList); 
-    onClose();
-  } catch (error) {
-    console.error("Error creating grocery list:", error);
-  }
-};
+    try {
+      const newGroceryList = await GroceryListService.createGroceryList(name, selectedItems, groupId);
+      onGroceryListCreated(newGroceryList);
+      onClose();
+    } catch (error) {
+      console.error("Error creating grocery list:", error);
+    }
+  };
 
-
-const handleItemAdd = (newItem: Item) => {
+  const handleItemAdd = (newItem: Item) => {
   if (newItem.id != null) {
-    setAvailableItems((prevAvailableItems) => [...prevAvailableItems, newItem]);
-
-    setSelectedItems((prevSelectedItems) => [...prevSelectedItems, newItem.id].filter((id) => id !== undefined));
-
+    setSelectedItems((prevSelectedItems) => {
+      return [...prevSelectedItems, newItem.id].filter((item): item is number => item !== undefined);
+    });
     setItemInputFields((prevItemInputFields) => [...prevItemInputFields, prevItemInputFields.length]);
-
     setIsAddItemModalOpen(false);
   } else {
     console.error("Invalid item ID: ", newItem);
     alert("Item ID is invalid.");
   }
 };
-
-
 
 
   return (
@@ -98,7 +87,7 @@ const handleItemAdd = (newItem: Item) => {
           onChange={handleNameChange}
           className="w-full p-2 mb-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
         />
-        
+
         {itemInputFields.map((_, index) => (
           <div key={index} className="flex items-center gap-4 mb-4">
             <select
@@ -159,8 +148,8 @@ const handleItemAdd = (newItem: Item) => {
       {isAddItemModalOpen && (
         <AddItemModal
           onClose={() => setIsAddItemModalOpen(false)}
-          groupItems={availableItems}  
-          onAdd={handleItemAdd} 
+          groupItems={availableItems}
+          onAdd={handleItemAdd}
         />
       )}
     </div>

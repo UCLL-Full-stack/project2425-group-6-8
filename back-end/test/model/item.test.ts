@@ -1,26 +1,52 @@
-import { User, Item, GroceryList, Schedule, Message, Group } from "../../model";
-import { ConsumableType } from "../../model/consumableTypeEnum";
+import { Item } from '../../model/item';
+import { ConsumableType } from '../../model/consumableTypeEnum';
 
+describe('Item Tests', () => {
+    test('given: invalid name (empty), when: Item is created, then: it throws an error', () => {
+        // Given
+        const itemData = {
+            name: '',
+            description: 'A delicious cake',
+            consumableType: ConsumableType.Food,
+            price: 20,
+            isCompleted: false,
+        };
 
-test('given: valid values for an item, when: item is created, then: item is created with those values', () => {
-//given valid values
-const name = "Red Velvet Cake";
-    const description = "Quite eligible and delicious";
-    const consumableType = ConsumableType.Food;
-    const price = 19.99;
+        // When / Then
+        expect(() => {
+            new Item(itemData);
+        }).toThrow('Item name is required.');
+    });
 
-//when
-const item = new Item({
-    name,
-    description,
-    consumableType,
-    price
+    test('given: invalid price, when: Item is created, then: it throws an error', () => {
+        // Given
+        const itemData = {
+            name: 'Cake',
+            description: 'A delicious cake',
+            consumableType: ConsumableType.Food,
+            price: -1,
+            isCompleted: false,
+        };
+
+        // When / Then
+        expect(() => {
+            new Item(itemData);
+        }).toThrow('Price must be greater than or equal to 0.');
+    });
+
+    test('given: invalid consumableType (undefined), when: Item is created, then: it throws an error', () => {
+        // Given
+        const itemData = {
+            name: 'Cake',
+            description: 'A delicious cake',
+            consumableType: undefined as any,
+            price: 20,
+            isCompleted: false,
+        };
+
+        // When / Then
+        expect(() => {
+            new Item(itemData);
+        }).toThrow('Consumable type is required.');
+    });
 });
-
-//then
-expect(item.getName()).toEqual(name);
-expect(item.getDescription()).toEqual(description);
-expect(item.getConsumableType()).toEqual(consumableType);
-expect(item.getPrice()).toEqual(price);
-
-})
