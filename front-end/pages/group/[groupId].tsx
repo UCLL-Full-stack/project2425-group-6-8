@@ -33,9 +33,15 @@ const groupchat: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation("common");
-
   const [isSliderOpen, setIsSliderOpen] = useState<boolean>(false);
   const [isGroceryListOpen, setIsGroceryListOpen] = useState<boolean>(false);
+  const [leaveConfirmation, setLeaveConfirmation] = useState(false);
+
+  const [kickConfirmation, setKickConfirmation] = useState<{
+    isOpen: boolean;
+    userNickname: string | null;
+    userId: number | null;
+  }>({ isOpen: false, userNickname: null, userId: null });
 
   const loggedInUserData = (() => {
     if (typeof localStorage === "undefined") {
@@ -46,18 +52,11 @@ const groupchat: React.FC = () => {
     return item ? JSON.parse(item) : null;
   })();
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
 
   useEffect(() => {
-    if (router.query.groupId) {
-      setGroupId(Number(router.query.groupId));
-    }
+    if (router.query.groupId) setGroupId(Number(router.query.groupId));
   }, [router.query.groupId]);
 
   useEffect(() => {
@@ -66,7 +65,6 @@ const groupchat: React.FC = () => {
         setLoading(true);
         try {
           const group = await GroupService.getGroupById(groupId);
-          console.log(group);
           setGroupchat(group);
         } catch (err) {
           setError("Failed to load group details.");
@@ -98,6 +96,28 @@ const groupchat: React.FC = () => {
     setMessages((prevMessages) => [...prevMessages, ...newMessages]);
   };
 
+  const openKickConfirmation = (nickname: string, userId: number) => {
+    setKickConfirmation({ isOpen: true, userNickname: nickname, userId });
+  };
+
+  const closeKickConfirmation = () => {
+    setKickConfirmation({ isOpen: false, userNickname: null, userId: null });
+  };
+
+  const confirmKick = async () => {
+    if (!groupId || !kickConfirmation.userId) return;
+
+    try {
+      await GroupService.removeUserFromExistingGroup(groupId, kickConfirmation.userId);
+      const updatedGroup = await GroupService.getGroupById(groupId);
+      setGroupchat(updatedGroup);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      closeKickConfirmation();
+    }
+  };
+
   const handleLeaveGroup = async () => {
     if (!groupId || !loggedInUserData?.id) {
       setError("Unable to leave group.");
@@ -106,7 +126,6 @@ const groupchat: React.FC = () => {
 
     try {
       await GroupService.removeUserFromExistingGroup(groupId, loggedInUserData.id);
-      alert("You have left the group successfully.");
       router.push("/group");
     } catch (err) {
       console.error(err);
@@ -124,9 +143,64 @@ const groupchat: React.FC = () => {
       </Head>
       <Header className="sticky top-0 z-50 bg-white shadow-md" />
       <div className="group-page flex flex-col h-auto relative max-w-5xl mx-auto p-4">
-        <div className="absolute top-4 right-4 flex flex-col space-y-4">
+        {/* Kick Confirmation Modal */}
+        {kickConfirmation.isOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+              <h2 className="text-lg font-semibold text-gray-800">
+                Confirm Kick
+              </h2>
+              <p className="mt-2 text-gray-600">
+                Are you sure you want to remove{" "}
+                <span className="font-bold">{kickConfirmation.userNickname}</span> from the group?
+              </p>
+              <div className="mt-4 flex justify-end gap-2">
+                <button
+                  onClick={closeKickConfirmation}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmKick}
+                  className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+                >
+                  Confirm
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Leave Confirmation Modal */}
+        {leaveConfirmation && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+              <h2 className="text-lg font-semibold text-gray-800">Confirm Leave</h2>
+              <p className="mt-2 text-gray-600">
+                Are you sure you want to leave the group?
+              </p>
+              <div className="mt-4 flex justify-end gap-2">
+                <button
+                  onClick={() => setLeaveConfirmation(false)}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleLeaveGroup}
+                  className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+                >
+                  Confirm
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+<div className="absolute top-4 right-4 flex flex-col space-y-4">
           <button
-            onClick={handleLeaveGroup}
+            onClick={() => setLeaveConfirmation(true)}
             className="bg-red-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-600"
           >
             Leave Group
@@ -164,12 +238,35 @@ const groupchat: React.FC = () => {
           <div className="p-4">
             {groupchat?.userGroups && groupchat.userGroups.length > 0 ? (
               <ul>
-                {groupchat.userGroups.map((userGroup: any, index: number) => (
-                  <li key={userGroup.user.id || index} className="py-2 border-b border-gray-300">
-                    <span className="font-semibold">{userGroup.user.nickname}</span>
-                    <span className="text-gray-500 ml-2">({userGroup.role})</span>
-                  </li>
-                ))}
+                {groupchat.userGroups.map((userGroup: any, index: number) => {
+                  const isCurrentUserAdmin = groupchat.userGroups.some(
+                    (ug: any) =>
+                      ug.user.id === loggedInUserData?.id && ug.role === "GroupAdmin"
+                  );
+
+                  return (
+                    <li
+                      key={userGroup.user.id || index}
+                      className="py-2 border-b border-gray-300 flex justify-between items-center"
+                    >
+                      <span>
+                        <span className="font-semibold">{userGroup.user.nickname}</span>
+                        <span className="text-gray-500 ml-2">({userGroup.role})</span>
+                      </span>
+                      {isCurrentUserAdmin &&
+                        loggedInUserData?.id !== userGroup.user.id && (
+                          <button
+                            onClick={() =>
+                              openKickConfirmation(userGroup.user.nickname, userGroup.user.id)
+                            }
+                            className="bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600"
+                          >
+                            Kick
+                          </button>
+                        )}
+                    </li>
+                  );
+                })}
               </ul>
             ) : (
               <p>No users available</p>
