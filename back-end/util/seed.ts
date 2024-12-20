@@ -96,12 +96,6 @@ const itemsData = [
   { name: 'Rice', description: 'Long grain rice', consumableType: 'FOOD', price: 5.99, weight: 2000, quantity: 1, isCompleted: false },
 ];
 
-  const itemsData = [
-    { name: 'Peanut Butter', description: 'Crunchy peanut butter', consumableType: 'FOOD', price: 2.99, weight: 200, quantity: 1, isCompleted: false },
-    { name: 'Bread', description: 'Whole grain bread', consumableType: 'FOOD', price: 1.99, quantity: 16, isCompleted: true },
-    { name: 'Tomatoes', description: 'Fresh tomatoes', consumableType: 'FOOD', price: 3.49, weight: 500, quantity: 10, isCompleted: true },
-    { name: 'Milk', description: 'Organic whole milk', consumableType: 'DRINK', price: 4.49, weight: 1000, quantity: 2, isCompleted: true },
-  ];
 
   await prisma.item.createMany({
     data: itemsData,
