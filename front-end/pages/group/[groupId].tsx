@@ -125,7 +125,7 @@ const Groupchat: React.FC = () => {
     (ug: any) => ug.user.id === loggedInUserData?.id && ug.role === "GroupAdmin"
   );
 
-  return (
+   return (
     <>
       <Head>
         <title>{t("group.title")}</title>
@@ -140,14 +140,17 @@ const Groupchat: React.FC = () => {
         handleDeleteGroup={handleDeleteGroup}
         setIsGroceryListOpen={setIsGroceryListOpen}
       />
-      <div className="flex flex-col md:flex-row justify-between p-4">
-        <GroupDetails groupchat={groupchat} />
-        <MessageSection
-          groupId={groupId || 0}
-          messages={messages}
-          onMessageSent={messages}
-        />
-      </div>
+      <div className="flex flex-col md:flex-row justify-start p-4 h-screen">
+  <div className="flex flex-col w-full md:w-4/4"> 
+    <GroupDetails groupchat={groupchat} />
+    <MessageSection
+      groupId={groupId || 0}
+      messages={messages}
+      onMessageSent={messages}
+    />
+  </div>
+</div>
+
       <UserListSidebar
         isSliderOpen={isSliderOpen}
         setIsSliderOpen={setIsSliderOpen}
