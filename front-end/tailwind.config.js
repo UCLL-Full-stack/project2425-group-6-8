@@ -8,7 +8,11 @@ module.exports = {
     // Or if using `src` directory:
     './src/**/*.{js,ts,jsx,tsx,mdx}',
   ], theme: {
-    extend: {},
+    extend: {
+      height: {
+        '61': '35.25rem', // Example: Adjust to your desired height
+      },
+    },
   },
   plugins: [],
 }

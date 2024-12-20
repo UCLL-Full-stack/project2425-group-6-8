@@ -12,6 +12,7 @@ const MessageList: React.FC<MessageListProps> = ({ groupId, messages }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [lastTimestamp, setLastTimestamp] = useState<string | null>(null);
+  const [userScrolled, setUserScrolled] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const fetchMessages = async () => {
@@ -25,7 +26,9 @@ const MessageList: React.FC<MessageListProps> = ({ groupId, messages }) => {
 
       // Initialize last timestamp
       if (fetchedMessages.length > 0) {
-        const lastMessageTimestamp = new Date(fetchedMessages[fetchedMessages.length - 1].timestamp).toISOString();
+        const lastMessageTimestamp = new Date(
+          fetchedMessages[fetchedMessages.length - 1].timestamp
+        ).toISOString();
         setLastTimestamp(lastMessageTimestamp);
       } else {
         setLastTimestamp(null); // No messages yet
@@ -40,7 +43,9 @@ const MessageList: React.FC<MessageListProps> = ({ groupId, messages }) => {
 
   const handleNewMessages = (newMessages: Message[]) => {
     if (newMessages.length > 0) {
-      const lastMessageTimestamp = new Date(newMessages[newMessages.length - 1].timestamp).toISOString();
+      const lastMessageTimestamp = new Date(
+        newMessages[newMessages.length - 1].timestamp
+      ).toISOString();
       setLastTimestamp(lastMessageTimestamp);
 
       const uniqueNewMessages = newMessages.filter(
@@ -63,8 +68,21 @@ const MessageList: React.FC<MessageListProps> = ({ groupId, messages }) => {
   };
 
   const scrollToBottom = () => {
-    if (containerRef.current) {
+    if (containerRef.current && !userScrolled) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }
+  };
+
+  const handleScroll = () => {
+    if (!containerRef.current) return;
+
+    const isUserAtBottom =
+      containerRef.current.scrollHeight - containerRef.current.scrollTop <=
+      containerRef.current.clientHeight + 10;
+
+    setUserScrolled(!isUserAtBottom);
+    if (isUserAtBottom) {
+      setUserScrolled(false);
     }
   };
 
@@ -81,14 +99,29 @@ const MessageList: React.FC<MessageListProps> = ({ groupId, messages }) => {
   }, [groupId, lastTimestamp]); // Depend on groupId and lastTimestamp
 
   useEffect(() => {
-    scrollToBottom(); // Scroll to the bottom whenever messages are updated
+    scrollToBottom(); // Automatically scroll to bottom when new messages arrive
   }, [localMessages]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener("scroll", handleScroll);
+    }
+    return () => {
+      if (container) {
+        container.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, []);
 
   if (loading) return <div className="text-center text-gray-500">Loading messages...</div>;
   if (error) return <div className="text-center text-red-500">{error}</div>;
 
   return (
-    <div ref={containerRef} className="h-96 overflow-y-auto border rounded-lg p-4 bg-gray-50 shadow-md">
+    <div
+      ref={containerRef}
+      className="h-96 overflow-y-auto border rounded-lg p-4 bg-gray-50 shadow-md"
+    >
       {localMessages.length === 0 ? (
         <div className="text-center text-gray-500">No messages found.</div>
       ) : (
@@ -98,13 +131,17 @@ const MessageList: React.FC<MessageListProps> = ({ groupId, messages }) => {
             className="mb-4 p-3 bg-white rounded-lg shadow-sm"
           >
             <p className="text-sm text-gray-700">
-              <strong className="text-blue-600">{message.user.nickname}</strong>: {message.message}
+              <strong className="text-blue-600">{message.user.nickname}</strong>:{" "}
+              {message.message}
             </p>
-            <small className="text-gray-400">{new Date(message.timestamp).toLocaleString()}</small>
+            <small className="text-gray-400">
+              {new Date(message.timestamp).toLocaleString()}
+            </small>
           </div>
         ))
       )}
     </div>
-  )};
-  
+  );
+};
+
 export default MessageList;

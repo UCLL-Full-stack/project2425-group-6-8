@@ -90,6 +90,7 @@ const groupchat: React.FC = () => {
       }
     };
     fetchMessages();
+    document.body.style.overflow = "hidden";
   }, [groupId]);
 
   const handleNewMessage = (newMessages: any[]) => {
@@ -142,7 +143,7 @@ const groupchat: React.FC = () => {
         <title>{t("group.title")}</title>
       </Head>
       <Header className="sticky top-0 z-50 bg-white shadow-md" />
-      <div className="group-page flex flex-col h-auto relative max-w-5xl mx-auto p-4">
+      <div className="group-page flex flex-col relative max-w-5xl mx-auto p-4">
         {/* Kick Confirmation Modal */}
         {kickConfirmation.isOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -198,7 +199,7 @@ const groupchat: React.FC = () => {
           </div>
         )}
 
-<div className="absolute top-1 right-4 flex flex-col space-y-4">
+        <div className="absolute top-1 right-4 flex flex-col space-y-4">
           <button
             onClick={() => setLeaveConfirmation(true)}
             className="bg-red-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-600"
@@ -294,7 +295,7 @@ const groupchat: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex-grow overflow-y-auto p-4 bg-gray-50 flex flex-col">
+        <div className="flex-grow p-4 bg-gray-50 flex flex-col">
           <h1>{groupchat?.name || "Group Details"}</h1>
           <h4 className="text-l font-semibold text-gray-800 dark:text-black text-center">
             Group Id: {groupchat?.id || "error no id available"}
@@ -308,7 +309,7 @@ const groupchat: React.FC = () => {
           {isModalOpen && (
             <CreateGroceryListModal groupId={Number(groupId)} onClose={handleCloseModal} />
           )}
-          <div className="flex-grow overflow-y-auto">
+          <div className="">
             <MessageList groupId={Number(groupId)} messages={messages} />
           </div>
         </div>
