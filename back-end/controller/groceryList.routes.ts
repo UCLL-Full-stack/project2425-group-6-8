@@ -139,9 +139,10 @@ groceryListRouter.put('/:id', async (req: Request, res: Response, next: NextFunc
     }
 });
 
+
 /**
- *@swagger
- * /delete/grocerylists/{id}:
+ * @swagger
+ * /grocerylists/{id}:
  *   delete:
  *     security:
  *       - bearerAuth: []
@@ -158,14 +159,20 @@ groceryListRouter.put('/:id', async (req: Request, res: Response, next: NextFunc
  *         description: Grocery list deleted successfully
  *       400:
  *         description: Error deleting grocery list
+ *       404:
+ *         description: Grocery list not found
  */
 
 groceryListRouter.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
     const groceryListId = parseInt(req.params.id, 10);
 
+    if (isNaN(groceryListId)) {
+        return res.status(400).json({ message: "Invalid grocery list ID" });
+    }
+
     try {
         await groceryListService.deleteGroceryList(groceryListId);
-        res.status(204).send(); // No content
+        res.status(204).send(); 
     } catch (error) {
         console.error(`Error deleting grocery list with ID ${groceryListId}:`, error);
         next(error);

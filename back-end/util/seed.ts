@@ -9,7 +9,6 @@ const encryptPassword = async (password: string) => {
 };
 
 const main = async () => {
-  // Seed Users
   const users = [
     { name: 'Dagobert Duck', email: 'dagoduck@duckberg.com', nickname: 'Wise Old Geezer', password: 'PassWordOfDagobert123', role: 'ApplicationAdmin' },
     { name: 'Donald Duck', email: 'donald@gmail.com', nickname: 'SuperDonald', password: 'PassWordOfDonald123', role: 'user' },
@@ -21,7 +20,7 @@ const main = async () => {
     { name: 'Webby Vanderquack', email: 'webby@duckberg.com', nickname: 'Adventurous Webby', password: 'PassWordOfWebby123', role: 'user' },
   ];
 
-  // Encrypt passwords and seed users
+  // Encrypt passwords and prepare user data
   const usersData = await Promise.all(
     users.map(async (user) => ({
       ...user,
@@ -29,15 +28,17 @@ const main = async () => {
     }))
   );
 
+  // Create users in the database
   const createdUsers = await prisma.user.createMany({
     data: usersData,
     skipDuplicates: true,
   });
   console.log(`Users seeded: ${createdUsers.count}`);
 
+  // Fetch all users from the database
   const allUsers = await prisma.user.findMany();
 
-  // Seed Groups (Random IDs between 1-20)
+  // Define groups
   const groups = [
     { id: Math.floor(Math.random() * 20) + 1, name: 'Household Family' },
     { id: Math.floor(Math.random() * 20) + 1, name: 'Camping Crew' },
@@ -45,6 +46,7 @@ const main = async () => {
     { id: Math.floor(Math.random() * 20) + 1, name: 'Sports Enthusiasts' },
   ];
 
+  // Create groups in the database
   const createdGroups = await prisma.group.createMany({
     data: groups,
     skipDuplicates: true,
@@ -53,21 +55,22 @@ const main = async () => {
 
   const allGroups = await prisma.group.findMany();
 
-  // Assign Users to Groups (at least 4 users per group)
+  const usersPerGroup = 4;
+
   await Promise.all(
-    allGroups.map((group, index) =>
-      prisma.group.update({
-        where: { id: group.id },
-        data: {
-          users: {
-            connect: allUsers.slice(index * 2, (index * 2) + 4).map(user => ({ id: user.id })),
-          },
-        },
-      })
-    )
+    allGroups.map(async (group, index) => {
+      const groupUsers = allUsers.slice(index * usersPerGroup, (index + 1) * usersPerGroup);
+
+      await prisma.userGroup.createMany({
+        data: groupUsers.map((user, userIndex) => ({
+          userId: user.id,
+          groupId: group.id,
+          role: userIndex === 0 ? 'Admin' : 'Member', 
+        })),
+      });
+    })
   );
   console.log('Users assigned to groups.');
-
 
   const items = Array.from({ length: 16 }, (_, i) => ({
     name: `Item ${i + 1} (${i % 2 === 0 ? 'Food' : 'Drink'})`,
@@ -106,7 +109,6 @@ const main = async () => {
   );
   console.log(`Grocery lists seeded: ${groceryLists.length}`);
 
-  // Seed Messages with more descriptive content
   const messages = Array.from({ length: 8 }, (_, i) => ({
     message: `This is a message for ${allGroups[i % allGroups.length].name} regarding ${allItems[i % allItems.length].name}`,
     timestamp: new Date(),
