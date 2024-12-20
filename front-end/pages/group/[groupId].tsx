@@ -11,6 +11,7 @@ import CreateGroceryListModal from "../../components/groceryList/CreateGroceryLi
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
 import { GetServerSideProps } from "next";
+import GroceryListService from "@services/GroceryListService";
 
 export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   const res = await fetch("http://localhost:3000/group");
@@ -62,6 +63,7 @@ const Groupchat: React.FC = () => {
     if (router.query.groupId) setGroupId(Number(router.query.groupId));
   }, [router.query.groupId]);
 
+
   useEffect(() => {
     const fetchGroupchat = async () => {
       if (groupId !== null) {
@@ -70,7 +72,7 @@ const Groupchat: React.FC = () => {
           const group = await GroupService.getGroupById(groupId);
           setGroupchat(group);
         } catch (err) {
-          setError("Failed to load group details.");
+          setError(t("general.error"));
           console.error(err);
         } finally {
           setLoading(false);
@@ -87,7 +89,7 @@ const Groupchat: React.FC = () => {
           const fetchedMessages = await MessageService.getAllMessages(groupId);
           setMessages(fetchedMessages);
         } catch (err) {
-          setError("Failed to load messages.");
+          setError(t("general.error"));
           console.error(err);
         }
       }
@@ -124,7 +126,7 @@ const Groupchat: React.FC = () => {
 
   const handleLeaveGroup = async () => {
     if (!groupId || !loggedInUserData?.id) {
-      setError("Unable to leave group.");
+      setError(t("general.error"));
       return;
     }
 
@@ -133,7 +135,7 @@ const Groupchat: React.FC = () => {
       router.push("/group");
     } catch (err) {
       console.error(err);
-      setError("Failed to leave group.");
+      setError(t("general.error"));
     }
   };
 
@@ -153,7 +155,7 @@ const handleDeleteGroup = async () => {
 };
 
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div>{t("general.loading")}</div>;
   if (error) return <div>{error}</div>;
 
   return (
@@ -162,28 +164,69 @@ const handleDeleteGroup = async () => {
         <title>{t("group.title")}</title>
       </Head>
       <Header className="sticky top-0 z-50 bg-white shadow-md" />
-      <div className="group-page flex flex-col relative max-w-8xl mx-auto p-4">
+      <div className="absolute top-30 left-5 flex flex-col space-y-1">
+          {loggedInUserData.globalRole === "user" &&
+            <button
+              onClick={() => setLeaveConfirmation(true)}
+              className="bg-red-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-600"
+            >
+              {t("group.leave.button")}
+            </button>
+          }
+          <button
+            onClick={() => setIsSliderOpen(true)}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600"
+          >
+            {t("group.viewUsers.button")}
+          </button>
+
+          {(isGroupAdmin || loggedInUserData?.globalRole === "ApplicationAdmin") && (
+            <button
+              onClick={handleOpenModal}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
+            >
+              {t("group.createGroceryList.button")}
+            </button>
+          )}
+
+          <button
+            onClick={() => setIsGroceryListOpen(true)}
+            className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-600"
+          >
+            {t("group.viewGroceryList.button")}
+          </button>
+          {(isGroupAdmin || loggedInUserData?.globalRole === "ApplicationAdmin") && (
+            <button
+              onClick={handleDeleteGroup}
+              className="bg-red-700 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-800"
+            >
+              Delete Group
+            </button>
+          )}
+      </div>
+      <div className="group-page flex flex-col relative max-w-4xl mx-auto p-4">
         {/* Kick Confirmation Modal */}
         {kickConfirmation.isOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-              <h2 className="text-lg font-semibold text-gray-800">Confirm Kick</h2>
+              <h2 className="text-lg font-semibold text-gray-800">
+                {t("group.kickConfirmation.title")}
+              </h2>
               <p className="mt-2 text-gray-600">
-                Are you sure you want to remove{" "}
-                <span className="font-bold">{kickConfirmation.userNickname}</span> from the group?
+                {t("group.kickConfirmation.text", { nickname: kickConfirmation.userNickname })}
               </p>
               <div className="mt-4 flex justify-end gap-2">
                 <button
                   onClick={closeKickConfirmation}
                   className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
                 >
-                  Cancel
+                  {t("group.kickConfirmation.cancel")}
                 </button>
                 <button
                   onClick={confirmKick}
                   className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
                 >
-                  Confirm
+                  {t("group.kickConfirmation.confirm")}
                 </button>
               </div>
             </div>
@@ -194,65 +237,25 @@ const handleDeleteGroup = async () => {
         {leaveConfirmation && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-              <h2 className="text-lg font-semibold text-gray-800">Confirm Leave</h2>
-              <p className="mt-2 text-gray-600">
-                Are you sure you want to leave the group?
-              </p>
+              <h2 className="text-lg font-semibold text-gray-800">{t("group.leave.title")}</h2>
+              <p className="mt-2 text-gray-600">{t("group.leave.text")}</p>
               <div className="mt-4 flex justify-end gap-2">
                 <button
                   onClick={() => setLeaveConfirmation(false)}
                   className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
                 >
-                  Cancel
+                  {t("group.leave.cancel")}
                 </button>
                 <button
                   onClick={handleLeaveGroup}
                   className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
                 >
-                  Confirm
+                  {t("group.leave.confirm")}
                 </button>
               </div>
             </div>
           </div>
         )}
-
-        <div className="absolute top-8 left-7 flex flex-row space-x-3">
-          <button
-            onClick={() => setLeaveConfirmation(true)}
-            className="bg-red-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-600"
-          >
-            Leave Group
-          </button>
-          <button
-            onClick={() => setIsSliderOpen(true)}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600"
-          >
-            View Users
-          </button>
-
-          {isGroupAdmin &&
-            <button
-              onClick={handleOpenModal}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
-            >
-              Create Grocery List
-            </button>
-          }
-
-          <button
-            onClick={() => setIsGroceryListOpen(true)}
-            className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-600"
-          >
-            View Grocery List
-          </button>
-          
-          <button
-            onClick={handleDeleteGroup}
-            className="bg-red-700 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-800"
-          >
-            Delete Group
-          </button>
-        </div>
         
         {/* Sidebar for users */}
         <div
@@ -261,7 +264,7 @@ const handleDeleteGroup = async () => {
           } transition-transform duration-300 ease-in-out z-50`}
         >
           <div className="flex items-center justify-between p-4 bg-gradient-to-br from-green-900 to-green-500 text-white">
-            <h3 className="text-gray-300">Group Users</h3>
+            <h3 className="text-gray-300">{t("users.title")}</h3>
             <button
               onClick={() => setIsSliderOpen(false)}
               className="text-white text-2xl leading-none"
@@ -280,7 +283,7 @@ const handleDeleteGroup = async () => {
                     >
                       <span>
                         <span className="font-semibold">{userGroup.user.nickname}</span>
-                        <span className="text-gray-500 ml-2">({userGroup.role})</span>
+                        <span className="text-gray-500 ml-2">({t(`group.role.${userGroup.role}`)})</span>
                       </span>
                       {isGroupAdmin &&
                         loggedInUserData?.id !== userGroup.user.id && (
@@ -290,7 +293,7 @@ const handleDeleteGroup = async () => {
                             }
                             className="bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600"
                           >
-                            Kick
+                            {t("group.kick")}
                           </button>
                         )}
                     </li>
@@ -298,11 +301,10 @@ const handleDeleteGroup = async () => {
                 })}
               </ul>
             ) : (
-              <p>No users available</p>
+              <p>{t("group.validate.noUsers")}</p>
             )}
           </div>
         </div>
-
         {/* Sidebar for grocery list */}
         <div
           className={`fixed top-0 right-0 h-full w-[40%] bg-gray-100 shadow-lg transform ${
@@ -310,7 +312,7 @@ const handleDeleteGroup = async () => {
           } transition-transform duration-300 ease-in-out z-50`}
         >
           <div className="flex items-center justify-between p-4 bg-gradient-to-br from-green-500 to-green-900 text-white">
-            <h3 className="text-lg font-semibold">Grocery List</h3>
+            <h3 className="text-lg font-semibold">{t("group.grocerylist")}</h3>
             <button
               onClick={() => setIsGroceryListOpen(false)}
               className="text-white text-2xl leading-none"
@@ -324,9 +326,9 @@ const handleDeleteGroup = async () => {
         </div>
 
         <div className="flex-grow p-4 bg-gray-50 flex flex-col">
-          <h1>{groupchat?.name || "Group Details"}</h1>
+          <h1>{groupchat?.name || t("group.details.defaultName")}</h1>
           <h4 className="text-l font-semibold text-gray-800 dark:text-black text-center">
-            Group Id: {groupchat?.id || "error no id available"}
+            {t("group.id")}: {groupchat?.id || t("group.details.noId")}
           </h4>
           {isModalOpen && (
             <CreateGroceryListModal

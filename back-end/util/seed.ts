@@ -57,8 +57,8 @@ const main = async () => {
       id: 10,
       name: 'Household Family',
       userGroups: [
-        { userId: users[0]?.id, role: 'GroupAdmin' }, 
-        { userId: users[1]?.id, role: 'user' },      
+        { userId: users[1]?.id, role: 'GroupAdmin' }, 
+        { userId: users[2]?.id, role: 'user' },      
       ],
     },
     {
@@ -73,8 +73,8 @@ const main = async () => {
       id: 12,
       name: 'Office Snacks Team',
       userGroups: [
-        { userId: users[1]?.id, role: 'GroupAdmin' }, 
-        { userId: users[2]?.id, role: 'user' },      
+        { userId: users[3]?.id, role: 'GroupAdmin' }, 
+        { userId: users[1]?.id, role: 'user' },      
       ],
     },
   ];
@@ -117,14 +117,14 @@ const itemsData = [
       {
         message: 'Hello everyone!',
         timestamp: new Date(),
-        userId: users[0]?.id,
+        userId: users[1]?.id,
         groupId: groups.find((g) => g.name === 'Household Family')?.id as number,
       },
       {
         message: 'Remember the tomatoes!',
         timestamp: new Date(),
-        userId: users[1]?.id,
-        groupId: groups.find((g) => g.name === 'Household Family')?.id as number,
+        userId: users[2]?.id,
+        groupId: groups.find((g) => g.name === 'Camping Crew')?.id as number,
       },
     ],
   });

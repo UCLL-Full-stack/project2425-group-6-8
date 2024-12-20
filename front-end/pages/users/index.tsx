@@ -21,7 +21,7 @@ export const getServerSideProps = async ({ locale }) => {
   };
 };
 
-const Login: React.FC = () => {
+const Users: React.FC = () => {
     const { t } = useTranslation("common");
     return (
         <>
@@ -36,7 +36,7 @@ const Login: React.FC = () => {
                 <UserOverViewTable />
               </section>
             </main>
-          ) : (
+          ) : ( 
             <p className="fixed inset-0 flex items-center justify-center text-red-500 text-xl font-bold">You are not allowed to view this page since you aren't an Admin.</p>
           )}
 
@@ -44,4 +44,4 @@ const Login: React.FC = () => {
     );
 };
 
-export default Login;
+export default Users;

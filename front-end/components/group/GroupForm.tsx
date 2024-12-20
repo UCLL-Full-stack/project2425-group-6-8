@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import GroupService from "../../services/GroupService";
 import UserService from "@services/UserService";
 
@@ -7,6 +8,7 @@ type Props = {
 };
 
 const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
+  const { t } = useTranslation();
   const [showCreateGroupForm, setShowCreateGroupForm] = useState(false);
   const [showJoinGroupForm, setShowJoinGroupForm] = useState(false);
   const [name, setName] = useState("");
@@ -27,23 +29,23 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
   const handleCreateGroup = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const userArray = [loggedInUserData?.nickname, ...users.split(",").map((nickname) => nickname.trim())];  
+    const userArray = [loggedInUserData?.nickname, ...users.split(",").map((nickname) => nickname.trim())];
 
     if (!name || userArray.length === 0) {
-      setErrorMessage("Please fill out all required fields.");
+      setErrorMessage(t("groupForm.error.fillFields"));
       return;
     }
 
     try {
       const newGroup = await GroupService.createGroup(name, userArray);
-      setSuccessMessage(`Group "${newGroup.name}" created successfully!`);
+      setSuccessMessage(t("groupForm.success.groupCreated", { groupName: newGroup.name }));
       setErrorMessage("");
       setName("");
       setUsers("");
 
       refreshGroups();
     } catch (error) {
-      setErrorMessage("Failed to create group. Please try again.");
+      setErrorMessage(t("groupForm.error.createFailed"));
       console.error(error);
     }
   };
@@ -52,18 +54,18 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
     e.preventDefault();
 
     if (!groupId) {
-      setErrorMessage("Please enter a group ID.");
+      setErrorMessage(t("groupForm.error.enterGroupId"));
       return;
     }
 
     try {
       await GroupService.addUserToExistingGroup(Number(groupId), loggedInUserData.id);
-      setSuccessMessage(`Successfully joined group with ID "${groupId}"!`);
+      setSuccessMessage(t("groupForm.success.joinedGroup", { groupId }));
       setErrorMessage("");
       setGroupId("");
       refreshGroups();
     } catch (error) {
-      setErrorMessage("Failed to join group. Please try again.");
+      setErrorMessage(t("groupForm.error.joinFailed"));
       console.error(error);
     }
   };
@@ -84,7 +86,7 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
               cursor: "pointer",
             }}
           >
-            Join a Group
+            {t("groupForm.joinGroup")}
           </button>
           <button
             onClick={() => setShowCreateGroupForm(true)}
@@ -97,23 +99,23 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
               cursor: "pointer",
             }}
           >
-            Create a Group
+            {t("groupForm.createGroup")}
           </button>
         </div>
       ) : showCreateGroupForm ? (
         <div style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>
-          <h1>Create a New Group</h1>
+          <h1>{t("groupForm.createTitle")}</h1>
           {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
           {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
           <form onSubmit={handleCreateGroup}>
             <div style={{ marginBottom: "10px" }}>
               <label>
-                <strong>Group Name:</strong>
+                <strong>{t("groupForm.groupName")}:</strong>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter group name"
+                  placeholder={t("groupForm.placeholder.groupName")}
                   required
                   style={{ width: "100%", padding: "8px", marginTop: "5px", border: "1px solid black" }}
                 />
@@ -121,12 +123,12 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
             </div>
             <div style={{ marginBottom: "10px" }}>
               <label>
-                <strong>Users (comma-separated nicknames):</strong>
+                <strong>{t("groupForm.users")}:</strong>
                 <input
                   type="text"
                   value={users}
                   onChange={(e) => setUsers(e.target.value)}
-                  placeholder="e.g., bob56,sam4334"
+                  placeholder={t("groupForm.placeholder.users")}
                   required
                   style={{ width: "100%", padding: "8px", marginTop: "5px", border: "1px solid black" }}
                 />
@@ -143,7 +145,7 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
                   cursor: "pointer",
                 }}
               >
-                Create Group
+                {t("groupForm.submitCreate")}
               </button>
               <button
                 type="button"
@@ -156,25 +158,25 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
                   cursor: "pointer",
                 }}
               >
-                Back
+                {t("groupForm.back")}
               </button>
             </div>
           </form>
         </div>
       ) : (
         <div style={{ padding: "20px", maxWidth: "600px", margin: "0 auto" }}>
-          <h1>Join a Group</h1>
+          <h1>{t("groupForm.joinTitle")}</h1>
           {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
           {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
           <form onSubmit={handleJoinGroup}>
             <div style={{ marginBottom: "10px" }}>
               <label>
-                <strong>Group ID:</strong>
+                <strong>{t("groupForm.groupId")}:</strong>
                 <input
                   type="text"
                   value={groupId}
                   onChange={(e) => setGroupId(e.target.value)}
-                  placeholder="Enter group ID"
+                  placeholder={t("groupForm.placeholder.groupId")}
                   required
                   style={{ width: "100%", padding: "8px", marginTop: "5px", border: "1px solid black" }}
                 />
@@ -191,7 +193,7 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
                   cursor: "pointer",
                 }}
               >
-                Join Group
+                {t("groupForm.submitJoin")}
               </button>
               <button
                 type="button"
@@ -204,7 +206,7 @@ const GroupForm: React.FC<Props> = ({ refreshGroups }) => {
                   cursor: "pointer",
                 }}
               >
-                Back
+                {t("groupForm.back")}
               </button>
             </div>
           </form>

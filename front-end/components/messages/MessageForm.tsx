@@ -1,5 +1,7 @@
 import { useState } from "react";
 import MessageService from "../../services/MessageService";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next";
 
 interface MessageFormProps {
   groupId: number;
@@ -8,6 +10,7 @@ interface MessageFormProps {
 
 const MessageForm: React.FC<MessageFormProps> = ({ groupId, onMessageSent }) => {
   const [message, setMessage] = useState("");
+  const { t } = useTranslation("common");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +38,7 @@ const MessageForm: React.FC<MessageFormProps> = ({ groupId, onMessageSent }) => 
         placeholder="Type your message"
       />
       <button type="submit" className="ml-2 p-2 bg-blue-500 text-white rounded">
-        Send
+        {t('message.send')}
       </button>
     </form>
   );

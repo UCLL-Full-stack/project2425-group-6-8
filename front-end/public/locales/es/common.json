@@ -30,12 +30,87 @@
     },
     "group": {
         "title": "Grupos",
+        "leave": {
+            "title": "Confirmar salida",
+            "text": "¿Estás seguro de que quieres salir del grupo?",
+            "button": "Salir del grupo",
+            "cancel": "Cancelar",
+            "confirm": "Confirmar"
+        },
+        "grocerylist": "Lista de compras",
+        "viewUsers": {
+            "button": "Ver usuarios"
+        },
+        "createGroceryList": {
+            "button": "Crear lista de compras"
+        },
+        "viewGroceryList": {
+            "button": "Ver lista de compras"
+        },
+        "deleteGroup": {
+            "button": "Eliminar grupo"
+        },
+        "id": "ID del grupo",
+        "details": {
+            "defaultName": "Detalles del grupo",
+            "noId": "ID no disponible"
+        },
+        "kickConfirmation": {
+            "title": "Confirmar expulsión",
+            "text": "¿Estás seguro de que deseas expulsar a {{nickname}}?",
+            "cancel": "Cancelar",
+            "confirm": "Confirmar"
+        },
+        "kick": "Expulsar",
+        "role": {
+            "GroupAdmin": "Administrador",
+            "user": "usuario"
+        },
         "validate": {
-            "noGroups": "No hay grupos"
+            "noUsers": "No hay usuarios disponibles"
         }
     },
     "users": {
         "title": "Usuarios"
+    },
+    "message": {
+        "send":"enviar"
+    },
+    "groupForm": {
+        "joinGroup": "Unirse a un grupo",
+        "createGroup": "Crear un grupo",
+        "createTitle": "Crear un nuevo grupo",
+        "joinTitle": "Unirse a un grupo",
+        "groupName": "Nombre del grupo",
+        "users": "Usuarios (nombres separados por comas)",
+        "groupId": "ID del grupo",
+        "placeholder": {
+            "groupName": "Introduce el nombre del grupo",
+            "users": "Ejemplo: bob56,sam4334",
+            "groupId": "Introduce el ID del grupo"
+        },
+        "submitCreate": "Crear grupo",
+        "submitJoin": "Unirse al grupo",
+        "back": "Volver",
+        "success": {
+            "groupCreated": "¡Grupo \"{{groupName}}\" creado con éxito!",
+            "joinedGroup": "¡Te has unido con éxito al grupo con ID \"{{groupId}}\"!"
+        },
+        "error": {
+            "fillFields": "Por favor, completa todos los campos requeridos.",
+            "enterGroupId": "Por favor, introduce un ID de grupo.",
+            "createFailed": "No se pudo crear el grupo. Inténtalo de nuevo.",
+            "joinFailed": "No se pudo unir al grupo. Inténtalo de nuevo."
+        }
+    },
+    "grocerylist": {
+        "loading": "Cargando listas de compras...",
+        "addItem": "Agregar artículo",
+        "saveChanges": "Guardar cambios",
+        "cancel": "Cancelar",
+        "edit": "Editar",
+        "delete": "Borrar",
+        "empty": "No hay listas de compras en este grupo."
     },
     "label": { "nickname": "Apodo:", "password": "Contraseña:", "name": "Nombre:", "email": "Correo electrónico:" },
     "header": {
