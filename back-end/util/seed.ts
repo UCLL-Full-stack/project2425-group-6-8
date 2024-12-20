@@ -48,17 +48,18 @@ const main = async () => {
     data: hashedUsersData,
     skipDuplicates: true,
   });
-  console.log('Users seeded with hashed passwords.');
+  console.log('Users seeded.');
 
   const users = await prisma.user.findMany();
 
+  // Seed Groups
   const groupsData = [
     {
       id: 10,
       name: 'Household Family',
       userGroups: [
-        { userId: users[1]?.id, role: 'GroupAdmin' }, 
-        { userId: users[2]?.id, role: 'user' },      
+        { userId: users[1]?.id, role: 'GroupAdmin' },
+        { userId: users[2]?.id, role: 'user' },
       ],
     },
     {
@@ -66,15 +67,7 @@ const main = async () => {
       name: 'Camping Crew',
       userGroups: [
         { userId: users[2]?.id, role: 'GroupAdmin' },
-        { userId: users[3]?.id, role: 'user' },     
-      ],
-    },
-    {
-      id: 12,
-      name: 'Office Snacks Team',
-      userGroups: [
-        { userId: users[3]?.id, role: 'GroupAdmin' }, 
-        { userId: users[1]?.id, role: 'user' },      
+        { userId: users[3]?.id, role: 'user' },
       ],
     },
   ];
@@ -93,16 +86,12 @@ const main = async () => {
   console.log('Groups seeded.');
 
   // Seed Items
-const itemsData = [
-  { name: 'Peanut Butter', description: 'Crunchy peanut butter', consumableType: 'FOOD', price: 2.99, weight: 200, quantity: 1, isCompleted: false },
-  { name: 'Bread', description: 'Whole grain bread', consumableType: 'FOOD', price: 1.99, quantity: 16, isCompleted: true },
-  { name: 'Tomatoes', description: 'Fresh tomatoes', consumableType: 'FOOD', price: 3.49, weight: 500, quantity: 10, isCompleted: true },
-  { name: 'Milk', description: 'Organic whole milk', consumableType: 'DRINK', price: 4.49, weight: 1000, quantity: 2, isCompleted: true },
-  { name: 'Chicken', description: 'Fresh chicken breast', consumableType: 'FOOD', price: 8.99, weight: 500, isCompleted: false },
-  { name: 'Apples', description: 'Red apples', consumableType: 'FOOD', price: 2.79, weight: 1000, quantity: 6, isCompleted: true },
-  { name: 'Rice', description: 'Long grain rice', consumableType: 'FOOD', price: 5.99, weight: 2000, quantity: 1, isCompleted: false },
-];
-
+  const itemsData = [
+    { name: 'Peanut Butter', description: 'Crunchy peanut butter', consumableType: 'FOOD', price: 2.99, weight: 200, quantity: 1, isCompleted: false },
+    { name: 'Bread', description: 'Whole grain bread', consumableType: 'FOOD', price: 1.99, quantity: 16, isCompleted: true },
+    { name: 'Tomatoes', description: 'Fresh tomatoes', consumableType: 'FOOD', price: 3.49, weight: 500, quantity: 10, isCompleted: true },
+    { name: 'Milk', description: 'Organic whole milk', consumableType: 'DRINK', price: 4.49, weight: 1000, quantity: 2, isCompleted: true },
+  ];
 
   await prisma.item.createMany({
     data: itemsData,
@@ -110,25 +99,34 @@ const itemsData = [
   });
   console.log('Items seeded.');
 
-  // Seed Messages
-  const groups = await prisma.group.findMany();
-  await prisma.message.createMany({
-    data: [
-      {
-        message: 'Hello everyone!',
-        timestamp: new Date(),
-        userId: users[1]?.id,
-        groupId: groups.find((g) => g.name === 'Household Family')?.id as number,
+  const items = await prisma.item.findMany();
+
+  // Seed Grocery Lists
+  const groceryListsData = [
+    {
+      name: 'Family Weekly Groceries',
+      groupId: groupsData[0].id,
+      itemIds: [items[0]?.id, items[1]?.id],
+    },
+    {
+      name: 'Camping Essentials',
+      groupId: groupsData[1].id,
+      itemIds: [items[2]?.id, items[3]?.id],
+    },
+  ];
+
+  for (const groceryList of groceryListsData) {
+    await prisma.groceryList.create({
+      data: {
+        name: groceryList.name,
+        groupId: groceryList.groupId,
+        items: {
+          connect: groceryList.itemIds.map((itemId) => ({ id: itemId })),
+        },
       },
-      {
-        message: 'Remember the tomatoes!',
-        timestamp: new Date(),
-        userId: users[2]?.id,
-        groupId: groups.find((g) => g.name === 'Camping Crew')?.id as number,
-      },
-    ],
-  });
-  console.log('Messages seeded.');
+    });
+  }
+  console.log('Grocery lists seeded.');
 };
 
 (async () => {

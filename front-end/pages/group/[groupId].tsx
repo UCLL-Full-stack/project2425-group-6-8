@@ -165,7 +165,7 @@ const handleDeleteGroup = async () => {
       </Head>
       <Header className="sticky top-0 z-50 bg-white shadow-md" />
       <div className="absolute top-30 left-5 flex flex-col space-y-1">
-          {loggedInUserData.globalRole === "user" &&
+          {loggedInUserData?.globalRole === "user" &&
             <button
               onClick={() => setLeaveConfirmation(true)}
               className="bg-red-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-600"
