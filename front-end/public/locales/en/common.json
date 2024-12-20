@@ -32,12 +32,84 @@
     },
     "group": {
         "title": "Groups",
-        "validate": {
-            "noGroups": "There are no groups"
+        "leave": {
+            "title": "Confirm Leave",
+            "text": "Are you sure you want to leave the group?",
+            "button": "Leave Group",
+            "cancel": "Cancel",
+            "confirm": "Confirm"
+        },
+        "grocerylist": "Grocery List",
+        "viewUsers": {
+            "button": "View Users"
+        },
+        "createGroceryList": {
+            "button": "Create Grocery List"
+        },
+        "viewGroceryList": {
+            "button": "View Grocery List"
+        },
+        "id": "Group Id",
+        "details": {
+            "defaultName": "Group Details",
+            "noId": "No ID available"
+        },
+        "kickConfirmation": {
+            "title": "Confirm Kick",
+            "text": "Are you sure you want to remove {nickname} from the group?",
+            "cancel": "Cancel",
+            "confirm": "Confirm"
+        },
+        "kick": "Kick",
+        "role": {
+            "GroupAdmin": "Admin",
+            "user": "User"
+        },
+            "validate": {
+            "noUsers": "No users available"
         }
     },
     "users": {
         "title": "Users"
+    },
+    "message": {
+        "send":"send"
+    },
+    "groupForm": {
+        "joinGroup": "Join a Group",
+        "createGroup": "Create a Group",
+        "createTitle": "Create a New Group",
+        "joinTitle": "Join a Group",
+        "groupName": "Group Name",
+        "users": "Users (comma-separated nicknames)",
+        "groupId": "Group ID",
+        "placeholder": {
+            "groupName": "Enter group name",
+            "users": "e.g., bob56,sam4334",
+            "groupId": "Enter group ID"
+        },
+        "submitCreate": "Create Group",
+        "submitJoin": "Join Group",
+        "back": "Back",
+        "success": {
+            "groupCreated": "Group \"{{groupName}}\" created successfully!",
+            "joinedGroup": "Successfully joined group with ID \"{{groupId}}\"!"
+        },
+        "error": {
+        "fillFields": "Please fill out all required fields.",
+        "enterGroupId": "Please enter a group ID.",
+        "createFailed": "Failed to create group. Please try again.",
+        "joinFailed": "Failed to join group. Please try again."
+        }
+    },
+    "grocerylist": {
+        "loading": "Loading grocery lists...",
+        "addItem": "Add Item",
+        "saveChanges": "Save Changes",
+        "cancel": "Cancel",
+        "edit": "Edit",
+        "delete": "Delete",
+        "empty": "No grocery lists in this group."
     },
     "label": { "nickname": "Nickname:", "password": "Password:", "name": "Name:", "email": "Email:"},
     "header": {

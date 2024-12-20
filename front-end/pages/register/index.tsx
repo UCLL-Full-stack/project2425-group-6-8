@@ -12,7 +12,7 @@ export const getServerSideProps = async ({ locale }) => {
   };
 };
 
-const Login: React.FC = () => {
+const Register: React.FC = () => {
     const { t } = useTranslation("common");
     return (
         <>
@@ -29,4 +29,4 @@ const Login: React.FC = () => {
     );
 };
 
-export default Login;
+export default Register;
