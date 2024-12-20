@@ -5,6 +5,7 @@ import AddItemModal from "../../components/item/AddItemModal";
 import ItemService from "@services/ItemService";
 import { Item } from "../../types";
 import { useTranslation } from "react-i18next";
+import GroupService from "../../services/GroupService";
 
 type GroceryListProps = {
   groupId: number;
@@ -20,6 +21,7 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
   const [editedItems, setEditedItems] = useState<any[]>([]);
   const [showAddItemModal, setShowAddItemModal] = useState<boolean>(false);
   const [currentGroceryListId, setCurrentGroceryListId] = useState<number | null>(null);
+  const [groupchat, setGroupchat] = useState<any>(null);
   const [editMode, setEditMode] = useState<boolean>(false);
   const [tempGroceryLists, setTempGroceryLists] = useState<any[] | null>(null); // Temp state for original lists
   const { t } = useTranslation();
@@ -35,6 +37,38 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
       return [...prev, editedItem];
     });
   };
+
+  const loggedInUserData = (() => {
+    if (typeof localStorage === "undefined") {
+      console.warn("localStorage is not defined.");
+      return null;
+    }
+    const item = localStorage.getItem("loggedInUser");
+    return item ? JSON.parse(item) : null;
+  })();
+
+
+  const isGroupAdmin = groupchat?.userGroups?.some(
+    (ug: any) => ug.user.id === loggedInUserData?.id && ug.role === "GroupAdmin"
+  );
+
+  useEffect(() => {
+    const fetchGroupchat = async () => {
+      if (groupId !== null) {
+        setLoading(true);
+        try {
+          const group = await GroupService.getGroupById(groupId);
+          setGroupchat(group);
+        } catch (err) {
+          setError(t("general.error"));
+          console.error(err);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    fetchGroupchat();
+  }, [groupId]);
 
   useEffect(() => {
     const fetchGroceryLists = async () => {
@@ -182,12 +216,14 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
                     {t("grocerylist.saveChanges")}
                   </button>
                 )}
-                <button
-                  onClick={() => handleDeleteGroceryList(groceryList.id)}
-                  className="px-4 py-2 bg-red-500 text-white rounded-lg"
-                >
-                  {t("grocerylist.delete")}
-                </button>
+                {(isGroupAdmin || loggedInUserData?.globalRole === "ApplicationAdmin") && (
+                  <button
+                    onClick={() => handleDeleteGroceryList(groceryList.id)}
+                    className="px-4 py-2 bg-red-500 text-white rounded-lg"
+                  >
+                    {t("grocerylist.delete")}
+                  </button>
+                )}
                 <button
                   onClick={() => setEditMode((prev) => !prev)}
                   className="px-4 py-2 bg-yellow-500 text-white rounded-lg"

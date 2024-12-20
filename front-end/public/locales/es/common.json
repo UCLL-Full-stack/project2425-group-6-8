@@ -47,6 +47,9 @@
         "viewGroceryList": {
             "button": "Ver lista de compras"
         },
+        "deleteGroup": {
+            "button": "Eliminar grupo"
+        },
         "id": "ID del grupo",
         "details": {
             "defaultName": "Detalles del grupo",
@@ -54,7 +57,7 @@
         },
         "kickConfirmation": {
             "title": "Confirmar expulsión",
-            "text": "¿Estás seguro de que quieres expulsar a {nickname} del grupo?",
+            "text": "¿Estás seguro de que deseas expulsar a {{nickname}}?",
             "cancel": "Cancelar",
             "confirm": "Confirmar"
         },

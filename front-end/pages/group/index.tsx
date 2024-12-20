@@ -45,7 +45,11 @@ const GroupPage: React.FC = () => {
     }
 
     try {
-      const response = await GroupService.getGroupsOfUser(loggedInUserData.id);
+      let response = await GroupService.getGroupsOfUser(loggedInUserData.id);
+      if (loggedInUserData.globalRole === "ApplicationAdmin")
+      {
+        response = await GroupService.getAllGroups();
+      }
       const groups = await response.json();
 
       if (groups.length < 1) {

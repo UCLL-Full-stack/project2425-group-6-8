@@ -49,6 +49,9 @@
         "viewGroceryList": {
             "button": "View Grocery List"
         },
+        "deleteGroup": {
+            "button": "Delete Group"
+        },
         "id": "Group Id",
         "details": {
             "defaultName": "Group Details",
@@ -56,7 +59,7 @@
         },
         "kickConfirmation": {
             "title": "Confirm Kick",
-            "text": "Are you sure you want to remove {nickname} from the group?",
+            "text": "Are you sure you want to kick {{nickname}}?",
             "cancel": "Cancel",
             "confirm": "Confirm"
         },
