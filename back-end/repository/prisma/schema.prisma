@@ -43,16 +43,18 @@ model Message {
 }
 
 model Item {
-  id              Int         @id @default(autoincrement())
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  id              Int              @id @default(autoincrement())
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
   name            String
   description     String
   consumableType  String
   price           Float
   weight          Int?
   quantity        Float?
-  groceryLists    GroceryList[] @relation("ItemGroceryLists")
+  isCompleted     Boolean          @default(false) 
+  groceryList     GroceryList?     @relation(fields: [groceryListId], references: [id])
+  groceryListId   Int?
 }
 
 model GroceryList {
@@ -62,7 +64,7 @@ model GroceryList {
   name      String
   group     Group?     @relation(fields: [groupId], references: [id])
   groupId   Int?
-  items     Item[]     @relation("ItemGroceryLists")
+  items     Item[]   
 }
 
 model Group {

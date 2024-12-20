@@ -5,9 +5,9 @@ import AddItemModal from "../../components/item/AddItemModal";
 import ItemService from "@services/ItemService";
 import { Item } from "../../types";
 
-interface GroceryListProps {
+type GroceryListProps = {
   groupId: number;
-}
+};
 
 const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
   const [groceryLists, setGroceryLists] = useState<any[] | null>(null);
@@ -20,19 +20,7 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
   const [showAddItemModal, setShowAddItemModal] = useState<boolean>(false);
   const [currentGroceryListId, setCurrentGroceryListId] = useState<number | null>(null);
   const [editMode, setEditMode] = useState<boolean>(false);
-  const [tempGroceryLists, setTempGroceryLists] = useState<any[] | null>(null); // Temp state for original lists
-
-  const handleItemEdit = (editedItem: any) => {
-    setEditedItems((prev) => {
-      const alreadyEdited = prev.find((item) => item.id === editedItem.id);
-      if (alreadyEdited) {
-        return prev.map((item) =>
-          item.id === editedItem.id ? editedItem : item
-        );
-      }
-      return [...prev, editedItem];
-    });
-  };
+  const [tempGroceryLists, setTempGroceryLists] = useState<any[] | null>(null); 
 
   useEffect(() => {
     const fetchGroceryLists = async () => {
@@ -41,7 +29,7 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
       try {
         const lists = await GroceryListService.getGroceryListsByGroupId(groupId);
         setGroceryLists(lists);
-        setTempGroceryLists(JSON.parse(JSON.stringify(lists))); // Save a deep copy of the original list
+        setTempGroceryLists(JSON.parse(JSON.stringify(lists))); 
         const items = await ItemService.getItemsByGroupId(groupId);
         setGroupItems(items);
       } catch (err) {
@@ -61,53 +49,68 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
   };
 
   const handleSaveChanges = async (groceryListId: number, name: string) => {
-    if (groceryLists && groceryLists.length > 0) {
-      const currentList = groceryLists.find((list) => list.id === groceryListId);
-      if (currentList?.items.length === 0) {
-        alert("You need to have at least one item in the list.");
-        return;
-      }
+  if (groceryLists && groceryLists.length > 0) {
+    const currentList = groceryLists.find((list) => list.id === groceryListId);
+    if (currentList?.items.length === 0) {
+      alert("You need to have at least one item in the list.");
+      return;
     }
+  }
 
-    try {
-      await Promise.all(
-        editedItems.map((item) =>
-          ItemService.updateItem(item.id, item)
-        )
-      );
+  try {
+    // Update the items that were edited and send changes to the database
+    await Promise.all(
+      editedItems.map((item) =>
+        ItemService.updateItem(item.id, item)  // Sends update to the database
+      )
+    );
 
-      setEditedItems([]);
+    // Clear the edited items once saved
+    setEditedItems([]);
 
-      const addItemIds = addedItems.map((item) => item.id);
-      const removeItemIds = removedItems;
+    // Handle added and removed items
+    const addItemIds = addedItems.map((item) => item.id);
+    const removeItemIds = removedItems;
 
-      const updatedList = await GroceryListService.updateGroceryList(
-        groceryListId,
-        name,
-        addItemIds,
-        removeItemIds
-      );
+    // Update the grocery list itself
+    const updatedList = await GroceryListService.updateGroceryList(
+      groceryListId,
+      name,
+      addItemIds,
+      removeItemIds
+    );
 
-      setGroceryLists((prevLists) => {
-        if (prevLists === null) return [];
-        return prevLists.map((list: any) => {
-          if (list.id === groceryListId) {
-            return { ...list, ...updatedList };
-          }
-          return list;
-        });
+    // Immediately update the groceryLists state after the save
+    setGroceryLists((prevLists) => {
+      if (prevLists === null) return [];
+      return prevLists.map((list: any) => {
+        if (list.id === groceryListId) {
+          // Update the items of the grocery list in the UI to reflect the changes
+          return { 
+            ...list, 
+            ...updatedList, 
+            items: list.items.map((item: any) => 
+              // Update individual items if their 'isCompleted' state changed
+              editedItems.find((editedItem) => editedItem.id === item.id) || item
+            )
+          };
+        }
+        return list;
       });
+    });
 
-      alert("Changes saved successfully!");
-      setEditMode(false);
-    } catch (error) {
-      console.error("Error saving changes:", error);
-      alert("Failed to save changes.");
-    }
-  };
+    alert("Changes saved successfully!");
+    setEditMode(false);
+  } catch (error) {
+    console.error("Error saving changes:", error);
+    alert("Failed to save changes.");
+  }
+};
+
+
+  
 
   const handleCancelChanges = () => {
-    // Revert to original lists before any deletions or edits
     setGroceryLists(tempGroceryLists);
     setRemovedItems([]);
     setAddedItems([]);
@@ -125,14 +128,19 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
           groceryLists.map((groceryList: any) => (
             <div
               key={groceryList.id}
-              className="p-4 bg-white shadow-md rounded-lg border border-gray-200 min-h-[250px] flex flex-col"
+              className={`p-4 shadow-md rounded-lg border min-h-[250px] flex flex-col transition-all duration-300 ${
+              groceryList.items.every((item: { isCompleted: any; }) => item.isCompleted)
+                ? "bg-green-200 border-green-400"
+                : "bg-white border-gray-200"
+            }`}
+
             >
               <div className="flex justify-between items-center">
                 {editMode ? (
                   <input
                     type="text"
                     value={groceryList.name}
-                    onChange={(e) => groceryList.name = e.target.value}
+                    onChange={(e) => (groceryList.name = e.target.value)}
                     className="text-lg font-semibold"
                   />
                 ) : (
@@ -170,17 +178,15 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
                     <EditableItem
                       item={item}
                       onSave={(updatedItem: any) => {
-                        setGroceryLists((prevLists: any[] | null) => {
-                          if (prevLists === null) return [];
-                          return prevLists.map((list: any) => list.id === groceryList.id
-                            ? {
-                                ...list,
-                                items: list.items.map((i: any) =>
-                                  i.id === updatedItem.id ? updatedItem : i
-                                ),
-                              }
-                            : list
-                          );
+                        setEditedItems((prev) => {
+                          // Update or add edited item
+                          const itemIndex = prev.findIndex((i: any) => i.id === updatedItem.id);
+                          if (itemIndex === -1) {
+                            return [...prev, updatedItem];
+                          }
+                          const updatedEditedItems = [...prev];
+                          updatedEditedItems[itemIndex] = updatedItem;
+                          return updatedEditedItems;
                         });
                       }}
                     />

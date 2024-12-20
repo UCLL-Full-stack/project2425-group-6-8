@@ -99,7 +99,7 @@ const createItem = async (item: Item) => {
   return data; 
 };
 
-const updateItem = async (id: number, updatedItem: Item) => {
+const updateItem = async (id: number | undefined, updatedItem: Item) => {
   const loggedInUserData = getLoggedInUserData();
   if (!loggedInUserData?.token) {
     throw new Error("User not logged in.");
