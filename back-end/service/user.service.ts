@@ -1,19 +1,19 @@
-import { UserInput, Role } from '../types';
+import { UserInput, AuthenticationResponse } from '../types';
 import { User } from '../model/user';
 import userDB from '../repository/user.db';
 import bcrypt from 'bcrypt';
 import { generateJwtToken } from '../util/jwt';
-import { AuthenticationResponse } from '../types/index';
-import { UnauthorizedError } from 'express-jwt';
 
 const SALT_ROUNDS = 10;
 
-const getAllUsers = async (): Promise<User[]> => userDB.getAllUsers();
+const getAllUsers = async (): Promise<User[]> => {
+    return await userDB.getAllUsers();
+};
 
 const getUserByNickName = async (nickname: string): Promise<User> => {
     const user = await userDB.getUserByNickName(nickname);
     if (!user) {
-        throw new Error(`User with username: ${nickname} does not exist.`);
+        throw new Error(`User with nickname: ${nickname} does not exist.`);
     }
     return user;
 };
@@ -23,26 +23,21 @@ const createUser = async (userInput: {
     nickname: string;
     email?: string;
     password: string;
-    role?: Role;
 }): Promise<User> => {
     const { name, nickname, email, password } = userInput;
 
-    // Step 1: Check if user already exists
     const existingUser = await userDB.getUserByNickName(nickname);
     if (existingUser) {
-        throw new Error(`User with username: ${name} already exists.`);
+        throw new Error(`User with nickname: ${nickname} already exists.`);
     }
 
-    // Step 2: Hash the password
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
-    // Step 3: Create the user in the database
     const newUser = await userDB.createUser({
         name,
         nickname,
         email,
         password: hashedPassword,
-        role: 'user',
     });
 
     return newUser;
@@ -50,30 +45,30 @@ const createUser = async (userInput: {
 
 const getUserById = async (id: number): Promise<User | null> => {
     const user = await userDB.getUserById(id);
-    if (!user) throw new Error(`User with ID ${id} not found`);
+    if (!user) {
+        throw new Error(`User with ID ${id} not found.`);
+    }
     return user;
 };
 
-/**
- * Authenticates a user by username and password.
- * @param nickname - The username of the user.
- * @param password - The entered password.
- * @returns An AuthenticationResponse containing username, token, and fullname.
- */
 const authenticate = async ({ nickname, password }: UserInput): Promise<AuthenticationResponse> => {
     const user = await getUserByNickName(nickname);
 
     const isValidPassword = await bcrypt.compare(password, user.getPassword());
-
     if (!isValidPassword) {
         throw new Error('Incorrect password.');
     }
+
+    const userId = user.getId() ?? 0;
+    const userGroups = await userDB.getUserGroupsByUserId(userId);
+    const role = userGroups[0]?.role || 'user';
+
     return {
         id: user.getId(),
-        token: generateJwtToken({ nickname, role: user.getRole() }),
+        token: generateJwtToken({ nickname, role }),
         nickname: nickname,
         name: `${user.getName()}`,
-        role: user.getRole(),
+        role,
     };
 };
 
@@ -83,5 +78,4 @@ export default {
     getAllUsers,
     getUserByNickName,
     authenticate,
-    generateJwtToken,
 };

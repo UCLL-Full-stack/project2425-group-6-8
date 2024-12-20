@@ -9,7 +9,6 @@ type ScheduleInput = {
     endDate: Date;
 };
 
-
 type ItemInput = {
     id?: number;
     description: string;
@@ -29,12 +28,17 @@ type UserInput = {
     role?: Role;
 };
 
+type UserGroupInput = {
+    id?: number;
+    userId: number;
+    groupId: number;
+    role: Role;
+};
 
 type GroceryListInput = {
     name: string;
     id?: number;
     items: ItemInput[];
-
 };
 
 type MessageInput = {
@@ -48,7 +52,7 @@ type MessageInput = {
 type GroupInput = {
     name: string;
     id?: number;
-    users: number[];
+    users: UserGroupInput[];
     groceryList?: GroceryListInput[];
     schedule?: ScheduleInput[];
     message?: MessageInput[];
@@ -66,6 +70,7 @@ export {
     ScheduleInput,
     ItemInput,
     UserInput,
+    UserGroupInput,
     GroceryListInput,
     MessageInput,
     GroupInput,

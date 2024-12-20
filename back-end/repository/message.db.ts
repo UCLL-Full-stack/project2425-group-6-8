@@ -1,4 +1,4 @@
-import { Message as MessagePrisma, User as UserPrisma, Group as GroupPrisma } from '@prisma/client';
+import { Message as MessagePrisma, User as UserPrisma, Group as GroupPrisma, UserGroup as UserGroupPrisma } from '@prisma/client';
 import { Message } from '../model';
 import { User } from '../model/user';
 import { Group } from '../model/group';
@@ -14,11 +14,20 @@ Message.from = function ({
     message,
     createdAt,
     updatedAt,
-}: MessagePrisma & { user: UserPrisma, group: GroupPrisma & { users: UserPrisma[] } }): Message {
+}: MessagePrisma & { user: UserPrisma; group: GroupPrisma & { userGroups: (UserGroupPrisma & { user: UserPrisma })[] } }): Message {
     return new Message({
         id,
         user: User.from(user),
-        group: Group.from(group),
+        group: Group.from({
+            ...group,
+            userGroups: group.userGroups.map((userGroup) => ({
+                id: userGroup.id,
+                userId: userGroup.userId,
+                groupId: userGroup.groupId,
+                role: userGroup.role,
+                user: User.from(userGroup.user),
+            })),
+        }),
         timestamp,
         message,
         createdAt,
@@ -53,7 +62,7 @@ const createMessage = async (message: Message): Promise<Message> => {
             },
             include: {
                 user: true,
-                group: { include: { users: true } },
+                group: { include: { userGroups: { include: { user: true } } } },
             },
         });
 
@@ -72,21 +81,21 @@ const getAllMessages = async (groupId?: number): Promise<Message[]> => {
                 where: { groupId },
                 include: {
                     user: true,
-                    group: { include: { users: true } },
+                    group: { include: { userGroups: { include: { user: true } } } },
                 },
             });
         } else {
             messagesPrisma = await database.message.findMany({
                 include: {
                     user: true,
-                    group: { include: { users: true } },
+                    group: { include: { userGroups: { include: { user: true } } } },
                 },
             });
         }
 
         return messagesPrisma.map((messagePrisma) => Message.from(messagePrisma));
     } catch (error) {
-        throw new Error('Database error. See server log for details');
+        throw new Error('Database error. See server log for details.');
     }
 };
 
@@ -98,7 +107,7 @@ const getMessageById = async (id: number): Promise<Message | null> => {
             },
             include: {
                 user: true,
-                group: { include: { users: true } },
+                group: { include: { userGroups: { include: { user: true } } } },
             },
         });
 
@@ -108,7 +117,7 @@ const getMessageById = async (id: number): Promise<Message | null> => {
 
         return Message.from(messagePrisma);
     } catch (error) {
-        throw new Error('Database error. See server log for details');
+        throw new Error('Database error. See server log for details.');
     }
 };
 
@@ -132,7 +141,7 @@ const getNewMessages = async (groupId: number, lastTimestamp: string): Promise<M
             },
             include: {
                 user: true,
-                group: { include: { users: true } },
+                group: { include: { userGroups: { include: { user: true } } } },
             },
         });
 
