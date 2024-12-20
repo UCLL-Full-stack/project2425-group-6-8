@@ -8,23 +8,26 @@ type EditableItemProps = {
 const EditableItem: React.FC<EditableItemProps> = ({ item, onSave }) => {
   const [editedItem, setEditedItem] = useState(item);
 
+  // Handle real-time updates
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const updatedItem = { ...editedItem, name: e.target.value };
+    setEditedItem(updatedItem);
+    onSave(updatedItem); // Immediate save when editing
+  };
+
   const handleSave = () => {
-    // Logic to save the edited item
-    onSave(editedItem);
+    onSave(editedItem); // Ensure saving the item on button click
   };
 
   return (
-    <div className="editable-item bg-white shadow-sm rounded-lg p-4 mb-4">
+    <div className="editable-item">
       <input
         type="text"
         value={editedItem.name}
-        onChange={(e) => setEditedItem({ ...editedItem, name: e.target.value })}
-        className="border border-gray-300 p-2 rounded-lg w-full"
+        onChange={handleChange}
+        className="border rounded p-2"
       />
-      <button
-        onClick={handleSave}
-        className="mt-2 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
-      >
+      <button onClick={handleSave} className="ml-2 px-4 py-2 bg-green-500 text-white rounded-lg">
         Save
       </button>
     </div>

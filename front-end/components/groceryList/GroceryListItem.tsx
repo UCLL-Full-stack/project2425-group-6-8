@@ -32,21 +32,22 @@ const GroceryListItem: React.FC<GroceryListItemProps> = ({
     }
   };
 
-  const handleSave = (updatedItem: Item) => {
-    setGroceryLists((prevLists) => {
-      if (!prevLists) return [];
-      return prevLists.map((list) =>
-        list.id === groceryList.id
-          ? {
-              ...list,
-              items: list.items.map((i: any) =>
-                i.id === updatedItem.id ? updatedItem : i
-              ),
-            }
-          : list
-      );
-    });
-  };
+ const handleSave = (updatedItem: Item) => {
+  setGroceryLists((prevLists) => {
+    if (!prevLists) return [];
+    
+    return prevLists.map((list) =>
+      list.id === groceryList.id
+        ? {
+            ...list,
+            items: list.items.map((i: Item) =>
+              i.id === updatedItem.id ? updatedItem : i
+            ),
+          }
+        : list
+    );
+  });
+};
 
   return (
     <div className="grocery-list-item bg-white shadow-lg rounded-lg p-4 mb-4">
