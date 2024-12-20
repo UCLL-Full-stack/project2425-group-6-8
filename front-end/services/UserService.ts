@@ -20,9 +20,31 @@ const registerUser = (user: User) => {
     });
 };
 
+const getAllUsers = async () => {
+    const loggedInUserData = (() => {
+        if (typeof localStorage === "undefined") {
+            console.warn("localStorage is not defined.");
+            return null;
+        }
+        const item = localStorage.getItem("loggedInUser");
+        return item ? JSON.parse(item) : null;
+      })();
+
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL + "/users", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${loggedInUserData.token}`
+        },
+    });
+    const users = await response.json();
+    return users;
+};
+
 const UserService = {
     loginUser,
     registerUser,
+    getAllUsers
 };
 
 
