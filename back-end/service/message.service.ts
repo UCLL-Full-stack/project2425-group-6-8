@@ -66,14 +66,12 @@ const getMessageById = async (id: number): Promise<Message | null> => {
 };
 
 const getAllMessages = async (groupId?: number): Promise<Message[]> => {
-    console.log('Fetching all messages for group ID:', groupId);
     return await messageDb.getAllMessages(groupId);
 };
 
 const getNewMessages = async (groupId: number, lastSentTimestamp: string): Promise<Message[]> => {
     return await messageDb.getNewMessages(groupId, new Date(lastSentTimestamp).toISOString());
 };
-
 
 
 export default { createMessage, getMessageById, getAllMessages,getNewMessages };

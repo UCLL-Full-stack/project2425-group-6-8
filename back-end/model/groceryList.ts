@@ -55,9 +55,7 @@ export class GroceryList {
         if (!grocerylist.name?.trim()) {
             throw new Error('Name is required');
         }
-        if (!grocerylist.items || grocerylist.items.length === 0) {
-            throw new Error('Grocery list must contain at least one item');
-        }
+     
     }
 
     static from({

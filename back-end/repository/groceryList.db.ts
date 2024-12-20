@@ -137,9 +137,22 @@ const addItemsToGroceryList = async (groceryListId: number, itemIds: number[]): 
     }
 };
 
-// Delete grocery list
 const deleteGroceryList = async (groceryListId: number): Promise<void> => {
     try {
+        const groceryList = await database.groceryList.findUnique({
+            where: { id: groceryListId },
+            include: { items: true },
+        });
+
+        if (!groceryList) {
+            throw new Error(`Grocery list with id ${groceryListId} does not exist`);
+        }
+
+        await database.item.updateMany({
+            where: { groceryListId: groceryListId },
+            data: { groceryListId: null }, 
+        });
+
         await database.groceryList.delete({
             where: { id: groceryListId },
         });
@@ -148,6 +161,7 @@ const deleteGroceryList = async (groceryListId: number): Promise<void> => {
         throw new Error('Database error. See server log for details');
     }
 };
+
 
 export default {
     createGroceryList,

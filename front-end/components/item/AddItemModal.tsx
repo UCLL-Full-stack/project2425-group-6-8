@@ -18,6 +18,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({ groupItems, onAdd, onClose 
     price: 0,
     weight: 0,
     quantity: 0,
+    isCompleted: false
   });
 
   const handleFieldChange = (field: keyof Item, value: any) => {

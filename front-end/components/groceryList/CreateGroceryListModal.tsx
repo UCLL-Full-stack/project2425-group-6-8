@@ -4,7 +4,15 @@ import GroceryListService from "../../services/GroceryListService";
 import { Item } from "@types";
 import AddItemModal from "../item/AddItemModal"; 
 
-const CreateGroceryListModal = ({ groupId, onClose }: { groupId: number; onClose: () => void }) => {
+const CreateGroceryListModal = ({
+  groupId,
+  onClose,
+  onGroceryListCreated, 
+}: {
+  groupId: number;
+  onClose: () => void;
+  onGroceryListCreated: (newGroceryList: any) => void; 
+}) => {
   const [name, setName] = useState("");
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [availableItems, setAvailableItems] = useState<Item[]>([]);
@@ -47,28 +55,36 @@ const CreateGroceryListModal = ({ groupId, onClose }: { groupId: number; onClose
   };
 
   const handleCreateGroceryList = async () => {
-    try {
-      await GroceryListService.createGroceryList(name, selectedItems, groupId);
-      onClose();
-    } catch (error) {
-      console.error("Error creating grocery list:", error);
-    }
-  };
+  try {
+    const newGroceryList = await GroceryListService.createGroceryList(
+      name,
+      selectedItems,
+      groupId
+    );
+    onGroceryListCreated(newGroceryList); 
+    onClose();
+  } catch (error) {
+    console.error("Error creating grocery list:", error);
+  }
+};
+
 
 const handleItemAdd = (newItem: Item) => {
   if (newItem.id != null) {
-    setSelectedItems((prevSelectedItems) => {
-      return [
-        ...prevSelectedItems,
-        newItem.id as number,
-      ];
-    });
+    setAvailableItems((prevAvailableItems) => [...prevAvailableItems, newItem]);
+
+    setSelectedItems((prevSelectedItems) => [...prevSelectedItems, newItem.id].filter((id) => id !== undefined));
+
+    setItemInputFields((prevItemInputFields) => [...prevItemInputFields, prevItemInputFields.length]);
+
     setIsAddItemModalOpen(false);
   } else {
     console.error("Invalid item ID: ", newItem);
     alert("Item ID is invalid.");
   }
 };
+
+
 
 
   return (

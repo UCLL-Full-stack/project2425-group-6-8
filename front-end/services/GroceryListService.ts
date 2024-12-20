@@ -83,7 +83,6 @@ const GroceryListService = {
     return response.json();
   },
 
-
   async updateGroceryList(id: number, name: string, addItemIds: number[], removeItemIds: number[]): Promise<GroceryList> {
     const response = await fetch(`${BASE_URL}/${id}`, {
       method: "PUT",
@@ -115,6 +114,9 @@ const GroceryListService = {
     });
 
     if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error(`Grocery list with ID ${id} not found.`);
+      }
       throw new Error("Failed to delete grocery list.");
     }
   },

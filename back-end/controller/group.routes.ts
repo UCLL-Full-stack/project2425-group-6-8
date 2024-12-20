@@ -65,9 +65,6 @@
  *     ItemInput:
  *       type: object
  *       properties:
- *         id:
- *           type: integer
- *           description: The unique ID of the item.
  *         name:
  *           type: string
  *           description: The name of the item.
@@ -92,12 +89,13 @@
  *           type: number
  *           format: integer
  *           description: The quantity of the item (optional).
+ *         isCompleted:
+ *           type: boolean
+ *           format: boolean
+ *           description: The state of an item, completed or not
  *     GroceryListInput:
  *       type: object
  *       properties:
- *         id:
- *           type: integer
- *           description: The unique ID of the grocery list.
  *         name:
  *           type: string
  *           description: The name of the grocery list.
@@ -109,9 +107,6 @@
  *     ScheduleInput:
  *       type: object
  *       properties:
- *         id:
- *           type: integer
- *           description: The unique ID of the schedule.
  *         name:
  *           type: string
  *           description: The name of the schedule.
@@ -126,9 +121,6 @@
  *     MessageInput:
  *       type: object
  *       properties:
- *         id:
- *           type: integer
- *           description: The unique ID of the message.
  *         user:
  *           $ref: '#/components/schemas/UserInput'
  *         timestamp:
@@ -228,8 +220,7 @@ groupRouter.get('/', async (req: Request, res: Response, next: NextFunction) => 
         const result = await groupService.getAllGroups();
         res.status(200).json(result);
     } catch (error) {
-        console.error("GET /groups - Error:", error); // Log error
-        next(error);
+        console.error("GET /groups - Error:", error); 
     }
 });
 
@@ -508,6 +499,79 @@ groupRouter.delete('/:id/users', async (req: Request, res: Response, next: NextF
             res.status(200).json(result);
         } else {
             res.status(404).json({ message: 'Group or user not found.' });
+        }
+    } catch (error) {
+        next(error);
+    }
+});
+
+
+
+/**
+ * @swagger
+ * /groups/{id}:
+ *   delete:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Delete a group by its ID.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: The ID of the group to delete.
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Group successfully deleted.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Group successfully deleted"
+ *       400:
+ *         description: Invalid group ID.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid group ID"
+ *       404:
+ *         description: Group not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Group with ID {groupId} does not exist"
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to delete the group"
+ */
+
+groupRouter.delete('/:id', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+        const id = parseInt(req.params.id, 10);
+        const result = await groupService.deleteGroup(id);
+        if (result) {
+            res.status(200).json(result);
+        } else {
+            res.status(404).json({ message: 'Group not found' });
         }
     } catch (error) {
         next(error);

@@ -20,6 +20,7 @@ export type Item = {
     price: number;
     weight?: number;
     quantity?: number;
+    isCompleted: boolean;
 };
 
 export type GroceryList = {

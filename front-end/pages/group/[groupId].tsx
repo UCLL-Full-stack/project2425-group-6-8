@@ -25,7 +25,7 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   };
 };
 
-const groupchat: React.FC = () => {
+const Groupchat: React.FC = () => {
   const router = useRouter();
   const [groupId, setGroupId] = useState<number | null>(null);
   const [groupchat, setGroupchat] = useState<any>(null);
@@ -37,7 +37,7 @@ const groupchat: React.FC = () => {
   const [isSliderOpen, setIsSliderOpen] = useState<boolean>(false);
   const [isGroceryListOpen, setIsGroceryListOpen] = useState<boolean>(false);
   const [leaveConfirmation, setLeaveConfirmation] = useState(false);
-
+  const [groceryLists, setGroceryLists] = useState<any[]>([]);
   const [kickConfirmation, setKickConfirmation] = useState<{
     isOpen: boolean;
     userNickname: string | null;
@@ -139,6 +139,22 @@ const groupchat: React.FC = () => {
     }
   };
 
+const handleDeleteGroup = async () => {
+  if (!groupId) return;
+
+  const confirmDelete = window.confirm("Are you sure you want to delete this group?");
+  if (confirmDelete) {
+    try {
+      await GroupService.deleteGroup(groupId);
+      router.push("/group");
+    } catch (err) {
+      console.error(err);
+      setError("Failed to delete group.");
+    }
+  }
+};
+
+
   if (loading) return <div>{t("general.loading")}</div>;
   if (error) return <div>{error}</div>;
 
@@ -228,9 +244,17 @@ const groupchat: React.FC = () => {
             onClick={() => setIsGroceryListOpen(true)}
             className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-600"
           >
-            {t("group.viewGroceryList.button")}
+            View Grocery List
+          </button>
+          
+          <button
+            onClick={handleDeleteGroup}
+            className="bg-red-700 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-800"
+          >
+            Delete Group
           </button>
         </div>
+        
         {/* Sidebar for users */}
         <div
           className={`fixed top-0 left-0 h-full w-64 bg-gray-100 shadow-lg transform ${
@@ -305,7 +329,13 @@ const groupchat: React.FC = () => {
             {t("group.id")}: {groupchat?.id || t("group.details.noId")}
           </h4>
           {isModalOpen && (
-            <CreateGroceryListModal groupId={Number(groupId)} onClose={handleCloseModal} />
+            <CreateGroceryListModal
+              groupId={Number(groupId)}
+              onClose={handleCloseModal}
+              onGroceryListCreated={(newGroceryList) =>
+                setGroceryLists((prev) => [...prev, newGroceryList])
+              }
+            />
           )}
           <div className="">
             <MessageList groupId={Number(groupId)} messages={messages} />
@@ -320,4 +350,4 @@ const groupchat: React.FC = () => {
   );
 };
 
-export default groupchat;
+export default Groupchat;

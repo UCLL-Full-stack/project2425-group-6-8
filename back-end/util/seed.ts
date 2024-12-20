@@ -50,33 +50,31 @@ const main = async () => {
   });
   console.log('Users seeded with hashed passwords.');
 
-  // Fetch all users
   const users = await prisma.user.findMany();
 
-  // Seed Groups
   const groupsData = [
     {
       id: 10,
       name: 'Household Family',
       userGroups: [
-        { userId: users[0]?.id, role: 'GroupAdmin' }, // Assign Dagobert as admin
-        { userId: users[1]?.id, role: 'user' },       // Assign Donald as a user
+        { userId: users[0]?.id, role: 'GroupAdmin' }, 
+        { userId: users[1]?.id, role: 'user' },      
       ],
     },
     {
       id: 11,
       name: 'Camping Crew',
       userGroups: [
-        { userId: users[2]?.id, role: 'GroupAdmin' }, // Assign Daisy as admin
-        { userId: users[3]?.id, role: 'user' },       // Assign Huey as a user
+        { userId: users[2]?.id, role: 'GroupAdmin' },
+        { userId: users[3]?.id, role: 'user' },     
       ],
     },
     {
       id: 12,
       name: 'Office Snacks Team',
       userGroups: [
-        { userId: users[1]?.id, role: 'GroupAdmin' }, // Assign Donald as admin
-        { userId: users[2]?.id, role: 'user' },       // Assign Daisy as a user
+        { userId: users[1]?.id, role: 'GroupAdmin' }, 
+        { userId: users[2]?.id, role: 'user' },      
       ],
     },
   ];
@@ -95,15 +93,16 @@ const main = async () => {
   console.log('Groups seeded.');
 
   // Seed Items
-  const itemsData = [
-    { name: 'Peanut Butter', description: 'Crunchy peanut butter', consumableType: 'FOOD', price: 2.99, weight: 200, quantity: 1 },
-    { name: 'Bread', description: 'Whole grain bread', consumableType: 'FOOD', price: 1.99, quantity: 16 },
-    { name: 'Tomatoes', description: 'Fresh tomatoes', consumableType: 'FOOD', price: 3.49, weight: 500, quantity: 10 },
-    { name: 'Milk', description: 'Organic whole milk', consumableType: 'DRINK', price: 4.49, weight: 1000, quantity: 2 },
-    { name: 'Chicken', description: 'Fresh chicken breast', consumableType: 'FOOD', price: 8.99, weight: 500 },
-    { name: 'Apples', description: 'Red apples', consumableType: 'FOOD', price: 2.79, weight: 1000, quantity: 6 },
-    { name: 'Rice', description: 'Long grain rice', consumableType: 'FOOD', price: 5.99, weight: 2000, quantity: 1 },
-  ];
+const itemsData = [
+  { name: 'Peanut Butter', description: 'Crunchy peanut butter', consumableType: 'FOOD', price: 2.99, weight: 200, quantity: 1, isCompleted: false },
+  { name: 'Bread', description: 'Whole grain bread', consumableType: 'FOOD', price: 1.99, quantity: 16, isCompleted: true },
+  { name: 'Tomatoes', description: 'Fresh tomatoes', consumableType: 'FOOD', price: 3.49, weight: 500, quantity: 10, isCompleted: true },
+  { name: 'Milk', description: 'Organic whole milk', consumableType: 'DRINK', price: 4.49, weight: 1000, quantity: 2, isCompleted: true },
+  { name: 'Chicken', description: 'Fresh chicken breast', consumableType: 'FOOD', price: 8.99, weight: 500, isCompleted: false },
+  { name: 'Apples', description: 'Red apples', consumableType: 'FOOD', price: 2.79, weight: 1000, quantity: 6, isCompleted: true },
+  { name: 'Rice', description: 'Long grain rice', consumableType: 'FOOD', price: 5.99, weight: 2000, quantity: 1, isCompleted: false },
+];
+
 
   await prisma.item.createMany({
     data: itemsData,

@@ -70,6 +70,17 @@ const removeUserFromGroup = async (groupId: number, userId: number): Promise<Gro
     return await groupDb.removeUserFromGroup(groupId, userId);
 };
 
+const deleteGroup = async (groupId: number): Promise<Group | undefined> => {
+    console.log("THIS IS THE GROUP ID: " + groupId);  
+    if (!groupId || groupId <= 0) throw new Error('Invalid group ID');
+
+    const group = await groupDb.getGroupById(groupId);
+    if (!group) throw new Error(`Group with ID ${groupId} does not exist`);
+
+    return await groupDb.deleteGroup(groupId);
+};
+
+
 export default {
     createGroup,
     getGroupById,
@@ -77,4 +88,5 @@ export default {
     getGroupsOfUser,
     addUserToGroup,
     removeUserFromGroup,
+    deleteGroup
 };

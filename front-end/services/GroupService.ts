@@ -1,8 +1,8 @@
 const createGroup = async (name: string, users: string[]) => {
   const loggedInUserData = (() => {
     if (typeof localStorage === "undefined") {
-        console.warn("localStorage is not defined.");
-        return null;
+      console.warn("localStorage is not defined.");
+      return null;
     }
     const item = localStorage.getItem("loggedInUser");
     return item ? JSON.parse(item) : null;
@@ -18,7 +18,7 @@ const createGroup = async (name: string, users: string[]) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${loggedInUserData.token}`
+        Authorization: `Bearer ${loggedInUserData?.token}`,
       },
       body: JSON.stringify(groupData),
     });
@@ -38,8 +38,8 @@ const createGroup = async (name: string, users: string[]) => {
 const getAllGroups = async () => {
   const loggedInUserData = (() => {
     if (typeof localStorage === "undefined") {
-        console.warn("localStorage is not defined.");
-        return null;
+      console.warn("localStorage is not defined.");
+      return null;
     }
     const item = localStorage.getItem("loggedInUser");
     return item ? JSON.parse(item) : null;
@@ -49,51 +49,51 @@ const getAllGroups = async () => {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${loggedInUserData.token}`
+      Authorization: `Bearer ${loggedInUserData?.token}`,
     },
   });
-}
+};
 
 const getGroupsOfUser = async (userId: number) => {
   const loggedInUserData = (() => {
     if (typeof localStorage === "undefined") {
-        console.warn("localStorage is not defined.");
-        return null;
+      console.warn("localStorage is not defined.");
+      return null;
     }
     const item = localStorage.getItem("loggedInUser");
     return item ? JSON.parse(item) : null;
   })();
-  
+
   return fetch(process.env.NEXT_PUBLIC_API_URL + `/groups/${userId}/users`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${loggedInUserData.token}`
+      Authorization: `Bearer ${loggedInUserData?.token}`,
     },
   });
-}
+};
 
-const addUserToExistingGroup = async (groupId: number,userId: number) => {
+const addUserToExistingGroup = async (groupId: number, userId: number) => {
   const loggedInUserData = (() => {
     if (typeof localStorage === "undefined") {
-        console.warn("localStorage is not defined.");
-        return null;
+      console.warn("localStorage is not defined.");
+      return null;
     }
     const item = localStorage.getItem("loggedInUser");
     return item ? JSON.parse(item) : null;
   })();
-  
+
   return fetch(process.env.NEXT_PUBLIC_API_URL + `/groups/${groupId}/users`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${loggedInUserData.token}`
+      Authorization: `Bearer ${loggedInUserData?.token}`,
     },
-    body:JSON.stringify({
-      userId, 
+    body: JSON.stringify({
+      userId,
     }),
   });
-}
+};
 
 const removeUserFromExistingGroup = async (groupId: number, userId: number) => {
   const loggedInUserData = (() => {
@@ -117,13 +117,11 @@ const removeUserFromExistingGroup = async (groupId: number, userId: number) => {
   });
 };
 
-
-
 const getGroupById = async (groupId: number) => {
   const loggedInUserData = (() => {
     if (typeof localStorage === "undefined") {
-        console.warn("localStorage is not defined.");
-        return null;
+      console.warn("localStorage is not defined.");
+      return null;
     }
     const item = localStorage.getItem("loggedInUser");
     return item ? JSON.parse(item) : null;
@@ -134,21 +132,52 @@ const getGroupById = async (groupId: number) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${loggedInUserData.token}`
+        Authorization: `Bearer ${loggedInUserData?.token}`,
       },
     });
 
-    if(!response.ok) {
+    if (!response.ok) {
       throw new Error(`Error: ${response.statusText}`);
     }
 
     const foundGroup = await response.json();
     return foundGroup;
-  } catch (error){
-    console.error("Failed to create group:", error);
+  } catch (error) {
+    console.error("Failed to fetch group:", error);
     throw error;
   }
-}
+};
+
+const deleteGroup = async (groupId: number) => {
+  const loggedInUserData = (() => {
+    if (typeof localStorage === "undefined") {
+      console.warn("localStorage is not defined.");
+      return null;
+    }
+    const item = localStorage.getItem("loggedInUser");
+    return item ? JSON.parse(item) : null;
+  })();
+
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/groups/${groupId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${loggedInUserData?.token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Failed to delete group:", error);
+    throw error;
+  }
+};
 
 const GroupService = {
   createGroup,
@@ -156,8 +185,8 @@ const GroupService = {
   getGroupsOfUser,
   addUserToExistingGroup,
   getGroupById,
-  removeUserFromExistingGroup
-}
-  
+  removeUserFromExistingGroup,
+  deleteGroup, 
+};
+
 export default GroupService;
-  

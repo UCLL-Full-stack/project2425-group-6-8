@@ -3,14 +3,14 @@ import { ItemInput } from '../types';
 import { Item } from '../model/item';
 
 const createItem = async (itemInput: ItemInput): Promise<Item> => {
-    const { name, description, consumableType, price, weight, quantity } = itemInput;
+    const { name, description, consumableType, price, weight, quantity, isCompleted } = itemInput;
 
     if (!name?.trim()) throw new Error('Item name is required.');
     if (!description?.trim()) throw new Error('Item description is required.');
     if (!consumableType) throw new Error('Consumable type is required.');
     if (price === undefined || price < 0) throw new Error('Item price must be positive.');
 
-    const item = new Item({ name, description, consumableType, price, weight, quantity });
+    const item = new Item({ name, description, consumableType, price, weight, quantity,isCompleted });
     return await itemDb.createItem(item);
 };
 
@@ -29,7 +29,7 @@ const deleteItem = async (id: number): Promise<boolean> => {
 };
 
 const updateItem = async (id: number, itemInput: ItemInput): Promise<Item | null> => {
-    const { name, description, consumableType, price, weight, quantity } = itemInput;
+    const { name, description, consumableType, price, weight, quantity, isCompleted } = itemInput;
 
     if (!id || id <= 0) throw new Error('Invalid ID.');
     if (!name?.trim()) throw new Error('Item name is required.');
@@ -37,7 +37,7 @@ const updateItem = async (id: number, itemInput: ItemInput): Promise<Item | null
     if (!consumableType) throw new Error('Consumable type is required.');
     if (price === undefined || price < 0) throw new Error('Item price must be positive.');
 
-    const updatedItem = new Item({ id, name, description, consumableType, price, weight, quantity });
+    const updatedItem = new Item({ id, name, description, consumableType, price, weight, quantity, isCompleted });
     return await itemDb.updateItem(id, updatedItem);
 };
 
