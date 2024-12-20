@@ -171,7 +171,7 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
                     onClick={() => handleAddItem(groceryList.id)}
                     className="px-4 py-2 bg-blue-500 text-white rounded-lg"
                   >
-                    Add Item
+                    {t("grocerylist.addItem")}
                   </button>
                 )}
                 {editMode && (
@@ -179,20 +179,20 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
                     onClick={() => handleSaveChanges(groceryList.id, groceryList.name)}
                     className="px-4 py-2 bg-green-500 text-white rounded-lg"
                   >
-                    Save Changes
+                    {t("grocerylist.saveChanges")}
                   </button>
                 )}
                 <button
                   onClick={() => handleDeleteGroceryList(groceryList.id)}
                   className="px-4 py-2 bg-red-500 text-white rounded-lg"
                 >
-                  Delete
+                  {t("grocerylist.delete")}
                 </button>
                 <button
                   onClick={() => setEditMode((prev) => !prev)}
                   className="px-4 py-2 bg-yellow-500 text-white rounded-lg"
                 >
-                  {editMode ? "Cancel" : "Edit"}
+                  {editMode ? t("grocerylist.cancel") : t("grocerylist.edit")}
                 </button>
               </div>
             </div>
@@ -233,7 +233,7 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
                       }}
                       className="px-2 py-1 bg-red-500 text-white rounded-lg mt-2 w-full"
                     >
-                      Delete
+                      {t("grocerylist.delete")}
                     </button>
                   )}
                 </div>
@@ -242,7 +242,7 @@ const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
           </div>
         ))
       ) : (
-        <p>No grocery lists in this group.</p>
+        <p>{t("grocerylist.empty")}</p>
       )}
     </div>
 
