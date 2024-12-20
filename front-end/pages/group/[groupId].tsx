@@ -198,7 +198,7 @@ const groupchat: React.FC = () => {
           </div>
         )}
 
-<div className="absolute top-4 right-4 flex flex-col space-y-4">
+<div className="absolute top-1 right-4 flex flex-col space-y-4">
           <button
             onClick={() => setLeaveConfirmation(true)}
             className="bg-red-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-600"
@@ -211,15 +211,15 @@ const groupchat: React.FC = () => {
           >
             View Users
           </button>
-        </div>
 
-        <button
+          <button
           onClick={() => setIsGroceryListOpen(true)}
-          className="absolute top-4 right-24 bg-green-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-600"
+          className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-600"
         >
           View Grocery List
         </button>
-
+        
+        </div>
         {/* Sidebar for users */}
         <div
           className={`fixed top-0 left-0 h-full w-64 bg-gray-100 shadow-lg transform ${
