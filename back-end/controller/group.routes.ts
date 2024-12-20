@@ -65,9 +65,6 @@
  *     ItemInput:
  *       type: object
  *       properties:
- *         id:
- *           type: integer
- *           description: The unique ID of the item.
  *         name:
  *           type: string
  *           description: The name of the item.
@@ -92,12 +89,13 @@
  *           type: number
  *           format: integer
  *           description: The quantity of the item (optional).
+ *         isCompleted:
+ *           type: boolean
+ *           format: boolean
+ *           description: The state of an item, completed or not
  *     GroceryListInput:
  *       type: object
  *       properties:
- *         id:
- *           type: integer
- *           description: The unique ID of the grocery list.
  *         name:
  *           type: string
  *           description: The name of the grocery list.
@@ -109,9 +107,6 @@
  *     ScheduleInput:
  *       type: object
  *       properties:
- *         id:
- *           type: integer
- *           description: The unique ID of the schedule.
  *         name:
  *           type: string
  *           description: The name of the schedule.
@@ -126,9 +121,6 @@
  *     MessageInput:
  *       type: object
  *       properties:
- *         id:
- *           type: integer
- *           description: The unique ID of the message.
  *         user:
  *           $ref: '#/components/schemas/UserInput'
  *         timestamp:

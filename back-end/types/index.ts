@@ -18,6 +18,7 @@ type ItemInput = {
     price: number;
     weight?: number;
     quantity?: number;
+    isCompleted: boolean;
 };
 
 type UserInput = {

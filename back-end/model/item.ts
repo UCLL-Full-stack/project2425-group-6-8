@@ -9,6 +9,7 @@
         private price: number; 
         private weight?: number | null;  
         private quantity?: number | null;  
+        private isCompleted: boolean; 
 
         constructor(item: { 
             id?: number; 
@@ -17,7 +18,8 @@
             consumableType: ConsumableType; 
             price: number;  
             weight?: number | null;  
-            quantity?: number | null;  
+            quantity?: number | null;
+            isCompleted: boolean;
         }) {
             this.validate(item);
             this.id = item.id;
@@ -27,6 +29,7 @@
             this.price = item.price;
             this.weight = item.weight;
             this.quantity = item.quantity;
+            this.isCompleted = item.isCompleted
         }
 
         getId(): number | undefined {
@@ -90,6 +93,14 @@
             this.quantity = quantity;
         }
 
+        getIsCompleted(): boolean {
+        return this.isCompleted;
+        }
+
+        setIsCompleted(isCompleted: boolean): void {
+            this.isCompleted = isCompleted;
+        }
+
         validate(item: { 
             name: string; 
             description: string; 
@@ -97,6 +108,7 @@
             price: number;  
             weight?: number | null;  
             quantity?: number | null;
+            isCompleted: boolean;
         }): void {
             if (!item.name?.trim()) {
                 throw new Error('Item name is required.');
@@ -109,7 +121,7 @@
             }
         }   
 
-        static from({ id, name, description, consumableType, price, weight, quantity }: ItemPrisma): Item {
+        static from({ id, name, description, consumableType, price, weight, quantity, isCompleted }: ItemPrisma): Item {
             return new Item({
                 id,
                 name,
@@ -118,6 +130,7 @@
                 price,
                 weight,
                 quantity,
+                isCompleted,
             });
         }
     }

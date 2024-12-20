@@ -8,7 +8,8 @@ Item.from = function ({
     name,
     description,
     consumableType,
-    price
+    price,
+    isCompleted
 }: ItemPrisma): Item {
     const consumableTypeEnum = consumableType as ConsumableType;
     return new Item({
@@ -16,7 +17,8 @@ Item.from = function ({
         name,
         description,
         consumableType: consumableTypeEnum,
-        price
+        price,
+        isCompleted
     });
 };
 //omd broooooo
