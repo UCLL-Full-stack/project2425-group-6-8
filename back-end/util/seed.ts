@@ -148,10 +148,10 @@ const main = async () => {
   const messagesData = [
     { message: 'Can someone buy bread?', userId: users[1].id, groupId: groupsData[0].id },
     { message: 'I got some milk today', userId: users[2].id, groupId: groupsData[0].id },
-    { message: 'Let’s buy tomatoes for the camping trip', userId: users[3].id, groupId: groupsData[1].id },
+    { message: 'Man you guys dont buy those items by the week you can make dinner yourself', userId: users[3].id, groupId: groupsData[1].id },
     { message: 'Should we get some chicken for the weekend?', userId: users[0].id, groupId: groupsData[0].id },
-    { message: 'I’ll bring the eggs tomorrow', userId: users[1].id, groupId: groupsData[2].id },
-    { message: 'Just bought some oranges for breakfast', userId: users[2].id, groupId: groupsData[2].id },
+    { message: 'I’ll bring the eggs tomorrow, long day at work christmas troubles you feel me', userId: users[1].id, groupId: groupsData[2].id },
+    { message: 'Just bought some oranges for breakfast, oranges were crazy big, might sell sum orange juice', userId: users[2].id, groupId: groupsData[2].id },
   ];
 
   for (const message of messagesData) {
