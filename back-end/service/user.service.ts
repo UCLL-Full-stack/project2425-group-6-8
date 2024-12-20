@@ -1,4 +1,4 @@
-import { UserInput, AuthenticationResponse } from '../types';
+import { UserInput, AuthenticationResponse, Role } from '../types';
 import { User } from '../model/user';
 import userDB from '../repository/user.db';
 import bcrypt from 'bcrypt';
@@ -23,6 +23,7 @@ const createUser = async (userInput: {
     nickname: string;
     email?: string;
     password: string;
+    globalRole?: Role;
 }): Promise<User> => {
     const { name, nickname, email, password } = userInput;
 
@@ -38,6 +39,7 @@ const createUser = async (userInput: {
         nickname,
         email,
         password: hashedPassword,
+        globalRole: 'user',
     });
 
     return newUser;
@@ -69,6 +71,7 @@ const authenticate = async ({ nickname, password }: UserInput): Promise<Authenti
         nickname: nickname,
         name: `${user.getName()}`,
         role,
+        globalRole: user.getRole()
     };
 };
 

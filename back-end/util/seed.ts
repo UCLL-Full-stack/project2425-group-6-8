@@ -1,140 +1,135 @@
+import bcrypt from 'bcrypt';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
+const SALT_ROUNDS = 10;
 
 const main = async () => {
-  // Users
- const main = async () => {
-  // Users
-  const users = await prisma.user.createMany({
-    data: [
-      { name: 'Dagobert Duck', email: 'dagoduck@duckberg.com', nickname: 'Wise Old Geezer', password: 'PassWordOfDagobert123', role: 'ApplicationAdmin' },
-      { name: 'Donald Duck', email: 'donald@gmail.com', nickname: 'SuperDonaldd', password: 'PassWordOfDonald123', role: 'user' },
-      { name: 'Daisy Duck', email: 'daisy@duckberg.com', nickname: 'Dazzling Daisy', password: 'PassWordOfDaisy123', role: 'user' },
-      { name: 'Huey Duck', email: 'huey@duckberg.com', nickname: 'Bright Huey', password: 'PassWordOfHuey123', role: 'user' },
-    ],
+  // Seed Users
+  const usersData = [
+    {
+      name: 'Dagobert Duck',
+      email: 'dagoduck@duckberg.com',
+      nickname: 'Wise Old Geezer',
+      password: 'PassWordOfDagobert123',
+      globalRole: 'ApplicationAdmin',
+    },
+    {
+      name: 'Donald Duck',
+      email: 'donald@gmail.com',
+      nickname: 'SuperDonaldd',
+      password: 'PassWordOfDonald123',
+      globalRole: 'user',
+    },
+    {
+      name: 'Daisy Duck',
+      email: 'daisy@duckberg.com',
+      nickname: 'Dazzling Daisy',
+      password: 'PassWordOfDaisy123',
+      globalRole: 'user',
+    },
+    {
+      name: 'Huey Duck',
+      email: 'huey@duckberg.com',
+      nickname: 'Bright Huey',
+      password: 'PassWordOfHuey123',
+      globalRole: 'user',
+    },
+  ];
+
+  const hashedUsersData = await Promise.all(
+    usersData.map(async (user) => ({
+      ...user,
+      password: await bcrypt.hash(user.password, SALT_ROUNDS),
+    }))
+  );
+
+  await prisma.user.createMany({
+    data: hashedUsersData,
     skipDuplicates: true,
   });
-
-  console.log('Users seeded:', users.count);
+  console.log('Users seeded with hashed passwords.');
 
   // Fetch all users
-  const usersList = await prisma.user.findMany();
+  const users = await prisma.user.findMany();
 
-  // Groups with Users
-  await prisma.group.create({
-    data: {
+  // Seed Groups
+  const groupsData = [
+    {
       id: 10,
       name: 'Household Family',
-      users: { connect: [{ id: usersList[0]?.id }, { id: usersList[1]?.id }] }, // Assign Dagobert and Donald
+      userGroups: [
+        { userId: users[0]?.id, role: 'GroupAdmin' }, // Assign Dagobert as admin
+        { userId: users[1]?.id, role: 'user' },       // Assign Donald as a user
+      ],
     },
-  });
-
-  await prisma.group.create({
-    data: {
+    {
       id: 11,
       name: 'Camping Crew',
-      users: { connect: [{ id: usersList[2]?.id }, { id: usersList[3]?.id }] }, // Assign Daisy and Huey
+      userGroups: [
+        { userId: users[2]?.id, role: 'GroupAdmin' }, // Assign Daisy as admin
+        { userId: users[3]?.id, role: 'user' },       // Assign Huey as a user
+      ],
     },
-  });
-
-  await prisma.group.create({
-    data: {
+    {
       id: 12,
       name: 'Office Snacks Team',
-      users: { connect: [{ id: usersList[1]?.id }, { id: usersList[2]?.id }] },
+      userGroups: [
+        { userId: users[1]?.id, role: 'GroupAdmin' }, // Assign Donald as admin
+        { userId: users[2]?.id, role: 'user' },       // Assign Daisy as a user
+      ],
     },
-  });
+  ];
 
-  console.log('Groups with users seeded');
+  for (const group of groupsData) {
+    await prisma.group.create({
+      data: {
+        id: group.id,
+        name: group.name,
+        userGroups: {
+          create: group.userGroups,
+        },
+      },
+    });
+  }
+  console.log('Groups seeded.');
 
-  // Messages
-  await prisma.message.create({
-    data: {
-      message: 'Hello everyone!',
-      timestamp: new Date(),
-      user: { connect: { id: usersList[0]?.id } },
-      group: { connect: { id: 10 } },
-    },
-  });
+  // Seed Items
+  const itemsData = [
+    { name: 'Peanut Butter', description: 'Crunchy peanut butter', consumableType: 'FOOD', price: 2.99, weight: 200, quantity: 1 },
+    { name: 'Bread', description: 'Whole grain bread', consumableType: 'FOOD', price: 1.99, quantity: 16 },
+    { name: 'Tomatoes', description: 'Fresh tomatoes', consumableType: 'FOOD', price: 3.49, weight: 500, quantity: 10 },
+    { name: 'Milk', description: 'Organic whole milk', consumableType: 'DRINK', price: 4.49, weight: 1000, quantity: 2 },
+    { name: 'Chicken', description: 'Fresh chicken breast', consumableType: 'FOOD', price: 8.99, weight: 500 },
+    { name: 'Apples', description: 'Red apples', consumableType: 'FOOD', price: 2.79, weight: 1000, quantity: 6 },
+    { name: 'Rice', description: 'Long grain rice', consumableType: 'FOOD', price: 5.99, weight: 2000, quantity: 1 },
+  ];
 
-  await prisma.message.create({
-    data: {
-      message: 'Remember the tomatoes!',
-      timestamp: new Date(),
-      user: { connect: { id: usersList[1]?.id } },
-      group: { connect: { id: 12 } },
-    },
-  });
-
-  console.log('Messages seeded');
-};
-
-
-  // Items
-  const items = await prisma.item.createMany({
-    data: [
-      { name: 'Peanut Butter', description: 'Crunchy peanut butter', consumableType: 'FOOD', price: 2.99, weight: 200, quantity: 1 },
-      { name: 'Bread', description: 'Whole grain bread', consumableType: 'FOOD', price: 1.99, quantity: 16 },
-      { name: 'Tomatoes', description: 'Fresh tomatoes', consumableType: 'FOOD', price: 3.49, weight: 500, quantity: 10 },
-      { name: 'Milk', description: 'Organic whole milk', consumableType: 'DRINK', price: 4.49, weight: 1000, quantity: 2 },
-      { name: 'Chicken', description: 'Fresh chicken breast', consumableType: 'FOOD', price: 8.99, weight: 500 },
-      { name: 'Apples', description: 'Red apples', consumableType: 'FOOD', price: 2.79, weight: 1000, quantity: 6 },
-      { name: 'Rice', description: 'Long grain rice', consumableType: 'FOOD', price: 5.99, weight: 2000, quantity: 1 },
-    ],
+  await prisma.item.createMany({
+    data: itemsData,
     skipDuplicates: true,
   });
+  console.log('Items seeded.');
 
-  console.log('Items seeded:', items.count);
-
-  // Grocery Lists
-  const groceryLists = await prisma.groceryList.createMany({
+  // Seed Messages
+  const groups = await prisma.group.findMany();
+  await prisma.message.createMany({
     data: [
-      { name: 'Weekly Groceries' },
-      { name: 'Party Supplies' },
-      { name: 'Camping Essentials' },
-      { name: 'Holiday Feast' },
+      {
+        message: 'Hello everyone!',
+        timestamp: new Date(),
+        userId: users[0]?.id,
+        groupId: groups.find((g) => g.name === 'Household Family')?.id as number,
+      },
+      {
+        message: 'Remember the tomatoes!',
+        timestamp: new Date(),
+        userId: users[1]?.id,
+        groupId: groups.find((g) => g.name === 'Household Family')?.id as number,
+      },
     ],
-    skipDuplicates: true,
   });
-
-  console.log('Grocery lists seeded:', groceryLists.count);
-
-  // Groups
-  const groups = await prisma.group.createMany({
-    data: [
-      { id: 1001, name: 'Household Family',  },
-      { id: 1002, name: 'Camping Crew' },
-      { id: 1003, name: 'Office Snacks Team' },
-    ],
-    skipDuplicates: true,
-  });
-
-  console.log('Groups seeded:', groups.count);
-
-  // Fetch all users and groups
-const usersList = await prisma.user.findMany();
-const groupsList = await prisma.group.findMany();
-
-  // Messages
-  await prisma.message.create({
-    data: {
-      message: 'Hello everyone!',
-      timestamp: new Date(),
-      user: { connect: { id: usersList[0]?.id } }, // Connect first user
-      group: { connect: { id: groupsList.find(g => g.name === 'Household Family')?.id } }, // Connect group
-    },
-  });
-  await prisma.message.create({
-    data: {
-      message: 'Remember the tomatoes!',
-      timestamp: new Date(),
-      user: { connect: { id: usersList[1]?.id } }, // Connect second user
-      group: { connect: { id: groupsList.find(g => g.name === 'Household Family')?.id } }, // Connect group
-    },
-  });
-
-  console.log('Database has been seeded with sample data!');
+  console.log('Messages seeded.');
 };
 
 (async () => {

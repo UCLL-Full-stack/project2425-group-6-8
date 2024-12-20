@@ -64,6 +64,7 @@ type AuthenticationResponse = {
     nickname: string;
     name: string;
     role: string;
+    globalRole: string;
 };
 
 export {

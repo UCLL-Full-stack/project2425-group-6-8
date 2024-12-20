@@ -12,7 +12,7 @@ const Header: React.FC<{ className?: string }> = ({ className }) => {
       const item = localStorage.getItem("loggedInUser");
       return item ? JSON.parse(item) : null;
     })();
-    const userDataToShow = loggedInUserData ? { name: loggedInUserData.name, role: loggedInUserData.role } : null;
+    const userDataToShow = loggedInUserData ? { name: loggedInUserData.name, role: loggedInUserData.globalRole } : null;
     setLoggedInUser(userDataToShow?.name);
   }, []);
 

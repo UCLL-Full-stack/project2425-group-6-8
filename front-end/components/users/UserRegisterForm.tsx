@@ -103,11 +103,11 @@ const UserRegisterForm: React.FC = () => {
             
             if(response2.ok)
             {
-              const { id, nickname, name, role, token } = loginData;
+              const { id, nickname, name, globalRole, token } = loginData;
 
               localStorage.setItem(
                   "loggedInUser",
-                  JSON.stringify({ id, nickname, name, role, token })
+                  JSON.stringify({ id, nickname, name, globalRole, token })
               );
             }
         } catch (error) {
