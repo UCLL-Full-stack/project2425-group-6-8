@@ -119,6 +119,7 @@
             if (item.price < 0) {
                 throw new Error('Price must be greater than or equal to 0.');
             }
+            
         }   
 
         static from({ id, name, description, consumableType, price, weight, quantity, isCompleted }: ItemPrisma): Item {

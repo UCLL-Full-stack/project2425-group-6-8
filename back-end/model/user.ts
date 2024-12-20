@@ -82,26 +82,28 @@ export class User {
         this.globalRole = globalRole;
     }
 
-    validate(user: { name?: string; email?: string; nickname: string; password: string, globalRole: Role; }): void {
-        if (!user.name?.trim()) {
-            throw new Error('Name is required');
-        }
-        if (!user.email?.trim()) {
-            throw new Error('Email is required');
-        }
-        if (!this.isValidEmail(user.email)) {
-            throw new Error('Email is not valid');
-        }
-        if (!user.nickname?.trim()) {
-            throw new Error('Nickname is required');
-        }
-        if (!user.password?.trim()) {
-            throw new Error('Password is required');
-        }
-        if (!user.globalRole) {
-            throw new Error('Role is required');
-        }
+   validate(user: { name?: string; email?: string; nickname: string; password: string, globalRole: Role; }): void {
+    // Check required fields first
+    if (!user.nickname?.trim()) {
+        throw new Error('Nickname is required');
     }
+    if (!user.password?.trim()) {
+        throw new Error('Password is required');
+    }
+    if (!user.email?.trim()) {
+        throw new Error('Email is required');
+    }
+    if (!this.isValidEmail(user.email)) {
+        throw new Error('Email is not valid');
+    }
+    if (!user.globalRole) {
+        throw new Error('Role is required');
+    }
+    if (!user.name?.trim()) {
+        throw new Error('Name is required');
+    }
+}
+
 
     equals(user: User): boolean {
         return (

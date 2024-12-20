@@ -8,11 +8,9 @@ const createGroceryList = async (
     groupId: number,
     
 ): Promise<GroceryList> => {
-    // Log the received value for
     console.log("Received itemIds:", itemIds);
     console.log("Type of itemIds:", typeof itemIds);
 
-    // Check if itemIds is an array
     if (!Array.isArray(itemIds)) {
         throw new Error("itemIds should be an array");
     }
