@@ -4,7 +4,6 @@ import GroceryListService from "../../services/GroceryListService";
 import EditableItem from "../../components/item/ItemForm";
 import AddItemModal from "../../components/item/AddItemModal";
 import ItemService from "../../services/ItemService";
-import { Item } from "../../types";
 
 
 type GroceryListProps = {
@@ -13,12 +12,12 @@ type GroceryListProps = {
 
 const GroceryList: React.FC<GroceryListProps> = ({ groupId }) => {
   const { data: groceryLists, mutate: mutateGroceryLists, error: groceryListError } = useSWR(
-    `/api/groups/${groupId}/groceryLists`,
+    `/groups/${groupId}/groceryLists`,
     () => GroceryListService.getGroceryListsByGroupId(groupId)
   );
 
   const { data: groupItems, error: groupItemsError } = useSWR(
-    `/api/groups/${groupId}/items`,
+    `/groups/${groupId}/items`,
     () => ItemService.getItemsByGroupId(groupId)
   );
 

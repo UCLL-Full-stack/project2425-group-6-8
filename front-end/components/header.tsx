@@ -39,9 +39,7 @@ const Header: React.FC<{ className?: string }> = ({ className }) => {
 
         {loggedInUserRole === "ApplicationAdmin" && (
           <Link
-            href="/users"
-            className="px-4 text-white text-xl hover:bg-gray-600 rounded-lg"
-          >
+            href="/users"  className="px-4 text-white text-xl hover:bg-gray-600 rounded-lg" >
             {t('header.nav.users')}
           </Link>
         )}
