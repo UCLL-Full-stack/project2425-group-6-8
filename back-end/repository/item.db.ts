@@ -78,6 +78,7 @@ const updateItem = async (id: number, updatedItem: Item): Promise<Item | null> =
                 description: updatedItem.getDescription(),
                 consumableType: updatedItem.getConsumableType(),
                 price: updatedItem.getPrice(),
+                isCompleted: updatedItem.getIsCompleted(),
             },
         });
         return Item.from(updatedItemPrisma);

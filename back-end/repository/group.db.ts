@@ -170,6 +170,42 @@ const getGroupsOfUser = async (userId: number): Promise<Group[]> => {
     return groupsForUser.map(Group.from);
 };
 
+
+
+const deleteGroup = async (groupId: number): Promise<Group | undefined> => {
+    const groupPrisma = await database.group.findUnique({
+        where: { id: groupId },
+        include: {
+            userGroups: true,
+            groceryLists: true,
+            schedules: true,
+            messages: true,
+        },
+    });
+
+    if (!groupPrisma) {
+        throw new Error('Group not found');
+    }
+
+    const userGroupsDeletion = groupPrisma.userGroups.length > 0
+        ? database.userGroup.deleteMany({ where: { groupId } })
+        : Promise.resolve(); 
+
+    const groceryListsDeletion = groupPrisma.groceryLists.length > 0
+        ? database.groceryList.deleteMany({ where: { groupId } })
+        : Promise.resolve(); 
+
+    const messagesDeletion = groupPrisma.messages.length > 0
+        ? database.message.deleteMany({ where: { groupId } })
+        : Promise.resolve();
+
+    await Promise.all([userGroupsDeletion, groceryListsDeletion, messagesDeletion]);
+    await database.group.delete({
+        where: { id: groupId },
+    });
+    return Group.from(groupPrisma);
+};
+
 export default {
     createGroup,
     getGroupById,
@@ -177,4 +213,5 @@ export default {
     addUserToGroup,
     removeUserFromGroup,
     getGroupsOfUser,
+    deleteGroup, 
 };

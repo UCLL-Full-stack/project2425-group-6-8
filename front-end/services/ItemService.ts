@@ -114,6 +114,8 @@ const updateItem = async (id: number | undefined, updatedItem: Item) => {
     body: JSON.stringify(updatedItem),
   });
 
+  console.log("Payload sent to server:", updatedItem);
+
   if (!response.ok) {
     throw new Error(`Failed to update item with ID ${id}`);
   }
