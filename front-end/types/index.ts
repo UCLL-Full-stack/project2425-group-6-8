@@ -9,6 +9,7 @@ export type User = {
     nickname: string;
     password: string;
     role?: Role;
+    globalRole?: Role;
 };
 
 export type Item = {

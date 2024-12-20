@@ -34,6 +34,9 @@
             "noGroups": "No hay grupos"
         }
     },
+    "users": {
+        "title": "Usuarios"
+    },
     "label": { "nickname": "Apodo:", "password": "Contraseña:", "name": "Nombre:", "email": "Correo electrónico:" },
     "header": {
         "welcome": "Bienvenido",
@@ -42,7 +45,8 @@
             "group": "Grupo",
             "login": "Conéctese",
             "logout": "Cerrar sesión",
-            "register": "Registro"
+            "register": "Registro",
+            "users": "Usuarios"
         },
         "description": "Esta es una aplicación de lista de compras compartida que puedes usar con tu familia o amigos."
     }

@@ -36,6 +36,9 @@
             "noGroups": "There are no groups"
         }
     },
+    "users": {
+        "title": "Users"
+    },
     "label": { "nickname": "Nickname:", "password": "Password:", "name": "Name:", "email": "Email:"},
     "header": {
         "welcome": "Welcome",
@@ -44,7 +47,8 @@
             "group": "Group",
             "login": "Login",
             "logout": "Logout",
-            "register": "Register"
+            "register": "Register",
+            "users": "Users"
         },
         "description": "This is a shared Grocery List App you can use with your family or friends."
     }

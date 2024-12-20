@@ -52,6 +52,9 @@ const groupchat: React.FC = () => {
     return item ? JSON.parse(item) : null;
   })();
 
+  const isGroupAdmin = groupchat?.userGroups?.some(
+    (ug: any) => ug.user.id === loggedInUserData?.id && ug.role === "GroupAdmin"
+  );
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 
@@ -143,7 +146,7 @@ const groupchat: React.FC = () => {
         <title>{t("group.title")}</title>
       </Head>
       <Header className="sticky top-0 z-50 bg-white shadow-md" />
-      <div className="group-page flex flex-col relative max-w-5xl mx-auto p-4">
+      <div className="group-page flex flex-col relative max-w-8xl mx-auto p-4">
         {/* Kick Confirmation Modal */}
         {kickConfirmation.isOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -199,7 +202,7 @@ const groupchat: React.FC = () => {
           </div>
         )}
 
-        <div className="absolute top-1 right-4 flex flex-col space-y-4">
+        <div className="absolute top-8 left-7 flex flex-row space-x-3">
           <button
             onClick={() => setLeaveConfirmation(true)}
             className="bg-red-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-600"
@@ -212,6 +215,15 @@ const groupchat: React.FC = () => {
           >
             View Users
           </button>
+
+          {isGroupAdmin &&
+            <button
+              onClick={handleOpenModal}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
+            >
+              Create Grocery List
+            </button>
+          }
 
           <button
           onClick={() => setIsGroceryListOpen(true)}
@@ -240,11 +252,6 @@ const groupchat: React.FC = () => {
             {groupchat?.userGroups && groupchat.userGroups.length > 0 ? (
               <ul>
                 {groupchat.userGroups.map((userGroup: any, index: number) => {
-                  const isCurrentUserAdmin = groupchat.userGroups.some(
-                    (ug: any) =>
-                      ug.user.id === loggedInUserData?.id && ug.role === "GroupAdmin"
-                  );
-
                   return (
                     <li
                       key={userGroup.user.id || index}
@@ -254,7 +261,7 @@ const groupchat: React.FC = () => {
                         <span className="font-semibold">{userGroup.user.nickname}</span>
                         <span className="text-gray-500 ml-2">({userGroup.role})</span>
                       </span>
-                      {isCurrentUserAdmin &&
+                      {isGroupAdmin &&
                         loggedInUserData?.id !== userGroup.user.id && (
                           <button
                             onClick={() =>
@@ -300,12 +307,6 @@ const groupchat: React.FC = () => {
           <h4 className="text-l font-semibold text-gray-800 dark:text-black text-center">
             Group Id: {groupchat?.id || "error no id available"}
           </h4>
-          <button
-            onClick={handleOpenModal}
-            className="my-4 px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 max-w-xs w-full"
-          >
-            Create Grocery List
-          </button>
           {isModalOpen && (
             <CreateGroceryListModal groupId={Number(groupId)} onClose={handleCloseModal} />
           )}

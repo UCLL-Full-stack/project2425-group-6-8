@@ -5,6 +5,7 @@ import { useTranslation } from "next-i18next";
 
 const Header: React.FC<{ className?: string }> = ({ className }) => {
   const [loggedInUser, setLoggedInUser] = useState<string | null>(null);
+  const [loggedInUserRole, setLoggedInUserRole] = useState<string | null>(null);
   const { t } = useTranslation("common");
 
   useEffect(() => {
@@ -14,6 +15,7 @@ const Header: React.FC<{ className?: string }> = ({ className }) => {
     })();
     const userDataToShow = loggedInUserData ? { name: loggedInUserData.name, role: loggedInUserData.globalRole } : null;
     setLoggedInUser(userDataToShow?.name);
+    setLoggedInUserRole(userDataToShow?.role);
   }, []);
 
   const handleClick = () => {
@@ -34,6 +36,15 @@ const Header: React.FC<{ className?: string }> = ({ className }) => {
         <Link href="/group" className="px-4 text-white text-xl hover:bg-gray-600 rounded-lg">
           {t('header.nav.group')}
         </Link>
+
+        {loggedInUserRole === "ApplicationAdmin" && (
+          <Link
+            href="/users"
+            className="px-4 text-white text-xl hover:bg-gray-600 rounded-lg"
+          >
+            {t('header.nav.users')}
+          </Link>
+        )}
 
         {!loggedInUser && (
           <Link
